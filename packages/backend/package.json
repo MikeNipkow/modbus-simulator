@@ -1,0 +1,26 @@
+{
+  "name": "@modbus-simulator/backend",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "start": "node dist/src/app.js",
+    "build": "tsc",
+    "test": "node --experimental-vm-modules --no-warnings ../../node_modules/jest/bin/jest.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/express": "^5.0.5",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "jest": "^30.2.0",
+    "ts-jest": "^29.4.5",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "modbus-serial": "^8.0.23"
+  }
+}
