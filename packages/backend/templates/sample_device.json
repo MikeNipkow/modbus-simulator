@@ -1,0 +1,304 @@
+{
+  "id": "sample_device.json",
+  "enabled": true,
+  "port": 502,
+  "endian": "BigEndian",
+  "name": "Sample Device",
+  "vendor": "Sample Vendor",
+  "description": "Sample Description",
+  "units": [
+    {
+      "unitId": 1,
+      "dataPoints": [
+        {
+          "id": "sample_coil_1",
+          "areas": [
+            "Coil"
+          ],
+          "type": "Bool",
+          "address": 0,
+          "accessMode": "RO",
+          "defaultValue": true,
+          "name": "Sample Coil 1",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_coil_2",
+          "areas": [
+            "Coil"
+          ],
+          "type": "Bool",
+          "address": 1,
+          "accessMode": "RW",
+          "defaultValue": true,
+          "name": "Sample Coil 2",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "feedbackDataPoint": "sample_discreteInput_1"
+        },
+        {
+          "id": "sample_discreteInput_1",
+          "areas": [
+            "DiscreteInput"
+          ],
+          "type": "Bool",
+          "address": 0,
+          "accessMode": "RO",
+          "defaultValue": true,
+          "name": "Sample Discrete Input 1",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Byte",
+          "address": 0,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 1",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 10,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 2",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt32",
+          "address": 11,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 3",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_4",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt64",
+          "address": 13,
+          "accessMode": "RW",
+          "defaultValue": "0",
+          "name": "Sample Holding Register 4",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_5",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 17,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 5",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_6",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int32",
+          "address": 18,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 6",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_7",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int64",
+          "address": 20,
+          "accessMode": "RW",
+          "defaultValue": "0",
+          "name": "Sample Holding Register 7",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_8",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 8",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_9",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float64",
+          "address": 26,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 9",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_holdingRegister_10",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "ASCII",
+          "address": 30,
+          "accessMode": "RW",
+          "defaultValue": "Sample String",
+          "name": "Sample Holding Register 10",
+          "unit": "Sample Unit",
+          "length": 7
+        },
+        {
+          "id": "sample_holdingRegister_11",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 100,
+          "accessMode": "RW",
+          "defaultValue": 230,
+          "name": "Sample Holding Register 11: Voltage L1",
+          "unit": "V",
+          "simulation": {
+            "enabled": true,
+            "minValue": 225,
+            "maxValue": 235
+          }
+        },
+        {
+          "id": "sample_holdingRegister_12",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 102,
+          "accessMode": "RW",
+          "defaultValue": 0,
+          "name": "Sample Holding Register 12: Setpoint P",
+          "unit": "%",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "feedbackDataPoint": "sample_inputRegister_1"
+        },
+        {
+          "id": "sample_inputRegister_1",
+          "areas": [
+            "InputRegister"
+          ],
+          "type": "Float32",
+          "address": 0,
+          "accessMode": "RO",
+          "defaultValue": 0,
+          "name": "Sample Input Register 1: Feedback Setpoint P",
+          "unit": "%",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_inputRegister_2",
+          "areas": [
+            "InputRegister",
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 200,
+          "accessMode": "RO",
+          "defaultValue": 0,
+          "name": "Sample Input Register 2: Can be read with FC03 and FC04",
+          "unit": "%",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        }
+      ]
+    }
+  ]
+}

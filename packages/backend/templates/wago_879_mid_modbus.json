@@ -1,0 +1,2282 @@
+{
+  "id": "wago_879_4pu_4ps_2puct_modbus.json",
+  "enabled": true,
+  "port": 503,
+  "endian": "BigEndian",
+  "name": "WAGO Energy Meters 4PU/4PS/2PU CT (MID)",
+  "vendor": "WAGO",
+  "description": "Modbus RTU mapping for WAGO MID energy meters 4PU, 4PS and 2PU CT based on operating instructions 082022V1.6.",
+  "units": [
+    {
+      "unitId": 1,
+      "dataPoints": [
+        {
+          "id": "wago_4000_serialNumber",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt32",
+          "address": 16384,
+          "accessMode": "RO",
+          "name": "Serial number",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4002_meterCode",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16386,
+          "accessMode": "RO",
+          "name": "Meter code (4PU:1111, 4PS:1112, 2PU CT:1113)",
+          "defaultValue": 1111,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4003_modbusId",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16387,
+          "accessMode": "RW",
+          "name": "Modbus ID",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4004_baudRate",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16388,
+          "accessMode": "RW",
+          "name": "Modbus baud rate (code)",
+          "defaultValue": 6,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4005_protocolVersion",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 16389,
+          "accessMode": "RO",
+          "name": "Protocol version",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4007_softwareVersion",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 16391,
+          "accessMode": "RO",
+          "name": "Software version",
+          "defaultValue": 1.34,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4009_hardwareVersion",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 16393,
+          "accessMode": "RO",
+          "name": "Hardware version",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_400B_meterAmp",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16395,
+          "accessMode": "RO",
+          "name": "Meter base current (Ib)",
+          "unit": "A",
+          "defaultValue": 5,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_400C_ctRatioCode",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16396,
+          "accessMode": "RO",
+          "name": "CT ratio code",
+          "unit": "A",
+          "defaultValue": 5,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_400D_s0PulseRate",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 16397,
+          "accessMode": "RW",
+          "name": "S0 pulse rate (pulses/kWh)",
+          "unit": "pulse/kWh",
+          "defaultValue": 1000.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_400F_combinationCode",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16399,
+          "accessMode": "RW",
+          "name": "Combination code (import/export)",
+          "defaultValue": 3,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4010_lcdRollingTime",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16400,
+          "accessMode": "RW",
+          "name": "LCD rolling time",
+          "unit": "s",
+          "defaultValue": 10,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4011_parity",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16401,
+          "accessMode": "RW",
+          "name": "Modbus parity (1=even,2=none,3=odd)",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4012_l1CurrentDirection",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "ASCII",
+          "address": 16402,
+          "accessMode": "RO",
+          "name": "L1 current direction (F=import,R=export)",
+          "length": 1,
+          "defaultValue": "F"
+        },
+        {
+          "id": "wago_4013_l2CurrentDirection",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "ASCII",
+          "address": 16403,
+          "accessMode": "RO",
+          "name": "L2 current direction (F=import,R=export)",
+          "length": 1,
+          "defaultValue": "F"
+        },
+        {
+          "id": "wago_4014_l3CurrentDirection",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "ASCII",
+          "address": 16404,
+          "accessMode": "RO",
+          "name": "L3 current direction (F=import,R=export)",
+          "length": 1,
+          "defaultValue": "F"
+        },
+        {
+          "id": "wago_4016_powerDownCounter",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16406,
+          "accessMode": "RW",
+          "name": "Power-down counter",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4017_currentQuadrant",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16407,
+          "accessMode": "RO",
+          "name": "Current total quadrant",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4018_l1Quadrant",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16408,
+          "accessMode": "RO",
+          "name": "L1 quadrant",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4019_l2Quadrant",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16409,
+          "accessMode": "RO",
+          "name": "L2 quadrant",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_401A_l3Quadrant",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16410,
+          "accessMode": "RO",
+          "name": "L3 quadrant",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_401B_checksum1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt32",
+          "address": 16411,
+          "accessMode": "RO",
+          "name": "Checksum 1",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_401D_activeStatusWord",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt32",
+          "address": 16413,
+          "accessMode": "RO",
+          "name": "Active status word",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_401F_ctRatio",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int32",
+          "address": 16415,
+          "accessMode": "RW",
+          "name": "CT ratio primary/secondary (e.g., 9995/5 A)",
+          "unit": "A",
+          "defaultValue": 5,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4021_s0PulseWidth",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16417,
+          "accessMode": "RW",
+          "name": "S0 pulse width",
+          "unit": "ms",
+          "defaultValue": 30,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4022_s0PulseType",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16418,
+          "accessMode": "RW",
+          "name": "S0 pulse type (1=energy,2=forward/reverse)",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4023_checksum2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt32",
+          "address": 16419,
+          "accessMode": "RO",
+          "name": "Checksum 2 (not relevant)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4025_reserved_block_4025_4025",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16421,
+          "accessMode": "RO",
+          "name": "Reserved (block 0x4025\u20130x4025)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4026_dataType",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16422,
+          "accessMode": "RW",
+          "name": "Data type (1=standard,2=integer)",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4027_reserved_block_4027_402A",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16423,
+          "accessMode": "RO",
+          "name": "Reserved (block 0x4027\u20130x402A)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4028_reserved_block_4027_402A",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16424,
+          "accessMode": "RO",
+          "name": "Reserved (block 0x4027\u20130x402A)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4029_reserved_block_4027_402A",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16425,
+          "accessMode": "RO",
+          "name": "Reserved (block 0x4027\u20130x402A)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_402A_reserved_block_4027_402A",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "UInt16",
+          "address": 16426,
+          "accessMode": "RO",
+          "name": "Reserved (block 0x4027\u20130x402A)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4032_screenDirection",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16434,
+          "accessMode": "RW",
+          "name": "Screen direction (0=normal,1=rotated 180\u00b0)",
+          "defaultValue": 0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_4033_obisOnOff",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 16435,
+          "accessMode": "RW",
+          "name": "OBIS code display ON/OFF (0=OFF,1=ON)",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_5000_voltageTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20480,
+          "accessMode": "RO",
+          "name": "Total voltage (average)",
+          "unit": "V",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 215.0,
+            "maxValue": 245.0
+          }
+        },
+        {
+          "id": "wago_5002_voltageL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20482,
+          "accessMode": "RO",
+          "name": "L1 voltage",
+          "unit": "V",
+          "defaultValue": 230.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 215.0,
+            "maxValue": 245.0
+          }
+        },
+        {
+          "id": "wago_5004_voltageL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20484,
+          "accessMode": "RO",
+          "name": "L2 voltage",
+          "unit": "V",
+          "defaultValue": 230.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 215.0,
+            "maxValue": 245.0
+          }
+        },
+        {
+          "id": "wago_5006_voltageL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20486,
+          "accessMode": "RO",
+          "name": "L3 voltage",
+          "unit": "V",
+          "defaultValue": 230.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 215.0,
+            "maxValue": 245.0
+          }
+        },
+        {
+          "id": "wago_5008_frequency",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20488,
+          "accessMode": "RO",
+          "name": "Line frequency",
+          "unit": "Hz",
+          "defaultValue": 50.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 49.9,
+            "maxValue": 50.1
+          }
+        },
+        {
+          "id": "wago_500A_currentTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20490,
+          "accessMode": "RO",
+          "name": "Total current",
+          "unit": "A",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 40.0
+          }
+        },
+        {
+          "id": "wago_500C_currentL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20492,
+          "accessMode": "RO",
+          "name": "L1 current",
+          "unit": "A",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 40.0
+          }
+        },
+        {
+          "id": "wago_500E_currentL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20494,
+          "accessMode": "RO",
+          "name": "L2 current",
+          "unit": "A",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 40.0
+          }
+        },
+        {
+          "id": "wago_5010_currentL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20496,
+          "accessMode": "RO",
+          "name": "L3 current",
+          "unit": "A",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 40.0
+          }
+        },
+        {
+          "id": "wago_5012_activePowerTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20498,
+          "accessMode": "RO",
+          "name": "Total active power",
+          "unit": "kW",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_5014_activePowerL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20500,
+          "accessMode": "RO",
+          "name": "L1 active power",
+          "unit": "kW",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_5016_activePowerL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20502,
+          "accessMode": "RO",
+          "name": "L2 active power",
+          "unit": "kW",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_5018_activePowerL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20504,
+          "accessMode": "RO",
+          "name": "L3 active power",
+          "unit": "kW",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_501A_reactivePowerTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20506,
+          "accessMode": "RO",
+          "name": "Total reactive power",
+          "unit": "kvar",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": -15.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_501C_reactivePowerL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20508,
+          "accessMode": "RO",
+          "name": "L1 reactive power",
+          "unit": "kvar",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": -15.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_501E_reactivePowerL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20510,
+          "accessMode": "RO",
+          "name": "L2 reactive power",
+          "unit": "kvar",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": -15.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_5020_reactivePowerL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20512,
+          "accessMode": "RO",
+          "name": "L3 reactive power",
+          "unit": "kvar",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": -15.0,
+            "maxValue": 15.0
+          }
+        },
+        {
+          "id": "wago_5022_apparentPowerTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20514,
+          "accessMode": "RO",
+          "name": "Total apparent power",
+          "unit": "kVA",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 30.0
+          }
+        },
+        {
+          "id": "wago_5024_apparentPowerL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20516,
+          "accessMode": "RO",
+          "name": "L1 apparent power",
+          "unit": "kVA",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 30.0
+          }
+        },
+        {
+          "id": "wago_5026_apparentPowerL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20518,
+          "accessMode": "RO",
+          "name": "L2 apparent power",
+          "unit": "kVA",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 30.0
+          }
+        },
+        {
+          "id": "wago_5028_apparentPowerL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20520,
+          "accessMode": "RO",
+          "name": "L3 apparent power",
+          "unit": "kVA",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 30.0
+          }
+        },
+        {
+          "id": "wago_502A_powerFactorTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20522,
+          "accessMode": "RO",
+          "name": "Total power factor",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 1.0
+          }
+        },
+        {
+          "id": "wago_502C_powerFactorL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20524,
+          "accessMode": "RO",
+          "name": "L1 power factor",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 1.0
+          }
+        },
+        {
+          "id": "wago_502E_powerFactorL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20526,
+          "accessMode": "RO",
+          "name": "L2 power factor",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 1.0
+          }
+        },
+        {
+          "id": "wago_5030_powerFactorL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20528,
+          "accessMode": "RO",
+          "name": "L3 power factor",
+          "defaultValue": 1.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 0.0,
+            "maxValue": 1.0
+          }
+        },
+        {
+          "id": "wago_5032_voltageL1L2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20530,
+          "accessMode": "RO",
+          "name": "L1-L2 voltage",
+          "unit": "V",
+          "defaultValue": 400.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 375.0,
+            "maxValue": 425.0
+          }
+        },
+        {
+          "id": "wago_5034_voltageL1L3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20532,
+          "accessMode": "RO",
+          "name": "L1-L3 voltage",
+          "unit": "V",
+          "defaultValue": 400.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 375.0,
+            "maxValue": 425.0
+          }
+        },
+        {
+          "id": "wago_5036_voltageL2L3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 20534,
+          "accessMode": "RO",
+          "name": "L2-L3 voltage",
+          "unit": "V",
+          "defaultValue": 400.0,
+          "simulation": {
+            "enabled": true,
+            "minValue": 375.0,
+            "maxValue": 425.0
+          }
+        },
+        {
+          "id": "wago_6000_totalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24576,
+          "accessMode": "RO",
+          "name": "Total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6002_t1TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24578,
+          "accessMode": "RO",
+          "name": "T1 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6004_t2TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24580,
+          "accessMode": "RO",
+          "name": "T2 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6006_l1TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24582,
+          "accessMode": "RO",
+          "name": "L1 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6008_l2TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24584,
+          "accessMode": "RO",
+          "name": "L2 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_600A_l3TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24586,
+          "accessMode": "RO",
+          "name": "L3 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_600C_activeEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24588,
+          "accessMode": "RO",
+          "name": "Active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_600E_t1ActiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24590,
+          "accessMode": "RO",
+          "name": "T1 active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6010_t2ActiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24592,
+          "accessMode": "RO",
+          "name": "T2 active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6012_l1ActiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24594,
+          "accessMode": "RO",
+          "name": "L1 active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6014_l2ActiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24596,
+          "accessMode": "RO",
+          "name": "L2 active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6016_l3ActiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24598,
+          "accessMode": "RO",
+          "name": "L3 active energy import",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6018_activeEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24600,
+          "accessMode": "RO",
+          "name": "Active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_601A_t1ActiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24602,
+          "accessMode": "RO",
+          "name": "T1 active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_601C_t2ActiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24604,
+          "accessMode": "RO",
+          "name": "T2 active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_601E_l1ActiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24606,
+          "accessMode": "RO",
+          "name": "L1 active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6020_l2ActiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24608,
+          "accessMode": "RO",
+          "name": "L2 active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6022_l3ActiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24610,
+          "accessMode": "RO",
+          "name": "L3 active energy export",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6024_totalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24612,
+          "accessMode": "RO",
+          "name": "Total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6026_t1TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24614,
+          "accessMode": "RO",
+          "name": "T1 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6028_t2TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24616,
+          "accessMode": "RO",
+          "name": "T2 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_602A_l1TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24618,
+          "accessMode": "RO",
+          "name": "L1 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_602C_l2TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24620,
+          "accessMode": "RO",
+          "name": "L2 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_602E_l3TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24622,
+          "accessMode": "RO",
+          "name": "L3 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6030_reactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24624,
+          "accessMode": "RO",
+          "name": "Reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6032_t1ReactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24626,
+          "accessMode": "RO",
+          "name": "T1 reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6034_t2ReactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24628,
+          "accessMode": "RO",
+          "name": "T2 reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6036_l1ReactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24630,
+          "accessMode": "RO",
+          "name": "L1 reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6038_l2ReactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24632,
+          "accessMode": "RO",
+          "name": "L2 reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_603A_l3ReactiveEnergyImport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24634,
+          "accessMode": "RO",
+          "name": "L3 reactive energy import",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_603C_reactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24636,
+          "accessMode": "RO",
+          "name": "Reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_603E_t1ReactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24638,
+          "accessMode": "RO",
+          "name": "T1 reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6040_t2ReactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24640,
+          "accessMode": "RO",
+          "name": "T2 reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6042_l1ReactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24642,
+          "accessMode": "RO",
+          "name": "L1 reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6044_l2ReactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24644,
+          "accessMode": "RO",
+          "name": "L2 reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6046_l3ReactiveEnergyExport",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24646,
+          "accessMode": "RO",
+          "name": "L3 reactive energy export",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6048_tariff",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Int16",
+          "address": 24648,
+          "accessMode": "RW",
+          "name": "Active tariff (1=T1,2=T2,3=T3,4=T4)",
+          "defaultValue": 1,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6049_resettableDayRegister",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24649,
+          "accessMode": "RW",
+          "name": "Resettable day register",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_604B_t3TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24651,
+          "accessMode": "RO",
+          "name": "T3 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_604D_t4TotalActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24653,
+          "accessMode": "RO",
+          "name": "T4 total active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_604F_t3ImportActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24655,
+          "accessMode": "RO",
+          "name": "T3 import active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6051_t4ImportActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24657,
+          "accessMode": "RO",
+          "name": "T4 import active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6053_t3ExportActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24659,
+          "accessMode": "RO",
+          "name": "T3 export active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6055_t4ExportActiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24661,
+          "accessMode": "RO",
+          "name": "T4 export active energy",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6057_t3TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24663,
+          "accessMode": "RO",
+          "name": "T3 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6059_t4TotalReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24665,
+          "accessMode": "RO",
+          "name": "T4 total reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_605B_t3ImportReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24667,
+          "accessMode": "RO",
+          "name": "T3 import reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_605D_t4ImportReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24669,
+          "accessMode": "RO",
+          "name": "T4 import reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_605F_t3ExportReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24671,
+          "accessMode": "RO",
+          "name": "T3 export reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6061_t4ExportReactiveEnergy",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24673,
+          "accessMode": "RO",
+          "name": "T4 export reactive energy",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6063_q1ImportInductiveTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24675,
+          "accessMode": "RO",
+          "name": "Import inductive reactive energy in Q1 (total)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6065_q1ImportInductiveT1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24677,
+          "accessMode": "RO",
+          "name": "Import inductive reactive energy in Q1 (T1)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6067_q1ImportInductiveT2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24679,
+          "accessMode": "RO",
+          "name": "Import inductive reactive energy in Q1 (T2)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6069_q1ImportInductiveT3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24681,
+          "accessMode": "RO",
+          "name": "Import inductive reactive energy in Q1 (T3)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_606B_q1ImportInductiveT4",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24683,
+          "accessMode": "RO",
+          "name": "Import inductive reactive energy in Q1 (T4)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_606D_q2ImportCapacitiveTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24685,
+          "accessMode": "RO",
+          "name": "Import capacitive reactive energy in Q2 (total)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_606F_q2ImportCapacitiveT1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24687,
+          "accessMode": "RO",
+          "name": "Import capacitive reactive energy in Q2 (T1)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6071_q2ImportCapacitiveT2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24689,
+          "accessMode": "RO",
+          "name": "Import capacitive reactive energy in Q2 (T2)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6073_q2ImportCapacitiveT3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24691,
+          "accessMode": "RO",
+          "name": "Import capacitive reactive energy in Q2 (T3)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6075_q2ImportCapacitiveT4",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24693,
+          "accessMode": "RO",
+          "name": "Import capacitive reactive energy in Q2 (T4)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6077_q3ExportInductiveTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24695,
+          "accessMode": "RO",
+          "name": "Export inductive reactive energy in Q3 (total)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6079_q3ExportInductiveT1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24697,
+          "accessMode": "RO",
+          "name": "Export inductive reactive energy in Q3 (T1)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_607B_q3ExportInductiveT2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24699,
+          "accessMode": "RO",
+          "name": "Export inductive reactive energy in Q3 (T2)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_607D_q3ExportInductiveT3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24701,
+          "accessMode": "RO",
+          "name": "Export inductive reactive energy in Q3 (T3)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_607F_q3ExportInductiveT4",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24703,
+          "accessMode": "RO",
+          "name": "Export inductive reactive energy in Q3 (T4)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6081_q4ExportCapacitiveTotal",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24705,
+          "accessMode": "RO",
+          "name": "Export capacitive reactive energy in Q4 (total)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6083_q4ExportCapacitiveT1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24707,
+          "accessMode": "RO",
+          "name": "Export capacitive reactive energy in Q4 (T1)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6085_q4ExportCapacitiveT2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24709,
+          "accessMode": "RO",
+          "name": "Export capacitive reactive energy in Q4 (T2)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6087_q4ExportCapacitiveT3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24711,
+          "accessMode": "RO",
+          "name": "Export capacitive reactive energy in Q4 (T3)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_6089_q4ExportCapacitiveT4",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24713,
+          "accessMode": "RO",
+          "name": "Export capacitive reactive energy in Q4 (T4)",
+          "unit": "kvarh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_608B_resettableDayRegisterL1",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24715,
+          "accessMode": "RO",
+          "name": "Resettable day register L1",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_608D_resettableDayRegisterL2",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24717,
+          "accessMode": "RO",
+          "name": "Resettable day register L2",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "wago_608F_resettableDayRegisterL3",
+          "areas": [
+            "HoldingRegister"
+          ],
+          "type": "Float32",
+          "address": 24719,
+          "accessMode": "RO",
+          "name": "Resettable day register L3",
+          "unit": "kWh",
+          "defaultValue": 0.0,
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        }
+      ]
+    }
+  ]
+}
