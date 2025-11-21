@@ -1,4 +1,3 @@
-import { DataPoint } from "../DataPoint.js";
 import { DataPointProps } from "./DataPointProps.js";
 
 export type ModbusUnitProps = {
