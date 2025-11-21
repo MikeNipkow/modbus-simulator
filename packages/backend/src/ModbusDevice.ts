@@ -62,12 +62,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
         return this.units.delete(id);
     }
 
-    public startAllSimulations(saveState: boolean = false): void {
-        for (const unit of this.units.values())
-            for (const dp of unit.getAllDataPoints())
-                dp.startSimulation(saveState);
-    }
-
     public startAllEnabledSimulations(): void {
         for (const unit of this.units.values())
             for (const dp of unit.getAllDataPoints())
@@ -75,10 +69,10 @@ export class ModbusDevice implements Modbus.IServiceVector {
                     dp.startSimulation();
     }
 
-    public stopAllSimulations(saveState: boolean = false): void {
+    public stopAllSimulations(): void {
         for (const unit of this.units.values())
             for (const dp of unit.getAllDataPoints())
-                dp.stopSimulation(saveState);
+                dp.stopSimulation();
     }
 
     // ~~~~~ Modbus Server ~~~~~

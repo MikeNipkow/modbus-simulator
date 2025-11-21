@@ -8,25 +8,31 @@ import { getDataViewFromValue, getDefaultValueForType, getRegisterLengthFromType
 
 export class DataPoint {
 
-    private readonly id         : string;
-    private readonly type       : DataType;
-    private readonly length     : number;
+    private readonly id         : string;               // Unique identifier.
+    private readonly type       : DataType;             // Data type of the datapoint.
+    private readonly length     : number;               // Length of the datapoint (in modbus registers).
 
-    private areas               : DataArea[];
-    private address             : number;
-    private accessMode          : AccessMode;
+    private areas               : DataArea[];           // Data areas the datapoint belongs to.
+    private address             : number;               // Base modbus address of the datapoint.
+    private accessMode          : AccessMode;           // Access mode of the datapoint.
 
-    private name                : string;
-    private unit                : string;
-    private simulation          : SimulationProps;
-    private simulationInterval  : NodeJS.Timeout | undefined = undefined;
+    private name                : string;               // Human-readable name of the datapoint.
+    private unit                : string;               // Unit of measurement for the datapoint.
+    private simulation          : SimulationProps;      // Simulation properties for the datapoint.
 
-    private feedbackDataPoint   : string | undefined;
+    private defaultValue        : boolean | number | bigint | string;   // Default value of the datapoint.
+    private value               : boolean | number | bigint | string;   // Current value of the datapoint.
 
-    private defaultValue        : boolean | number | bigint | string;
-    private value               : boolean | number | bigint | string;
+    private feedbackDataPoint   : string | undefined;   // ID of the datapoint used for feedback (if any).
+    
+    private simulationInterval  : NodeJS.Timeout | undefined = undefined;   // Interval for simulation updates.
 
+    /**
+     * Creates a new DataPoint instance.
+     * @param props Properties for the DataPoint.
+     */
     constructor(props: DataPointProps) {
+        // Validate required properties.
         if (!props.id)                                                      throw new Error('DataPoint must have an id');
         if (!props.areas || props.areas.length === 0)                       throw new Error('DataPoint must have at least one DataArea');
         if (!props.type)                                                    throw new Error('DataPoint must have a DataType');
@@ -40,6 +46,7 @@ export class DataPoint {
             && (props.defaultValue as string).length/2 > props.length) 
             throw new Error('DataPoint defaultValue length exceeds defined length for String type');
 
+        // Initialize properties.
         this.id                 = props.id;
         this.areas              = props.areas;
         this.type               = props.type;
@@ -63,46 +70,104 @@ export class DataPoint {
         }
     }
 
-    // ~~~~~ Modbus Value ~~~~~
 
-    public getRegisterValue(offset?: number, endian?: Endian): boolean | number {
+    // ~~~~~ Value Handling ~~~~~√
+
+    /**
+     * Gets the current value of the DataPoint.
+     * @returns The current value of the DataPoint.
+     */
+    public getValue(): boolean | number | bigint | string {
+        return this.value;
+    }
+
+    /**
+     * Sets the current value of the DataPoint.
+     * @param value The new value to set.
+     * @param force If true, forces the value to be set even if the DataPoint is read-only.
+     * @returns True if the value was set successfully, false otherwise.
+     */
+    public setValue(value: boolean | number | bigint | string, force: boolean = false): boolean {
+        // If read-only and not forced, do not set the value.
+        if (!this.hasWriteAccess() && !force)
+            return false;
+
+        this.value = value;
+        return true;
+    }
+
+    /**
+     * Checks if the DataPoint has read access.
+     * @returns True if the DataPoint has read access, false otherwise.
+     */
+    public hasReadAccess(): boolean {
+        return this.accessMode === AccessMode.ReadOnly || this.accessMode === AccessMode.ReadWrite;
+    }
+
+    /**
+     * Checks if the DataPoint has write access.
+     * @returns True if the DataPoint has write access, false otherwise.
+     */
+    public hasWriteAccess(): boolean {
+        return this.accessMode === AccessMode.WriteOnly || this.accessMode === AccessMode.ReadWrite;
+    }
+
+
+    // ~~~~~ Modbus Value Handling ~~~~~
+
+    /**
+     * Gets the value of the datapoint as a Modbus register value.
+     * @param offset Offset of the register to read.
+     * @param endian Endianess of the register value.
+     * @returns The value of the register.
+     */
+    public getRegisterValue(offset: number = 0, endian: Endian = Endian.BigEndian): boolean | number {
+        // Return value directly for Bool types.
         if (this.type === DataType.Bool)
             return this.value as boolean;
 
-        if (this.type == DataType.Byte      ||
+        // Return value directly for single-register types.
+        if (this.type === DataType.Byte     ||
             this.type === DataType.Int16    || 
             this.type === DataType.UInt16)
             return this.value as number;
+        
+        // Check if offset is valid.
+        if (offset < 0 || offset >= this.getLength())
+            throw new Error(`Invalid offset ${offset} for datapoint ${this.getId()}`);
 
-        // Create DataView for multi-register types.
+        // Create DataView for multi-register types (required to access individual bytes).
         const dataView: DataView = getDataViewFromValue(this);
 
         // Get index to read, depending on endian.
-        if (offset === undefined || offset < 0)
-            offset = 0;
-        if (offset >= this.getLength())
-            offset = this.getLength() - 1;
         const index = endian === Endian.BigEndian ? offset * 2 : (this.getLength()*2 - 2 - offset * 2);
 
+        // Return the register value.
         return dataView.getUint16(index);
     }
 
+    /**
+     * Sets the value of the datapoint as a Modbus register value.
+     * @param value The value to set.
+     * @param force Whether to force the value set, ignoring access restrictions.
+     * @param offset Offset of the register to write.
+     * @param endian Endianess of the register value.
+     * @returns True if the value was set successfully, false otherwise.
+     */
     public setRegisterValue(value: number, force: boolean = false, offset: number = 0, endian: Endian = Endian.BigEndian): boolean {
         // Check if datapoint is read-only.
         if (!this.hasWriteAccess() && !force)
             return false;
 
-        if (this.type === DataType.Bool) {
+        // Set value directly for Bool and numeric single-register types.
+        if (this.type === DataType.Bool     ||
+            this.type === DataType.Byte     ||
+            this.type === DataType.Int16    || 
+            this.type === DataType.UInt16
+        ) {
             this.value = value;
             return true;
         }
-
-        if (this.type == DataType.Byte      ||
-            this.type === DataType.Int16    || 
-            this.type === DataType.UInt16) {
-                this.value = value;        
-                return true;
-            }
 
         // Check if offset is valid.
         if (offset < 0 || offset >= this.getLength())
@@ -114,14 +179,72 @@ export class DataPoint {
         // Get index to read, depending on endian.
         const index = endian === Endian.BigEndian ? offset * 2 : (this.getLength()*2 - 2 - offset * 2);
 
-        // Manipulate the correct bytes.
+        // Change the correct bytes.
         dataView.setUint16(index, value);
 
-        // Set the new value.
+        // Set the new value for this data point.
         return this.setValue(getValueFromDataView(dataView, this), force);
     }
 
+
+    // ~~~~~ Data Areas ~~~~~
+
+    public addDataArea(area: DataArea): void {
+        // Check if area is valid for this datapoint.
+        if ((area === DataArea.Coil || area === DataArea.DiscreteInput) && this.type !== DataType.Bool)
+            throw new Error(`DataPoint of type ${this.type} cannot have area ${area}`);
+
+        // Add area if not already present.
+        if (!this.hasDataArea(area))
+            this.areas.push(area);
+    }
+
+    public deleteDataArea(area: DataArea): void {
+        // Check if at least one area remains.
+        if (this.areas.length <= 1)
+            throw new Error('DataPoint must have at least one DataArea');
+
+        this.areas = this.areas.filter(a => a !== area);
+    }
+
+    public hasDataArea(area: DataArea): boolean {
+        return this.areas.includes(area);
+    }
+
+
     // ~~~~~ Simulation ~~~~~
+
+    /**
+     * Gets the simulation properties of the DataPoint.
+     * @returns The simulation properties of the DataPoint.
+     */
+    public getSimulation(): SimulationProps {
+        return this.simulation;
+    }
+
+    /**
+     * Checks if simulation is enabled for the DataPoint.
+     * @returns True if simulation is enabled, false otherwise.
+     */
+    public isSimulationEnabled(): boolean {
+        return this.simulation.enabled;
+    }
+
+    /**
+     * Enables simulation for the data point and starts it.
+     */
+    public enableSimulation(): void {
+        this.simulation.enabled = true;
+        this.startSimulation();
+    }
+
+    /**
+     * Disables simulation for the data point and stops it.
+     */
+    public disableSimulation(): void {
+        this.simulation.enabled = false;
+        this.stopSimulation();
+    }
 
     /**
      * Checks if the simulation is currently running.
@@ -136,7 +259,7 @@ export class DataPoint {
      * @param intervalMs Interval in milliseconds for value changes.
      * @returns True if simulation started successfully, false if already running.
      */
-    public startSimulation(saveState: boolean = true, intervalMs: number = 1000): boolean {
+    public startSimulation(intervalMs: number = 1000): boolean {
         // Check if type allows simulation.
         if (this.type === DataType.ASCII)
             return false;
@@ -151,10 +274,6 @@ export class DataPoint {
             this.setValue(this.generateRandomValue(), true);
         }, intervalMs);
 
-        // Enable random value changes.
-        if (saveState)
-            this.simulation.enabled = true;
-
         return true;
     }
 
@@ -162,7 +281,7 @@ export class DataPoint {
      * Stops the simulation for the data point.
      * @returns True if simulation stopped successfully, false if not running.
      */
-    public stopSimulation(saveState: boolean = true): boolean {
+    public stopSimulation(): boolean {
         // Check if simulation is running.
         if (!this.isSimulationRunning()) 
             return false;
@@ -170,10 +289,6 @@ export class DataPoint {
         // Stop the simulation.
         clearInterval(this.simulationInterval);
         this.simulationInterval = undefined;
-
-        // Disable random value changes.
-        if (saveState)
-            this.simulation.enabled = false;
 
         return true;
     }
@@ -203,100 +318,107 @@ export class DataPoint {
         return random as number | bigint;
     }
 
-    public addDataArea(area: DataArea): void {
-        // Check if area is valid for this datapoint.
-        if ((area === DataArea.Coil || area === DataArea.DiscreteInput) && this.type !== DataType.Bool)
-            throw new Error(`DataPoint of type ${this.type} cannot have area ${area}`);
-
-        // Add area if not already present.
-        if (!this.hasDataArea(area))
-            this.areas.push(area);
-    }
-
-    public deleteDataArea(area: DataArea): void {
-        // Check if at least one area remains.
-        if (this.areas.length <= 1)
-            throw new Error('DataPoint must have at least one DataArea');
-
-        this.areas = this.areas.filter(a => a !== area);
-    }
-
-    public hasDataArea(area: DataArea): boolean {
-        return this.areas.includes(area);
-    }
 
     // ~~~~~ Getter & Setter ~~~~~
 
-    getId(): string {
+    /**
+     * Gets the unique identifier of the DataPoint.
+     * @returns The unique identifier of the DataPoint.
+     */
+    public getId(): string {
         return this.id;
     }
 
-    getAreas(): DataArea[] {
+    /**
+     * Gets the data areas of the DataPoint.
+     * @returns The data areas of the DataPoint.
+     */
+    public getAreas(): DataArea[] {
         return this.areas;
     }
-    getType(): DataType {
+
+    /**
+     * Gets the data type of the DataPoint.
+     * @returns The data type of the DataPoint.
+     */
+    public getType(): DataType {
         return this.type;
     }
-    getAddress(): number {
+
+    /**
+     * Gets the base modbus address of the DataPoint.
+     * @returns The base modbus address of the DataPoint.
+     */
+    public getAddress(): number {
         return this.address;
     }
-    getOccupiedAddresses(): number[] {
+
+    /**
+     * Gets all occupied modbus addresses of the DataPoint.
+     * @returns An array of all occupied modbus addresses of the DataPoint.
+     */
+    public getOccupiedAddresses(): number[] {
         const addresses: number[] = [];
         for (let i = 0; i < this.getLength(); i++)
             addresses.push(this.address + i);
 
         return addresses;
     }
-    getAccessMode(): AccessMode {
+
+    /**
+     * Gets the access mode of the DataPoint.
+     * @returns The access mode of the DataPoint.
+     */
+    public getAccessMode(): AccessMode {
         return this.accessMode;
     }
-    getLength(): number {
+
+    /**
+     * Gets the length of the DataPoint (in modbus registers).
+     * @returns The length of the DataPoint.
+     */
+    public getLength(): number {
         return this.length;
     }
-    getDefaultValue(): boolean | number | bigint | string {
+
+    /**
+     * Gets the default value of the DataPoint.
+     * @returns The default value of the DataPoint.
+     */
+    public getDefaultValue(): boolean | number | bigint | string {
         return this.defaultValue;
     }
-    getName(): string {
+
+    /**
+     * Gets the name of the DataPoint.
+     * @returns The name of the DataPoint.
+     */
+    public getName(): string {
         return this.name;
     }
-    getUnit(): string {
+
+    /**
+     * Gets the unit of the DataPoint.
+     * @returns The unit of the DataPoint.
+     */
+    public getUnit(): string {
         return this.unit;
     }
-    getSimulation(): SimulationProps {
-        return this.simulation;
-    }
 
-    getFeedbackDataPoint(): string | undefined {
+    /**
+     * Gets the feedback DataPoint identifier.
+     * @returns The feedback DataPoint identifier, or undefined if not set.
+     */
+    public getFeedbackDataPoint(): string | undefined {
         return this.feedbackDataPoint;
     }
 
-    hasFeedbackDataPoint(): boolean {
+    /**
+     * Checks if the DataPoint has a feedback DataPoint identifier.
+     * @returns True if a feedback DataPoint identifier is set, false otherwise.
+     */
+    public hasFeedbackDataPoint(): boolean {
         return this.feedbackDataPoint !== undefined;
-    }
-
-    getValue(): boolean | number | bigint | string {
-        return this.value;
-    }
-
-    setValue(value: boolean | number | bigint | string, force: boolean = false): boolean {
-        // If read-only and not forced, do not set the value.
-        if (!this.hasWriteAccess() && !force)
-            return false;
-
-        this.value = value;
-        return true;
-    }
-
-    hasReadAccess(): boolean {
-        return this.accessMode === AccessMode.ReadOnly || this.accessMode === AccessMode.ReadWrite;
-    }
-
-    hasWriteAccess(): boolean {
-        return this.accessMode === AccessMode.WriteOnly || this.accessMode === AccessMode.ReadWrite;
-    }
-
-    isSimulationEnabled(): boolean {
-        return this.simulation.enabled;
     }
 
 }
