@@ -40,7 +40,7 @@ deviceErrors.forEach(err => console.error(err));
 console.log(deviceManager.getDevices().length + " devices loaded");
 
 // Sample device
-if (true) {
+if (false) {
     const device = new ModbusDevice("sample_device.json", true, 502, Endian.BigEndian, "Sample Device", "Sample Vendor", "Sample Description");
     const unit = new ModbusUnit(1);
 

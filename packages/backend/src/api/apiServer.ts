@@ -1,10 +1,11 @@
 import express from 'express';
-import { createDeviceRoute, deleteDeviceRoute, getDeviceRoute, getDevicesRoute } from './controllers/deviceController.js';
-import { createUnitRoute, deleteUnitRoute, getUnitRoute, getUnitsRoute } from './controllers/unitController.js';
-import { getDataPointsRoute, getDataPointRoute, deleteDataPointRoute, createDataPointRoute } from './controllers/dataPointController.js';
+import { createDeviceRoute, deleteDeviceRoute, getDeviceRoute, getDevicesRoute, updateDeviceRoute } from './controllers/deviceController.js';
+import { createUnitRoute, deleteUnitRoute, getUnitRoute, getUnitsRoute, updateUnitRoute } from './controllers/unitController.js';
+import { getDataPointsRoute, getDataPointRoute, deleteDataPointRoute, createDataPointRoute, updateDataPointRoute } from './controllers/dataPointController.js';
 
 export function initializeApiServer() {
     const app = express();
+    
     app.use(express.json());
 
     // Routes
@@ -12,18 +13,21 @@ export function initializeApiServer() {
     app.get     ('/api/v1/devices/:id', getDeviceRoute);
     app.post    ('/api/v1/devices', createDeviceRoute);
     app.delete  ('/api/v1/devices/:id', deleteDeviceRoute);
+    app.put     ('/api/v1/devices/:id', updateDeviceRoute);
     
     app.get     ('/api/v1/devices/:id/units', getUnitsRoute);
     app.get     ('/api/v1/devices/:id/units/:unitId', getUnitRoute);
     app.post    ('/api/v1/devices/:id/units', createUnitRoute);
     app.delete  ('/api/v1/devices/:id/units/:unitId', deleteUnitRoute);
+    app.put     ('/api/v1/devices/:id/units/:unitId', updateUnitRoute);
 
     app.get     ('/api/v1/devices/:id/units/:unitId/dataPoints', getDataPointsRoute);
     app.get     ('/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId', getDataPointRoute);
     app.post    ('/api/v1/devices/:id/units/:unitId/dataPoints', createDataPointRoute);
     app.delete  ('/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId', deleteDataPointRoute);
+    app.put     ('/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId', updateDataPointRoute);
 
-    const port = 3000;
+    const port = 3001;
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);
     });

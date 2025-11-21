@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import deviceManager, { templateManager } from "../../app.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
-import { fromJSON, fromModbusDevice } from "../mapper/ModbusDeviceDTOMapper.js";
+import { fromJSON, fromModbusDevice, modbusDeviceFromDTO } from "../mapper/ModbusDeviceDTOMapper.js";
 import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/ParseResult.js";
 
@@ -82,3 +82,51 @@ export const deleteDeviceRoute = (req: Request, res: Response) => {
     deviceManager.deleteDevice(device.getId());
     res.status(204).send();
 }
+
+export const updateDeviceRoute = async (req: Request, res: Response) => {
+    const device = getDeviceFromRequest(req, res);
+    if (!device) return;
+    const parseResult = fromJSON(req.body);
+    if (!parseResult.success) {
+        res.status(400).json({ errors: parseResult.errors });
+        return;
+    }
+    
+    const newDeviceDTO = parseResult.value;
+    const newDeviceResult = modbusDeviceFromDTO(newDeviceDTO);
+    if (!newDeviceResult.success) {
+        res.status(400).json({ errors: newDeviceResult.errors });
+        return;
+    }
+
+    const newDevice = newDeviceResult.value;
+
+    // Stop and delete old device.
+    const wasRunning = device.isRunning();
+    if (wasRunning)
+        await device.stopServer();
+    const deleted = deviceManager.deleteDevice(device.getId());
+    if (!deleted) {
+        res.status(500).json({ error: `Failed to delete existing device with id ${device.getId()}` });
+        return;
+    }
+
+    // Try to add new device.
+    const addResult = deviceManager.addDevice(newDevice.getId(), newDevice);
+    if (!addResult) {
+        // Try to add the old device back.
+        deviceManager.addDevice(device.getId(), device);
+        if (wasRunning)
+            await device.startServer();
+        deviceManager.saveDevice(device.getId());
+
+        res.status(500).json({ error: `Failed to add new device with id ${newDevice.getId()}` });
+        return;
+    }
+
+    deviceManager.saveDevice(newDevice.getId());
+    if (newDevice.isEnabled())
+        await newDevice.startServer();
+    
+    res.status(200).json(fromModbusDevice(newDevice));
+};

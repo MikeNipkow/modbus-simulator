@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { getDeviceFromRequest } from "./deviceController.js";
-import { fromModbusUnit } from "../mapper/ModbusUnitDTOMapper.js";
+import { fromJSON, fromModbusUnit, modbusUnitFromDTO } from "../mapper/ModbusUnitDTOMapper.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
 import deviceManager from "../../app.js";
@@ -82,4 +82,46 @@ export const deleteUnitRoute = (req: Request, res: Response) => {
     deviceManager.saveDevice(device.getId());
 
     res.status(204).send();
+}
+
+export const updateUnitRoute = (req: Request, res: Response) => {
+    const device = getDeviceFromRequest(req, res);
+    if (!device) return;
+    const unit = getUnitFromRequest(req, res);
+    if (!unit) return;
+
+    const parseResult = fromJSON(req.body);
+    if (!parseResult.success) {
+        res.status(400).json({ errors: parseResult.errors });
+        return;
+    }
+
+    const unitDTO = parseResult.value;
+    
+    // Try to parse new unit from DTO.
+    const newUnitResult = modbusUnitFromDTO(unitDTO);
+    if (!newUnitResult.success) {
+        res.status(400).json({ errors: newUnitResult.errors });
+        return;
+    }
+
+    // Delete existing unit and replace with new one.
+    if (!device.deleteUnit(unit.getId())) {
+        res.status(500).json({ error: `Failed to delete existing unit with id ${unit.getId()}` });
+        return;
+    }
+
+    // Try to add new unit.
+    const newUnit = newUnitResult.value;
+    const addResult = device.addUnit(newUnit);
+    if (!addResult) {
+        // Restore old unit.
+        device.addUnit(unit);
+
+        res.status(500).json({ error: `Failed to add new unit with id ${newUnit.getId()}` });
+        return;
+    }
+
+    deviceManager.saveDevice(device.getId());
+    res.json(unitDTO);
 }
