@@ -30,6 +30,7 @@ export class DataPoint {
     /**
      * Creates a new DataPoint instance.
      * @param props Properties for the DataPoint.
+     * @throws Error if required properties are missing or invalid.
      */
     constructor(props: DataPointProps) {
         // Validate required properties.
@@ -120,6 +121,7 @@ export class DataPoint {
      * @param offset Offset of the register to read.
      * @param endian Endianess of the register value.
      * @returns The value of the register.
+     * @throws Error if the offset is invalid.
      */
     public getRegisterValue(offset: number = 0, endian: Endian = Endian.BigEndian): boolean | number {
         // Return value directly for Bool types.
@@ -153,6 +155,7 @@ export class DataPoint {
      * @param offset Offset of the register to write.
      * @param endian Endianess of the register value.
      * @returns True if the value was set successfully, false otherwise.
+     * @throws Error if the offset is invalid.
      */
     public setRegisterValue(value: number, force: boolean = false, offset: number = 0, endian: Endian = Endian.BigEndian): boolean {
         // Check if datapoint is read-only.
@@ -189,6 +192,11 @@ export class DataPoint {
 
     // ~~~~~ Data Areas ~~~~~
 
+    /**
+     * Adds a DataArea to the DataPoint.
+     * @param area The DataArea to add.
+     * @throws Error if the area is not compatible with the DataPoint type.
+     */
     public addDataArea(area: DataArea): void {
         // Check if area is valid for this datapoint.
         if ((area === DataArea.Coil || area === DataArea.DiscreteInput) && this.type !== DataType.Bool)
@@ -199,6 +207,11 @@ export class DataPoint {
             this.areas.push(area);
     }
 
+    /**
+     * Deletes a DataArea from the DataPoint.
+     * @param area The DataArea to delete.
+     * @throws Error if trying to delete the last remaining area.
+     */
     public deleteDataArea(area: DataArea): void {
         // Check if at least one area remains.
         if (this.areas.length <= 1)
@@ -207,6 +220,11 @@ export class DataPoint {
         this.areas = this.areas.filter(a => a !== area);
     }
 
+    /**
+     * Checks if the DataPoint has the specified DataArea.
+     * @param area The DataArea to check.
+     * @returns True if the DataPoint has the specified DataArea, false otherwise.
+     */
     public hasDataArea(area: DataArea): boolean {
         return this.areas.includes(area);
     }
