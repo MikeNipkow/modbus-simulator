@@ -78,7 +78,6 @@ export const deleteUnitRoute = (req: Request, res: Response) => {
     if (!unit) return;
 
     device.deleteUnit(unit.getId());
-    console.log(device.getAllUnits().length);
     deviceManager.saveDevice(device.getId());
 
     res.status(204).send();
@@ -123,5 +122,5 @@ export const updateUnitRoute = (req: Request, res: Response) => {
     }
 
     deviceManager.saveDevice(device.getId());
-    res.json(unitDTO);
+    res.json(fromModbusUnit(newUnit));
 }

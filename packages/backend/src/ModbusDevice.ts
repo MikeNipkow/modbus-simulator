@@ -3,8 +3,8 @@ import { DataArea } from "./types/DataArea.js";
 import { Endian } from "./types/Endian.js";
 import Modbus, { FCallbackVal } from "modbus-serial";
 import { ModbusError } from "./types/ModbusError.js";
-import { off } from "process";
 
+// TODO: id may only be alphanumeric and underscores with .json ending.
 export class ModbusDevice implements Modbus.IServiceVector {
     
     // Device info.
@@ -267,6 +267,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
         // Calculate offset to base address for multi-register data points.
         const offset = addr - dp.getAddress();
 
+        const val = dp.getRegisterValue(offset, this.endian);
         // Return the value.
         cb(null, dp.getRegisterValue(offset, this.endian));
     }

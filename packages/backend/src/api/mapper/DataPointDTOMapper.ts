@@ -4,7 +4,7 @@ import { AccessMode } from "../../types/AccessMode.js";
 import { DataArea } from "../../types/DataArea.js";
 import { DataType } from "../../types/DataType.js";
 import { ParseResult } from "../../types/ParseResult.js";
-import { getMinValueForType, getMaxValueForType, serializeValue, deserializeValue } from "../../util/modbusUtils.js";
+import { getMinValueForType, getMaxValueForType, serializeValue, deserializeValue, getJSTypeFromDataType } from "../../util/modbusUtils.js";
 import { DataPointDTO } from "../dto/DataPointDTO.js";
 import { DataPointProps } from "../../types/DataPointProps.js";
 
@@ -38,10 +38,23 @@ export function fromJSON(json: any): ParseResult<DataPointDTO> {
     }
 
     if (!json.id || typeof json.id !== 'string')                                                                    errors.push('DataPointDTO must have a valid id');
-    if (!json.areas || !Array.isArray(json.areas))                                                                  errors.push('DataPointDTO must have valid areas');
-    if (json.type === undefined || !Object.values(DataType).includes(json.type))                                    errors.push('DataPointDTO must have a valid type');
-    if (json.address === undefined || typeof json.address !== 'number' || json.address < 0 || json.address > 65535) errors.push('DataPointDTO must have a valid address');
-    if (json.accessMode === undefined || !Object.values(AccessMode).includes(json.accessMode))                      errors.push('DataPointDTO must have a valid accessMode');
+    if (!json.areas || !Array.isArray(json.areas))                                                                  errors.push(`DataPointDTO for id ${json.id} must have valid areas`);
+    if (json.type === undefined || !Object.values(DataType).includes(json.type))                                    errors.push(`DataPointDTO for id ${json.id} must have a valid type`);
+    if (json.address === undefined || typeof json.address !== 'number' || json.address < 0 || json.address > 65535) errors.push(`DataPointDTO for id ${json.id} must have a valid address`);
+    if (json.accessMode === undefined || !Object.values(AccessMode).includes(json.accessMode))                      errors.push(`DataPointDTO for id ${json.id} must have a valid accessMode`);
+    if (json.defaultValue === undefined)                                                                            errors.push(`DataPointDTO for id ${json.id} must have a valid defaultValue`);
+    if (json.value === undefined)                                                                                   errors.push(`DataPointDTO for id ${json.id} must have a valid value`);
+
+    if (errors.length > 0)
+        return { success: false, errors: errors };
+
+    const defaultValue = deserializeValue(json.defaultValue);
+    const value = deserializeValue(json.value);
+
+    if (typeof defaultValue !== getJSTypeFromDataType(json.type))
+        errors.push(`DataPointDTO defaultValue type ${typeof defaultValue} does not match DataType for data point '${json.id}'`);
+    if (typeof value !== getJSTypeFromDataType(json.type))
+        errors.push(`DataPointDTO value type ${typeof defaultValue} does not match DataType for data point '${json.id}'`);
 
     if (errors.length > 0)
         return { success: false, errors: errors };
@@ -49,9 +62,9 @@ export function fromJSON(json: any): ParseResult<DataPointDTO> {
     if (json.type === DataType.ASCII) {
         if (typeof json.length !== "number" || json.length < 1)
             errors.push('DataPointDTO of type ASCII must have a valid length greater than 0');
-        else if (json.defaultValue !== undefined && json.defaultValue.length/2 > json.length)
+        else if (json.defaultValue.length/2 > json.length)
             errors.push('DataPointDTO defaultValue length exceeds defined length');
-        else if (json.value !== undefined && json.value.length/2 > json.length)
+        else if (json.value.length/2 > json.length)
             errors.push('DataPointDTO value length exceeds defined length');
     }
     

@@ -17,6 +17,28 @@ export function getRegisterLengthFromType(type: DataType): number {
     }
 }
 
+export function getJSTypeFromDataType(type: DataType): string {
+    switch (type) {
+        case DataType.Bool:
+            return 'boolean';
+        case DataType.Byte:
+        case DataType.Int16:
+        case DataType.Int32:
+        case DataType.UInt16:
+        case DataType.UInt32:
+        case DataType.Float32:
+        case DataType.Float64:
+            return 'number';
+        case DataType.Int64:
+        case DataType.UInt64:
+            return 'bigint';
+        case DataType.ASCII:
+            return 'string';
+        default:
+            throw new Error(`Unsupported DataType ${type} for JS type mapping`);
+    }
+}
+
 export function getDefaultValueForType(type: DataType): boolean | number | bigint | string {
     switch (type) {
         case DataType.Bool:

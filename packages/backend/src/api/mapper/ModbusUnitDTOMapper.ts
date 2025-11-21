@@ -1,5 +1,3 @@
-import { error } from "console";
-import { DataPoint } from "../../DataPoint.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
 import { ParseResult } from "../../types/ParseResult.js";
 import { DataPointDTO } from "../dto/DataPointDTO.js";
@@ -22,13 +20,13 @@ export function fromJSON(json: any): ParseResult<ModbusUnitDTO> {
         return { success: false, errors: errors };
     }
 
-    if (json.unitId === undefined || typeof json.unitId !== 'number')   errors.push('ModbusUnit must have a valid unitId');
+    if (json.id === undefined || typeof json.id !== 'number')   errors.push('ModbusUnit must have a valid unitId');
 
     if (errors.length > 0)
         return { success: false, errors: errors };
 
     // Check Unit ID.
-    const unitId: number = json.unitId;
+    const unitId: number = json.id;
     if (unitId < 1 || unitId > 254) {
         errors.push('ModbusUnit unitId must be between 1 and 254');
         return { success: false, errors: errors };

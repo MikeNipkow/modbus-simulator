@@ -29,19 +29,19 @@ export function fromJSON(json: any): ParseResult<ModbusDeviceDTO> {
             return { success: false, errors: errors };
         }
     
-        if (json.id === undefined || typeof json.id !== 'string' || json.id.length === 0)   errors.push('ModbusDevice must have a valid id string');
-        if (json.enabled === undefined || typeof json.enabled !== 'boolean')                errors.push('ModbusDevice must have a valid enabled boolean');
-        if (json.port === undefined || typeof json.port !== 'number')                       errors.push('ModbusDevice must have a valid port number');
-        if (json.endian === undefined || typeof json.endian !== 'string')                   errors.push('ModbusDevice must have a valid endian string');
-        if (json.name === undefined || typeof json.name !== 'string')                       errors.push('ModbusDevice must have a valid name string');
-        if (json.vendor === undefined || typeof json.vendor !== 'string')                   errors.push('ModbusDevice must have a valid vendor string');
-        if (json.description === undefined || typeof json.description !== 'string')         errors.push('ModbusDevice must have a valid description string');
-        if (json.running === undefined || typeof json.running !== 'boolean')                errors.push('ModbusDevice must have a valid running boolean');
+        if (json.fileName === undefined || typeof json.fileName !== 'string' || json.fileName.length === 0) errors.push('ModbusDevice must have a valid fileName string');
+        if (json.enabled === undefined || typeof json.enabled !== 'boolean')                                errors.push('ModbusDevice must have a valid enabled boolean');
+        if (json.port === undefined || typeof json.port !== 'number')                                       errors.push('ModbusDevice must have a valid port number');
+        if (json.endian === undefined || typeof json.endian !== 'string')                                   errors.push('ModbusDevice must have a valid endian string');
+        if (json.name === undefined || typeof json.name !== 'string')                                       errors.push('ModbusDevice must have a valid name string');
+        if (json.vendor === undefined || typeof json.vendor !== 'string')                                   errors.push('ModbusDevice must have a valid vendor string');
+        if (json.description === undefined || typeof json.description !== 'string')                         errors.push('ModbusDevice must have a valid description string');
+        if (json.running === undefined || typeof json.running !== 'boolean')                                errors.push('ModbusDevice must have a valid running boolean');
 
         if (errors.length > 0)
             return { success: false, errors: errors };
     
-        const id            = json.id;
+        const id            = json.fileName;
         const enabled       = json.enabled;
         const port          = json.port;
         const endian        = json.endian;
