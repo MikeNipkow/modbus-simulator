@@ -1,7 +1,7 @@
 import { error } from "console";
 import { ModbusDevice } from "../../ModbusDevice.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
-import { ParseResult } from "../../types/ParseResult.js";
+import { ParseResult } from "../../types/enums/ParseResult.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { fromModbusUnit, modbusUnitFromDTO } from "./ModbusUnitDTOMapper.js";

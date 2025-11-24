@@ -1,6 +1,6 @@
-import { AccessMode } from "../../types/AccessMode.js";
-import { DataArea } from "../../types/DataArea.js";
-import { DataType } from "../../types/DataType.js";
+import { AccessMode } from "../../types/enums/AccessMode.js";
+import { DataArea } from "../../types/enums/DataArea.js";
+import { DataType } from "../../types/enums/DataType.js";
 import { SimulationProps } from "../../types/SimulationProps.js";
 
 export type DataPointDTO = {

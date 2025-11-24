@@ -1,12 +1,15 @@
 import { DataPoint } from "./DataPoint.js";
-import { DataArea } from "./types/DataArea.js";
-import { DataType } from "./types/DataType.js";
+import { DataArea } from "./types/enums/DataArea.js";
+import { DataType } from "./types/enums/DataType.js";
 import { ModbusUnitProps } from "./types/ModbusUnitProps.js";
-import { ParseResult } from "./types/ParseResult.js";
+import { ParseResult } from "./types/enums/ParseResult.js";
 
+/**
+ * Represents a Modbus Unit containing multiple DataPoints.
+ */
 export class ModbusUnit {
 
-    private id                  : number;   // Modbus Unit ID (1-254).
+    private unitId                  : number;   // Modbus Unit ID (1-254).
 
     private dataPointsById      : Map<string, DataPoint>                  = new Map();  // Map of DataPoints by their unique id.
     private dataPointsByAddr    : Map<DataArea, Map<number, DataPoint>>   = new Map();  // Map of DataPoints by their address within each DataArea.
@@ -18,9 +21,9 @@ export class ModbusUnit {
      */
     constructor(props: ModbusUnitProps) {
         // Validate id.
-        if (props.id < 1 || props.id > 254)
+        if (props.unitId < 1 || props.unitId > 254)
             throw new Error('ModbusUnit id must be between 1 and 254');
-        this.id = props.id;
+        this.unitId = props.unitId;
 
         // Initialize maps for each DataArea.
         for (const area of Object.values(DataArea) as DataArea[])
@@ -37,7 +40,7 @@ export class ModbusUnit {
 
             // Check for errors.
             if (!result.success)
-                throw new Error(`Failed to add DataPoint with id '${dp.getId()}' to ModbusUnit ${this.id}: ${result.errors}`);
+                throw new Error(`Failed to add DataPoint with id '${dp.getId()}' to ModbusUnit ${this.unitId}: ${result.errors}`);
         }
     }
 
@@ -104,7 +107,7 @@ export class ModbusUnit {
 
         // Check for duplicate id.
         if (this.hasDataPoint(dataPoint.getId())) {
-           errors.push(`DataPoint with id '${dataPoint.getId()}' already exists in ModbusUnit ${this.id}`);
+           errors.push(`DataPoint with id '${dataPoint.getId()}' already exists in ModbusUnit ${this.unitId}`);
            return { success: false, errors: errors };
         }
 
@@ -112,7 +115,7 @@ export class ModbusUnit {
         for (const address of dataPoint.getOccupiedAddresses()) {
             for (const area of dataPoint.getAreas()) {
                 if (this.hasDataPointAt(area, address)) {
-                    errors.push(`Address ${address} in area ${area} is already occupied in ModbusUnit ${this.id}`);
+                    errors.push(`Address ${address} in area ${area} is already occupied in ModbusUnit ${this.unitId}`);
                     return { success: false, errors: errors };
                 }
             }
@@ -194,7 +197,7 @@ export class ModbusUnit {
         if (id < 1 || id > 254)
             throw new Error('ModbusUnit id must be between 1 and 254');
 
-        this.id = id;
+        this.unitId = id;
     }
 
     /**
@@ -202,7 +205,7 @@ export class ModbusUnit {
      * @returns The Modbus Unit ID.
      */
     public getId(): number {
-        return this.id;
+        return this.unitId;
     }
 
 }

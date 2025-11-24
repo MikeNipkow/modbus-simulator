@@ -1,5 +1,5 @@
 import { DataPoint } from "../DataPoint.js";
-import { DataType } from "../types/DataType.js";
+import { DataType } from "../types/enums/DataType.js";
 
 export function getRegisterLengthFromType(type: DataType): number {
     switch (type) {

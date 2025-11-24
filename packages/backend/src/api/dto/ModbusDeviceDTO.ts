@@ -1,4 +1,4 @@
-import { Endian } from "../../types/Endian.js";
+import { Endian } from "../../types/enums/Endian.js";
 import { ModbusUnitDTO } from "./ModbusUnitDTO.js";
 
 export interface ModbusDeviceDTO {

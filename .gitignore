@@ -3,3 +3,5 @@ devices/
 node_modules/
 temp/
 .vscode/
+.DS_Store
+.env

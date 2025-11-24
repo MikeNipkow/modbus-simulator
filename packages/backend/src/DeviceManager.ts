@@ -2,7 +2,7 @@ import path from "path";
 import { toJSON as deviceToJSON, fromJSON as deviceFromJSON } from "./mapper/ModbusDeviceMapper.js";
 import { ModbusDevice } from "./ModbusDevice.js";
 import * as fs from "fs";
-import { ParseResult } from "./types/ParseResult.js";
+import { ParseResult } from "./types/enums/ParseResult.js";
 
 export class DeviceManager {
 

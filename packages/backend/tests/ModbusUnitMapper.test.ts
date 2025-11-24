@@ -1,9 +1,9 @@
 import { ModbusUnit } from '../src/ModbusUnit.js';
 import { DataPoint } from '../src/DataPoint.js';
 import { toJSON, fromJSON } from '../src/mapper/ModbusUnitMapper.js';
-import { AccessMode } from '../src/types/AccessMode.js';
-import { DataArea } from '../src/types/DataArea.js';
-import { DataType } from '../src/types/DataType.js';
+import { AccessMode } from '../src/types/enums/AccessMode.js';
+import { DataArea } from '../src/types/enums/DataArea.js';
+import { DataType } from '../src/types/enums/DataType.js';
 
 describe('ModbusUnitMapper', () => {
 

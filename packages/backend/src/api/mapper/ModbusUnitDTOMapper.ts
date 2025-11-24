@@ -1,5 +1,5 @@
 import { ModbusUnit } from "../../ModbusUnit.js";
-import { ParseResult } from "../../types/ParseResult.js";
+import { ParseResult } from "../../types/enums/ParseResult.js";
 import { DataPointDTO } from "../dto/DataPointDTO.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { dataPointFromDTO, fromDataPoint } from "./DataPointDTOMapper.js";

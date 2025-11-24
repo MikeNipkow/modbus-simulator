@@ -3,7 +3,7 @@ import deviceManager, { templateManager } from "../../app.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 import { fromJSON, fromModbusDevice, modbusDeviceFromDTO } from "../mapper/ModbusDeviceDTOMapper.js";
 import { ModbusDevice } from "../../ModbusDevice.js";
-import { ParseResult } from "../../types/ParseResult.js";
+import { ParseResult } from "../../types/enums/ParseResult.js";
 
 /**
  * Helper function to get a device by ID from request parameters.

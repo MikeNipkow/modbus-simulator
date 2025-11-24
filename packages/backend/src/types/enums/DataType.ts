@@ -1,3 +1,7 @@
+
+/**
+ * Enumeration of data types available for Modbus data points.
+ */
 export enum DataType {
     Bool        = 'Bool',
     Byte        = 'Byte',

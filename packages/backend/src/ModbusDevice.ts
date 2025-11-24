@@ -1,54 +1,82 @@
 import { ModbusUnit } from "./ModbusUnit.js";
-import { DataArea } from "./types/DataArea.js";
-import { Endian } from "./types/Endian.js";
+import { DataArea } from "./types/enums/DataArea.js";
+import { Endian } from "./types/enums/Endian.js";
 import Modbus, { FCallbackVal } from "modbus-serial";
-import { ModbusError } from "./types/ModbusError.js";
+import { ModbusError } from "./types/enums/ModbusError.js";
+import { ModbusDeviceProps } from "./types/ModbusDeviceProps.js";
+import { isValidFileName } from "./util/fileUtils.js";
 
-// TODO: id may only be alphanumeric and underscores with .json ending.
+/**
+ * Class representing a Modbus device with multiple units and data points.
+ */
 export class ModbusDevice implements Modbus.IServiceVector {
     
     // Device info.
-    private readonly id     : string;
-    private enabled         : boolean;
-    private port            : number
-    private endian          : Endian = Endian.BigEndian;
-    private name            : string;
-    private vendor          : string;
-    private description     : string;
+    private readonly fileName   : string;
+    private enabled             : boolean;
+    private port                : number
+    private endian              : Endian = Endian.BigEndian;
+    private name                : string;
+    private vendor              : string;
+    private description         : string;
 
     // Different modbus units (Unit-ID 1-254) with different data points.
-    private units           : Map<number, ModbusUnit> = new Map(); // <Unit-ID>, ModbusUnit>
+    private units               : Map<number, ModbusUnit> = new Map(); // <Unit-ID>, ModbusUnit>
 
     // Modbus server instance.
-    private server          : Modbus.ServerTCP | undefined;
-    private running         : boolean = false;
+    private server              : Modbus.ServerTCP | undefined;
+    private running             : boolean = false;
 
-    constructor(id: string, enabled: boolean, port: number, endian: Endian, name: string, vendor: string, description: string) {
-        // Validate ID.
-        if (id === undefined || id.trim() === '')
-            throw new Error('ModbusDevice must have a valid non-empty ID');
-        
-        // Check for valid port.
-        if (port < 1 || port > 65535)
+    /**
+     * Creates a new ModbusDevice instance.
+     * @param props The properties of the Modbus device.
+     */
+    constructor(props: ModbusDeviceProps) {
+        // Validate fileName.
+        if (!isValidFileName(props.fileName))
+            throw new Error('ModbusDevice must have a valid non-empty fileName');
+
+        // Check if fileName ends with .json.
+        if (props.fileName.endsWith('.json'))
+            throw new Error('ModbusDevice fileName must end with .json');
+
+        // Check if port is valid.
+        if (props.port < 1 || props.port > 65535)
             throw new Error('ModbusDevice port must be between 1 and 65535');
 
-        this.id             = id;
-        this.enabled        = enabled;
-        this.port           = port;
-        this.endian         = endian;
-        this.name           = name;
-        this.vendor         = vendor;
-        this.description    = description;
+        this.fileName       = props.fileName;
+        this.enabled        = props.enabled;
+        this.port           = props.port;
+        this.name           = props.name        ?? this.fileName.replace('.json', '');
+        this.vendor         = props.vendor      ?? '';
+        this.description    = props.description ?? '';
     }
 
+    // ~~~~~ Unit Management ~~~~~
+
+    /**
+     * Checks if a unit with the given ID exists.
+     * @param id The ID of the unit.
+     * @returns True if the unit exists, false otherwise.
+     */
     public hasUnit(id: number): boolean {
         return this.units.has(id);
     }
 
+    /**
+     * Retrieves the unit with the given ID.
+     * @param id The ID of the unit.
+     * @returns The ModbusUnit with the given ID, or undefined if not found.
+     */
     public getUnit(id: number): ModbusUnit | undefined {
         return this.units.get(id);
     }
 
+    /**
+     * Adds a new unit to the device.
+     * @param unit The ModbusUnit to add.
+     * @returns True if the unit was added successfully, false if the unit is undefined or already exists.
+     */
     public addUnit(unit: ModbusUnit): boolean {
         // Validate unit.
         if (unit === undefined || this.hasUnit(unit.getId())) 
@@ -58,10 +86,18 @@ export class ModbusDevice implements Modbus.IServiceVector {
         return true;
     }
 
+    /**
+     * Deletes the unit with the given ID.
+     * @param id The ID of the unit to delete.
+     * @returns True if the unit was deleted successfully, false otherwise.
+     */
     public deleteUnit(id: number): boolean {
         return this.units.delete(id);
     }
 
+    /**
+     * Starts simulations for all data points that have simulation enabled.
+     */
     public startAllEnabledSimulations(): void {
         for (const unit of this.units.values())
             for (const dp of unit.getAllDataPoints())
@@ -69,6 +105,9 @@ export class ModbusDevice implements Modbus.IServiceVector {
                     dp.startSimulation();
     }
 
+    /**
+     * Stops all running simulations for all data points.
+     */
     public stopAllSimulations(): void {
         for (const unit of this.units.values())
             for (const dp of unit.getAllDataPoints())
@@ -315,35 +354,67 @@ export class ModbusDevice implements Modbus.IServiceVector {
 
     // ~~~~~ Getter & Setter ~~~~~
 
-    getId(): string {
-        return this.id;
+    /**
+     * Gets the file name of the Modbus device.
+     * @returns The file name of the Modbus device.
+     */
+    public getFileName(): string {
+        return this.fileName;
     }
 
+    /**
+     * Checks if the Modbus device is enabled.
+     * @returns True if the device is enabled, false otherwise.
+     */
     public isEnabled(): boolean {
         return this.enabled;
     }
 
-    getPort(): number {
+    /**
+     * Gets the port number of the Modbus device.
+     * @returns The port number.
+     */
+    public getPort(): number {
         return this.port;
     }
 
-    getEndian(): Endian {
+    /**
+     * Gets the endian format of the Modbus device.
+     * @returns The endian format.
+     */
+    public getEndian(): Endian {
         return this.endian;
     }
 
-    getName(): string {
+    /**
+     * Gets the name of the Modbus device.
+     * @returns The name of the device.
+     */
+    public getName(): string {
         return this.name;
     }
 
-    getVendor(): string {
+    /**
+     * Gets the vendor of the Modbus device.
+     * @returns The vendor of the device.
+     */
+    public getVendor(): string {
         return this.vendor;
     }   
 
-    getDescription(): string {
+    /**
+     * Gets the description of the Modbus device.
+     * @returns The description of the device.
+     */
+    public getDescription(): string {
         return this.description;
     }
 
-    getAllUnits(): ModbusUnit[] {
+    /**
+     * Gets all the units of the Modbus device.
+     * @returns An array of Modbus units.
+     */
+    public getAllUnits(): ModbusUnit[] {
         return Array.from(this.units.values());
     }
 

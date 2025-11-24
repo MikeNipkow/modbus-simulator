@@ -4,11 +4,11 @@ import { fileURLToPath } from "url";
 import { DeviceManager } from './DeviceManager.js';
 import { ModbusDevice } from './ModbusDevice.js';
 import { ModbusUnit } from './ModbusUnit.js';
-import { DataArea } from './types/DataArea.js';
-import { Endian } from './types/Endian.js';
+import { DataArea } from './types/enums/DataArea.js';
+import { Endian } from './types/enums/Endian.js';
 import { DataPoint } from './DataPoint.js';
-import { AccessMode } from './types/AccessMode.js';
-import { DataType } from './types/DataType.js';
+import { AccessMode } from './types/enums/AccessMode.js';
+import { DataType } from './types/enums/DataType.js';
 import { initializeApiServer } from './api/apiServer.js';
 
 // Create directory containing device JSON files.

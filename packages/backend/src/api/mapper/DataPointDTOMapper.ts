@@ -1,9 +1,9 @@
 import { json } from "stream/consumers";
 import { DataPoint } from "../../DataPoint.js";
-import { AccessMode } from "../../types/AccessMode.js";
-import { DataArea } from "../../types/DataArea.js";
-import { DataType } from "../../types/DataType.js";
-import { ParseResult } from "../../types/ParseResult.js";
+import { AccessMode } from "../../types/enums/AccessMode.js";
+import { DataArea } from "../../types/enums/DataArea.js";
+import { DataType } from "../../types/enums/DataType.js";
+import { ParseResult } from "../../types/enums/ParseResult.js";
 import { getMinValueForType, getMaxValueForType, serializeValue, deserializeValue, getJSTypeFromDataType } from "../../util/modbusUtils.js";
 import { DataPointDTO } from "../dto/DataPointDTO.js";
 import { DataPointProps } from "../../types/DataPointProps.js";

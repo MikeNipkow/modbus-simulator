@@ -1,11 +1,11 @@
 import { ModbusDevice } from '../src/ModbusDevice.js';
 import { ModbusUnit } from '../src/ModbusUnit.js';
 import { DataPoint } from '../src/DataPoint.js';
-import { Endian } from '../src/types/Endian.js';
-import { DataArea } from '../src/types/DataArea.js';
-import { DataType } from '../src/types/DataType.js';
-import { AccessMode } from '../src/types/AccessMode.js';
-import { ModbusError } from '../src/types/ModbusError.js';
+import { Endian } from '../src/types/enums/Endian.js';
+import { DataArea } from '../src/types/enums/DataArea.js';
+import { DataType } from '../src/types/enums/DataType.js';
+import { AccessMode } from '../src/types/enums/AccessMode.js';
+import { ModbusError } from '../src/types/enums/ModbusError.js';
 
 describe('ModbusDevice', () => {
 

@@ -1,10 +1,10 @@
 import { DataPoint } from "../DataPoint.js";
-import { AccessMode } from "../types/AccessMode.js";
-import { DataArea } from "../types/DataArea.js";
+import { AccessMode } from "../types/enums/AccessMode.js";
+import { DataArea } from "../types/enums/DataArea.js";
 import { DataPointProps } from "../types/DataPointProps.js";
-import { DataType } from "../types/DataType.js";
+import { DataType } from "../types/enums/DataType.js";
 import { deserializeValue, getMaxValueForType, getMinValueForType, serializeValue } from "../util/modbusUtils.js";
-import { ParseResult } from "../types/ParseResult.js";
+import { ParseResult } from "../types/enums/ParseResult.js";
 
 export function toJSON(dataPoint: DataPoint): DataPointProps {
     const json: DataPointProps = {

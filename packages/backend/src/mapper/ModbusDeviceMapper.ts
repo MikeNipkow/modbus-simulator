@@ -1,5 +1,5 @@
 import { ModbusDevice } from "../ModbusDevice.js";
-import { ParseResult } from "../types/ParseResult.js";
+import { ParseResult } from "../types/enums/ParseResult.js";
 import {toJSON as unitToJSON, fromJSON as unitFromJSON} from "./ModbusUnitMapper.js";
 
 export function toJSON(device: ModbusDevice): object {

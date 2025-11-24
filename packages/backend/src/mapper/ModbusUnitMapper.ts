@@ -1,6 +1,6 @@
 import { ModbusUnit } from "../ModbusUnit.js";
 import { toJSON as dpToJSON, fromJSON as dpFromJSON } from "./DataPointMapper.js";
-import { ParseResult } from "../types/ParseResult.js";
+import { ParseResult } from "../types/enums/ParseResult.js";
 
 export function toJSON(unit: ModbusUnit): object {
 
