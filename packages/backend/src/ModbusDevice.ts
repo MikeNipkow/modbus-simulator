@@ -4,7 +4,7 @@ import { Endian } from "./types/enums/Endian.js";
 import Modbus, { FCallbackVal } from "modbus-serial";
 import { ModbusError } from "./types/enums/ModbusError.js";
 import { ModbusDeviceProps } from "./types/ModbusDeviceProps.js";
-import { isValidFileName } from "./util/fileUtils.js";
+import { isValidFilename } from "./util/fileUtils.js";
 
 /**
  * Class representing a Modbus device with multiple units and data points.
@@ -12,7 +12,7 @@ import { isValidFileName } from "./util/fileUtils.js";
 export class ModbusDevice implements Modbus.IServiceVector {
     
     // Device info.
-    private readonly fileName   : string;
+    private readonly filename   : string;
     private enabled             : boolean;
     private port                : number
     private endian              : Endian = Endian.BigEndian;
@@ -32,22 +32,22 @@ export class ModbusDevice implements Modbus.IServiceVector {
      * @param props The properties of the Modbus device.
      */
     constructor(props: ModbusDeviceProps) {
-        // Validate fileName.
-        if (!isValidFileName(props.fileName))
-            throw new Error('ModbusDevice must have a valid non-empty fileName');
+        // Validate filename.
+        if (!isValidFilename(props.filename))
+            throw new Error('ModbusDevice must have a valid non-empty filename');
 
-        // Check if fileName ends with .json.
-        if (props.fileName.endsWith('.json'))
-            throw new Error('ModbusDevice fileName must end with .json');
+        // Check if filename ends with .json.
+        if (props.filename.endsWith('.json'))
+            throw new Error('ModbusDevice filename must end with .json');
 
         // Check if port is valid.
         if (props.port < 1 || props.port > 65535)
             throw new Error('ModbusDevice port must be between 1 and 65535');
 
-        this.fileName       = props.fileName;
+        this.filename       = props.filename;
         this.enabled        = props.enabled;
         this.port           = props.port;
-        this.name           = props.name        ?? this.fileName.replace('.json', '');
+        this.name           = props.name        ?? this.filename.replace('.json', '');
         this.vendor         = props.vendor      ?? '';
         this.description    = props.description ?? '';
     }
@@ -380,8 +380,8 @@ export class ModbusDevice implements Modbus.IServiceVector {
      * Gets the file name of the Modbus device.
      * @returns The file name of the Modbus device.
      */
-    public getFileName(): string {
-        return this.fileName;
+    public getFilename(): string {
+        return this.filename;
     }
 
     /**

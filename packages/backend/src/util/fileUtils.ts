@@ -3,7 +3,7 @@
  * @param fileName The filename to validate.
  * @returns True if the filename is valid on both systems, false otherwise.
  */
-export function isValidFileName(fileName: string): boolean {
+export function isValidFilename(fileName: string): boolean {
     // Check if empty or only whitespace
     if (!fileName || fileName.trim().length === 0)
         return false;

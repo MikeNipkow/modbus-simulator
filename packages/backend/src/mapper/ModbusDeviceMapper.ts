@@ -1,71 +1,121 @@
 import { ModbusDevice } from "../ModbusDevice.js";
+import { Endian } from "../types/enums/Endian.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
-import {toJSON as unitToJSON, fromJSON as unitFromJSON} from "./ModbusUnitMapper.js";
+import { ModbusDeviceProps } from "../types/ModbusDeviceProps.js";
+import { isValidFilename } from "../util/fileUtils.js";
+import { unitFromObject, unitToUnitProps } from "./ModbusUnitMapper.js";
 
-export function toJSON(device: ModbusDevice): object {
+/**
+ * Maps a ModbusDevice to its ModbusDeviceProps representation.
+ * @param device ModbusDevice to map.
+ * @returns ModbusDeviceProps representation of the ModbusDevice.
+ */
+export function deviceToDeviceProps(device: ModbusDevice): ModbusDeviceProps {
+    // Check if device is valid.
+    if (!device)
+        throw new Error("Invalid ModbusDevice");
 
     return {
-        id          : device.getId(),
+        filename    : device.getFilename(),
         enabled     : device.isEnabled(),
         port        : device.getPort(),
         endian      : device.getEndian(),
         name        : device.getName(),
         vendor      : device.getVendor(),
         description : device.getDescription(),
-        units       : device.getAllUnits().map(unit => unitToJSON(unit))
+        modbusUnits : device.getAllUnits().map(unit => unitToUnitProps(unit))
     };
-
 }
 
-export function fromJSON(json: any): ParseResult<ModbusDevice> {
+/**
+ * Creates a ModbusDevice from a plain object, validating its properties.
+ * @param obj Object to convert to ModbusDevice.
+ * @returns ParseResult containing the ModbusDevice or errors.
+ */
+export function deviceFromObject(obj: any): ParseResult<ModbusDevice> {
+    // Collect errors.
     const errors: string[] = [];
 
-    if (json === null || typeof json !== 'object') {
-        errors.push('Invalid JSON object for ModbusDevice');
+    // Check if object is valid.
+    if (obj === null || typeof obj !== 'object') {
+        errors.push('Invalid object for ModbusDevice');
         return { success: false, errors: errors };
     }
 
-    if (json.id === undefined || typeof json.id !== 'string' || json.id.length === 0)   errors.push('ModbusDevice must have a valid id string');
-    if (json.enabled === undefined || typeof json.enabled !== 'boolean')                errors.push('ModbusDevice must have a valid enabled boolean');
-    if (json.port === undefined || typeof json.port !== 'number')                       errors.push('ModbusDevice must have a valid port number');
-    if (json.endian === undefined || typeof json.endian !== 'string')                   errors.push('ModbusDevice must have a valid endian string');
-    if (json.name === undefined || typeof json.name !== 'string')                       errors.push('ModbusDevice must have a valid name string');
-    if (json.vendor === undefined || typeof json.vendor !== 'string')                   errors.push('ModbusDevice must have a valid vendor string');
-    if (json.description === undefined || typeof json.description !== 'string')         errors.push('ModbusDevice must have a valid description string');
+    // Check filename.
+    const filename = obj.filename;
+    if (filename === undefined || typeof filename !== 'string' || filename.length === 0)
+        errors.push('ModbusDevice must have a valid filename string');
+    else if (!isValidFilename(filename))
+        errors.push(`ModbusDevice filename '${filename}' is not valid`);
 
+    // Check enabled.
+    const enabled = obj.enabled;
+    if (enabled === undefined || typeof enabled !== 'boolean')
+        errors.push('ModbusDevice must have a valid enabled boolean');
+
+    // Check port.
+    const port = obj.port;
+    if (port === undefined || typeof port !== 'number')
+        errors.push('ModbusDevice must have a valid port number');
+    else if (port < 1 || port > 65535)
+        errors.push('ModbusDevice port must be between 1 and 65535');
+
+    // Check endian.
+    const endian = obj.endian;
+    if (endian === undefined || typeof endian !== 'string')
+        errors.push('ModbusDevice must have a valid endian string');
+    else if (endian !== Endian.BigEndian && endian !== Endian.LittleEndian)
+        errors.push(`ModbusDevice endian must be either '${Endian.BigEndian}' or '${Endian.LittleEndian}'`);
+
+    // Check name.
+    const name = obj.name;
+    if (name === undefined || typeof name !== 'string')
+        errors.push('ModbusDevice must have a valid name string');
+
+    // Check vendor.
+    const vendor = obj.vendor;
+    if (vendor === undefined || typeof vendor !== 'string')
+        errors.push('ModbusDevice must have a valid vendor string');
+
+    // Check description.
+    const description = obj.description;
+    if (description === undefined || typeof description !== 'string')
+        errors.push('ModbusDevice must have a valid description string');
+
+    // Check if any errors occurred.
     if (errors.length > 0)
         return { success: false, errors: errors };
 
-    const id            = json.id;
-    const enabled       = json.enabled;
-    const port          = json.port;
-    const endian        = json.endian;
-    const name          = json.name;
-    const vendor        = json.vendor;
-    const description   = json.description;
+    // Create ModbusDevice instance.
+    const device = new ModbusDevice({ filename, enabled, port, endian, name, vendor, description });
+    
+    // Check if units are defined.
+    if (obj.modbusUnits && Array.isArray(obj.modbusUnits)) {
 
-    const device = new ModbusDevice(id, enabled, port, endian, name, vendor, description);
+        // Iterate over units.
+        for (const unitObj of obj.modbusUnits) {
 
-    // Parse Units.
-    if (json.units && Array.isArray(json.units)) {
-        for (const unitJson of json.units) {
-            const unitResult = unitFromJSON(unitJson);
+            // Try to parse unit.
+            const unitResult = unitFromObject(unitObj);
             if (!unitResult.success) {
                 errors.push(...unitResult.errors.map(err => `ModbusUnit error: ${err}`));
                 continue;
             }
 
+            // Check if unit can be added to the device.
             const unit = unitResult.value;
-
             if (device.hasUnit(unit.getId())) {
                 errors.push(`ModbusUnit with id '${unit.getId()}' already exists in ModbusDevice`);
                 continue;
             }
 
+            // Add unit to device.
             device.addUnit(unit);
         }
     }
 
+    // Check if any errors occurred while parsing units.
     if (errors.length > 0)
         return { success: false, errors: errors };
 

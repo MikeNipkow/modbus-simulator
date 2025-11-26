@@ -10,6 +10,7 @@ import { DataPoint } from './DataPoint.js';
 import { AccessMode } from './types/enums/AccessMode.js';
 import { DataType } from './types/enums/DataType.js';
 import { initializeApiServer } from './api/apiServer.js';
+import { ModbusDeviceProps } from './types/ModbusDeviceProps.js';
 
 // Create directory containing device JSON files.
 const __filename    = fileURLToPath(import.meta.url);
@@ -40,9 +41,18 @@ deviceErrors.forEach(err => console.error(err));
 console.log(deviceManager.getDevices().length + " devices loaded");
 
 // Sample device
-if (false) {
-    const device = new ModbusDevice("sample_device.json", true, 502, Endian.BigEndian, "Sample Device", "Sample Vendor", "Sample Description");
-    const unit = new ModbusUnit(1);
+if (true) {
+    const deviceProps: ModbusDeviceProps = {
+        filename            : "sample_device.json",
+        enabled             : true,
+        port                : 502,
+        endian              : Endian.BigEndian,
+        name                : "Sample Device",
+        vendor              : "Sample Vendor",
+        description         : "This is a sample Modbus device with various data points for testing purposes."
+    }
+    const device = new ModbusDevice(deviceProps);
+    const unit = new ModbusUnit({ unitId: 1 });
 
     // Coils.
     const coil1 = new DataPoint( { 

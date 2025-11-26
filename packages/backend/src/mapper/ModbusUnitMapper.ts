@@ -1,50 +1,65 @@
 import { ModbusUnit } from "../ModbusUnit.js";
-import { toJSON as dpToJSON, fromJSON as dpFromJSON } from "./DataPointMapper.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
+import { ModbusUnitProps } from "../types/ModbusUnitProps.js";
+import { dataPointFromObject, dataPointToDataPointProps } from "./DataPointMapper.js";
 
-export function toJSON(unit: ModbusUnit): object {
+/**
+ * Maps a ModbusUnit to its ModbusUnitProps representation.
+ * @param unit ModbusUnit to map.
+ * @returns ModbusUnitProps representation of the ModbusUnit.
+ * @throws Error if the ModbusUnit is invalid.
+ */
+export function unitToUnitProps(unit: ModbusUnit): ModbusUnitProps {
+    // Check if unit is valid.
+    if (!unit)
+        throw new Error("Invalid ModbusUnit");
 
     return {
-        unitId: unit.getId(),
-        dataPoints: unit.getAllDataPoints().map(dp => dpToJSON(dp))
+        unitId      : unit.getId(),
+        dataPoints  : unit.getAllDataPoints().map(dp => dataPointToDataPointProps(dp))
     };
-
 }
 
-export function fromJSON(json: any): ParseResult<ModbusUnit> {
+/**
+ * Creates a ModbusUnit from a plain object, validating its properties.
+ * @param obj Object to convert to ModbusUnit.
+ * @returns ParseResult containing the ModbusUnit or errors.
+ */
+export function unitFromObject(obj: any): ParseResult<ModbusUnit> {
+    // Collect errors.
     const errors: string[] = [];
 
-    if (json === null || typeof json !== 'object') {
-        errors.push('Invalid JSON object for ModbusUnit');
+    // Check if unit is valid.
+    if (obj === null || typeof obj !== 'object') {
+        errors.push('Invalid object for ModbusUnit');
         return { success: false, errors: errors };
     }
 
-    if (json.unitId === undefined || typeof json.unitId !== 'number')   errors.push('ModbusUnit must have a valid unitId');
-
-    if (errors.length > 0)
-        return { success: false, errors: errors };
-
     // Check Unit ID.
-    const unitId: number = json.unitId;
-    if (unitId < 1 || unitId > 254) {
+    const unitId: number = obj.unitId;
+    if (unitId === undefined || unitId < 1 || unitId > 254) {
         errors.push('ModbusUnit unitId must be between 1 and 254');
         return { success: false, errors: errors };
     }
 
-    const unit = new ModbusUnit(unitId);
+    // Create ModbusUnit instance.
+    const unit = new ModbusUnit({ unitId });
 
-    // Parse DataPoints.
-    if (json.dataPoints && Array.isArray(json.dataPoints)) {
-        for (const dpJson of json.dataPoints) {
-            const dpResult = dpFromJSON(dpJson);
+    // Check if DataPoints are defined.
+    if (obj.dataPoints && Array.isArray(obj.dataPoints)) {
+
+        // Iterate over DataPoints.
+        for (const dpObj of obj.dataPoints) {
+
+            // Try to parse DataPoint.
+            const dpResult = dataPointFromObject(dpObj);
             if (!dpResult.success) {
                 errors.push(...dpResult.errors.map(err => `DataPoint error: ${err}`));
                 continue;
             }
-
-            const dp = dpResult.value;
-
+            
             // Check if DataPoint can be added to the unit.
+            const dp        = dpResult.value;
             const addResult = unit.addDataPoint(dp);
             if (!addResult.success) {
                 errors.push(...addResult.errors);
@@ -52,9 +67,10 @@ export function fromJSON(json: any): ParseResult<ModbusUnit> {
             }
         }
     }
-    
+
+    // Check if any errors occurred while parsing DataPoints.
     if (errors.length > 0)
         return { success: false, errors: errors };
-    
+
     return { success: true, value: unit };
 }

@@ -11,8 +11,13 @@ import { serializeValue, deserializeValue } from "../util/jsonUtils.js";
  * Maps a DataPoint to its DataPointProps representation.
  * @param dataPoint DataPoint to map.
  * @returns DataPointProps representation of the DataPoint.
+ * @throws Error if the DataPoint is invalid.
  */
 export function dataPointToDataPointProps(dataPoint: DataPoint): DataPointProps {
+    // Check if dataPoint is valid.
+    if (!dataPoint)
+        throw new Error("Invalid DataPoint");
+
     const props: DataPointProps = {
         id                  : dataPoint.getId(),
         areas               : dataPoint.getAreas(),
