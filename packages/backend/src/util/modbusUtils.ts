@@ -1,6 +1,12 @@
 import { DataPoint } from "../DataPoint.js";
 import { DataType } from "../types/enums/DataType.js";
 
+/**
+ * Gets the number of Modbus registers required to store a value of the specified data type (except ASCII).
+ * @param type Data type.
+ * @returns Number of Modbus registers required.
+ * @throws Error if the data type is ASCII, as its length depends on the string length.
+ */
 export function getRegisterLengthFromType(type: DataType): number {
     switch (type) {
         case DataType.Int64:
@@ -13,14 +19,24 @@ export function getRegisterLengthFromType(type: DataType): number {
         case DataType.Float32: 
             return 2;
 
+        case DataType.ASCII:
+            throw new Error("Cannot determine register length for ASCII type without string length");
+
         default: return 1;
     }
 }
 
+/**
+ * Maps a DataType to its corresponding JavaScript type as a string.
+ * @param type Data type to map.
+ * @returns Corresponding JavaScript type as a string.
+ * @throws Error if the data type is unsupported for JS type mapping.
+ */
 export function getJSTypeFromDataType(type: DataType): string {
     switch (type) {
         case DataType.Bool:
             return 'boolean';
+
         case DataType.Byte:
         case DataType.Int16:
         case DataType.Int32:
@@ -29,16 +45,24 @@ export function getJSTypeFromDataType(type: DataType): string {
         case DataType.Float32:
         case DataType.Float64:
             return 'number';
+
         case DataType.Int64:
         case DataType.UInt64:
             return 'bigint';
+
         case DataType.ASCII:
             return 'string';
+
         default:
             throw new Error(`Unsupported DataType ${type} for JS type mapping`);
     }
 }
 
+/**
+ * Gets the default value for a given DataType.
+ * @param type Data type.
+ * @returns Default value corresponding to the data type.
+ */
 export function getDefaultValueForType(type: DataType): boolean | number | bigint | string {
     switch (type) {
         case DataType.Bool:
@@ -62,26 +86,12 @@ export function getDefaultValueForType(type: DataType): boolean | number | bigin
     }
 }
 
-export function serializeValue(value: boolean | number | bigint | string): boolean | number | bigint | string {
-    if (typeof value === 'bigint')
-        return value.toString();
-
-    return value;
-}
-
-export function deserializeValue(value: boolean | number | bigint | string): boolean | number | bigint | string {
-    // Convert numeric strings to BigInt.
-    if (typeof value === "string" && /^[0-9-]+$/.test(value)) {
-      try {
-        return BigInt(value);
-      } catch {
-        return value; // Fallback, if conversion fails, return original string.
-      }
-    }
-
-    return value;
-}
-
+/**
+ * Converts the value of a DataPoint into a DataView for Modbus register storage.
+ * @param dataPoint DataPoint to convert.
+ * @returns DataView representing the DataPoint's value.
+ * @throws Error if the DataType is unsupported for conversion.
+ */
 export function getDataViewFromValue(dataPoint: DataPoint): DataView {
     // Create DataView for multi-register types.
     const dataView: DataView = new DataView(new ArrayBuffer(dataPoint.getLength() * 2));
@@ -134,6 +144,13 @@ export function getDataViewFromValue(dataPoint: DataPoint): DataView {
     }
 }
 
+/**
+ * Retrieves a value from a DataView based on the specified DataPoint's type.
+ * @param dataView DataView containing the value.
+ * @param dataPoint DataPoint defining the type and length.
+ * @returns Value extracted from the DataView.
+ * @throws Error if the DataType is unsupported for conversion.
+ */
 export function getValueFromDataView(dataView: DataView, dataPoint: DataPoint): boolean | number | bigint | string {
     switch (dataPoint.getType()) {
         case DataType.Bool:
@@ -173,6 +190,12 @@ export function getValueFromDataView(dataView: DataView, dataPoint: DataPoint): 
     }
 }
 
+/**
+ * Gets the minimum value for a given DataType.
+ * @param type Data type.
+ * @returns Minimum value corresponding to the data type.
+ * @throws Error if the DataType does not have a defined minimum value.
+ */
 export function getMinValueForType(type: DataType): number | bigint {
     switch (type) {
         case DataType.Bool:
@@ -202,6 +225,12 @@ export function getMinValueForType(type: DataType): number | bigint {
     throw new Error(`Type ${type} does not have a defined minimum value`);
 }
 
+/**
+ * Gets the maximum value for a given DataType.
+ * @param type Data type.
+ * @returns Maximum value corresponding to the data type.
+ * @throws Error if the DataType does not have a defined maximum value.
+ */
 export function getMaxValueForType(type: DataType): number | bigint {
     switch (type) {
         case DataType.Bool:
