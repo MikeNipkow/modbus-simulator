@@ -6,7 +6,6 @@ import { DataType } from "../types/enums/DataType.js";
 import { getJSTypeFromDataType, getMaxValueForType, getMinValueForType } from "../util/modbusUtils.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
 import { serializeValue, deserializeValue } from "../util/jsonUtils.js";
-import { SimulationProps } from "../types/SimulationProps.js";
 
 /**
  * Maps a DataPoint to its DataPointProps representation.
