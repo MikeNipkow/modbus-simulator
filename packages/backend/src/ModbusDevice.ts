@@ -117,6 +117,36 @@ export class ModbusDevice implements Modbus.IServiceVector {
     // ~~~~~ Modbus Server ~~~~~
 
     /**
+     * Enables the Modbus server.
+     * @returns A promise that resolves with the result of the enable attempt and a message.
+     */
+    public enableServer(): Promise<{ success: boolean; message: string }> {
+        // Check if server is already enabled.
+        if (this.enabled)
+            return Promise.resolve({ success: false, message: `Modbus server on device '${this.name}' is already enabled` });
+
+        this.enabled = true;
+
+        // Start server.
+        return this.startServer();
+    }
+
+    /**
+     * Disables the Modbus server.
+     * @returns A promise that resolves with the result of the disable attempt and a message.
+     */
+    public disableServer(): Promise<{ success: boolean; message: string }> {
+        // Check if server is already disabled.
+        if (!this.enabled)
+            return Promise.resolve({ success: false, message: `Modbus server on device '${this.name}' is already disabled` });
+
+        this.enabled = false;
+
+        // Stop server.
+        return this.stopServer();
+    }
+
+    /**
      * Checks if the Modbus server is running.
      * @returns True if the Modbus server is running, false otherwise.
      */
@@ -129,7 +159,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
      * @param timeoutMs Optional timeout in milliseconds to wait for server start (default: 3000ms).
      * @returns A promise that resolves with the result of the server start attempt and a message.
      */
-    public startServer(saveState: boolean = true, timeoutMs: number = 3000): Promise<{ success: boolean; message: string }> {
+    public startServer(timeoutMs: number = 3000): Promise<{ success: boolean; message: string }> {
         // Check if server is already running.
         if(this.isRunning())
             return Promise.resolve({ success: false, message: `Modbus server on device '${this.name}' is already running` });
@@ -140,9 +170,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
                 host: '0.0.0.0', 
                 port: this.port 
             });
-
-            if (saveState)
-                this.enabled = true;
 
             // Check if server was started successfully.
             this.server.on('initialized', () => {
@@ -197,11 +224,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
                 this.running = false;
                 return resolve({ success: true, message: `Modbus server on device '${this.name}' stopped successfully` });
             });
-        }).then((result) => {
-            if (saveState)
-                this.enabled = false;
-
-            return result;
         });
     }
 
