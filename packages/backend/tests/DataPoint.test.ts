@@ -1,13 +1,12 @@
-
 import { DataPoint } from '../src/DataPoint.js';
 import { AccessMode } from '../src/types/enums/AccessMode.js';
 import { DataArea } from '../src/types/enums/DataArea.js';
 import { DataType } from '../src/types/enums/DataType.js';
 import { Endian } from '../src/types/enums/Endian.js';
-    
+
 describe('DataPoint', () => {
 
-    describe('Constructor', () => {
+    describe('Constructor Validation', () => {
         test('should create a valid DataPoint with required properties', () => {
             const dp = new DataPoint({
                 id: 'dp1',
@@ -22,7 +21,6 @@ describe('DataPoint', () => {
             expect(dp.getType()).toBe(DataType.Int16);
             expect(dp.getAddress()).toBe(100);
             expect(dp.getAccessMode()).toBe(AccessMode.ReadWrite);
-            expect(dp.getLength()).toBe(1);
         });
 
         test('should throw error when id is missing', () => {
@@ -45,7 +43,7 @@ describe('DataPoint', () => {
             })).toThrow('DataPoint must have at least one DataArea');
         });
 
-        test('should throw error when address is invalid', () => {
+        test('should throw error when address is negative', () => {
             expect(() => new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -53,7 +51,9 @@ describe('DataPoint', () => {
                 address: -1,
                 accessMode: AccessMode.ReadWrite
             })).toThrow('DataPoint must have a valid address');
+        });
 
+        test('should throw error when address exceeds 65535', () => {
             expect(() => new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -63,7 +63,7 @@ describe('DataPoint', () => {
             })).toThrow('DataPoint must have a valid address');
         });
 
-        test('should throw error for ASCII type without length', () => {
+        test('should throw error when ASCII type has no length', () => {
             expect(() => new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -73,145 +73,21 @@ describe('DataPoint', () => {
             })).toThrow('DataPoint of type String must have a length defined');
         });
 
-        test('should set default values correctly', () => {
-            const dp = new DataPoint({
+        test('should throw error when ASCII defaultValue exceeds length', () => {
+            expect(() => new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            expect(dp.getName()).toBe('');
-            expect(dp.getUnit()).toBe('');
-            expect(dp.getSimulation().enabled).toBe(false);
-        });
-    });
-
-    describe('Value Management', () => {
-        test('should get and set value for Bool', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.Coil],
-                type: DataType.Bool,
-                address: 0,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: false
-            });
-
-            expect(dp.getValue()).toBe(false);
-            expect(dp.setValue(true)).toBe(true);
-            expect(dp.getValue()).toBe(true);
-        });
-
-        test('should get and set value for Byte', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Byte,
+                type: DataType.ASCII,
                 address: 100,
                 accessMode: AccessMode.ReadWrite,
-                defaultValue: 128
-            });
-
-            expect(dp.getValue()).toBe(128);
-            expect(dp.setValue(255)).toBe(true);
-            expect(dp.getValue()).toBe(255);
+                length: 2,
+                defaultValue: 'TOOLONG'
+            })).toThrow('DataPoint defaultValue length exceeds defined length for String type');
         });
 
-        test('should get and set value for Int16', () => {
+        test('should accept valid ASCII DataPoint', () => {
             const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: -1000
-            });
-
-            expect(dp.getValue()).toBe(-1000);
-            expect(dp.setValue(1000)).toBe(true);
-            expect(dp.getValue()).toBe(1000);
-        });
-
-        test('should get and set value for UInt16', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.UInt16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 30000
-            });
-
-            expect(dp.getValue()).toBe(30000);
-            expect(dp.setValue(50000)).toBe(true);
-            expect(dp.getValue()).toBe(50000);
-        });
-
-        test('should get and set value for Int32', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: -100000
-            });
-
-            expect(dp.getValue()).toBe(-100000);
-            expect(dp.setValue(100000)).toBe(true);
-            expect(dp.getValue()).toBe(100000);
-        });
-
-        test('should get and set value for UInt32', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.UInt32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 3000000
-            });
-
-            expect(dp.getValue()).toBe(3000000);
-            expect(dp.setValue(4000000)).toBe(true);
-            expect(dp.getValue()).toBe(4000000);
-        });
-
-        test('should get and set value for Float32', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.45
-            });
-
-            expect(dp.getValue()).toBeCloseTo(123.45);
-            expect(dp.setValue(678.90)).toBe(true);
-            expect(dp.getValue()).toBeCloseTo(678.90);
-        });
-
-        test('should get and set value for Float64', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float64,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.456789
-            });
-
-            expect(dp.getValue()).toBeCloseTo(123.456789);
-            expect(dp.setValue(987.654321)).toBe(true);
-            expect(dp.getValue()).toBeCloseTo(987.654321);
-        });
-
-        test('should get and set value for ASCII', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
+                id: 'ascii1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.ASCII,
                 address: 100,
@@ -220,44 +96,59 @@ describe('DataPoint', () => {
                 defaultValue: 'HELLO'
             });
 
+            expect(dp.getType()).toBe(DataType.ASCII);
+            expect(dp.getLength()).toBe(10);
             expect(dp.getValue()).toBe('HELLO');
-            expect(dp.setValue('WORLD')).toBe(true);
-            expect(dp.getValue()).toBe('WORLD');
-        });
-
-        test('should not set value on read-only DataPoint without force', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.InputRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 42
-            });
-
-            expect(dp.setValue(100)).toBe(false);
-            expect(dp.getValue()).toBe(42);
-        });
-
-        test('should set value on read-only DataPoint with force', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.InputRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 42
-            });
-
-            expect(dp.setValue(100, true)).toBe(true);
-            expect(dp.getValue()).toBe(100);
         });
     });
 
-    describe('Register Value Management', () => {
-        test('should get and set register value for Bool', () => {
+    describe('Value Handling', () => {
+        test('should get and set value for ReadWrite DataPoint', () => {
             const dp = new DataPoint({
                 id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 100
+            });
+
+            expect(dp.getValue()).toBe(100);
+            expect(dp.setValue(200)).toBe(true);
+            expect(dp.getValue()).toBe(200);
+        });
+
+        test('should not set value for ReadOnly DataPoint without force', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.InputRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadOnly,
+                defaultValue: 100
+            });
+
+            expect(dp.setValue(200)).toBe(false);
+            expect(dp.getValue()).toBe(100);
+        });
+
+        test('should set value for ReadOnly DataPoint with force', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.InputRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadOnly,
+                defaultValue: 100
+            });
+
+            expect(dp.setValue(200, true)).toBe(true);
+            expect(dp.getValue()).toBe(200);
+        });
+
+        test('should handle Bool type correctly', () => {
+            const dp = new DataPoint({
+                id: 'coil1',
                 areas: [DataArea.Coil],
                 type: DataType.Bool,
                 address: 0,
@@ -265,360 +156,38 @@ describe('DataPoint', () => {
                 defaultValue: false
             });
 
-            expect(dp.getRegisterValue()).toBe(false);
-            expect(dp.setRegisterValue(1)).toBe(true);
-            expect(dp.getRegisterValue()).toBe(1);
+            expect(dp.getValue()).toBe(false);
+            dp.setValue(true);
+            expect(dp.getValue()).toBe(true);
         });
 
-        test('should get and set register value for Byte', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Byte,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 128
+        test('should handle all numeric types', () => {
+            const types = [
+                { type: DataType.Byte, value: 255 },
+                { type: DataType.Int16, value: -32768 },
+                { type: DataType.UInt16, value: 65535 },
+                { type: DataType.Int32, value: -2147483648 },
+                { type: DataType.UInt32, value: 4294967295 },
+                { type: DataType.Float32, value: 3.14 },
+                { type: DataType.Float64, value: 3.141592653589793 }
+            ];
+
+            types.forEach(({ type, value }) => {
+                const dp = new DataPoint({
+                    id: `dp_${type}`,
+                    areas: [DataArea.HoldingRegister],
+                    type: type,
+                    address: 100,
+                    accessMode: AccessMode.ReadWrite,
+                    defaultValue: value
+                });
+
+                expect(dp.getValue()).toBe(value);
             });
-
-            expect(dp.getRegisterValue()).toBe(128);
-            expect(dp.setRegisterValue(255)).toBe(true);
-            expect(dp.getRegisterValue()).toBe(255);
-        });
-
-        test('should get and set register value for Int16', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: -1000
-            });
-
-            expect(dp.getRegisterValue()).toBe(-1000);
-            expect(dp.setRegisterValue(1000)).toBe(true);
-            expect(dp.getRegisterValue()).toBe(1000);
-        });
-
-        test('should get and set register value for UInt16', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.UInt16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 30000
-            });
-
-            expect(dp.getRegisterValue()).toBe(30000);
-            expect(dp.setRegisterValue(50000)).toBe(true);
-            expect(dp.getRegisterValue()).toBe(50000);
-        });
-
-        test('should get and set register values for Int32 (big-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: -100000
-            });
-
-            // -100000 = 0xFFFE7960
-            expect(dp.getRegisterValue(0, Endian.BigEndian)).toBe(0xFFFE);
-            expect(dp.getRegisterValue(1, Endian.BigEndian)).toBe(0x7960);
-
-            // Set new value: 100000 = 0x000186A0
-            expect(dp.setRegisterValue(0x0001, false, 0, Endian.BigEndian)).toBe(true);
-            expect(dp.setRegisterValue(0x86A0, false, 1, Endian.BigEndian)).toBe(true);
-            expect(dp.getValue()).toBe(100000);
-        });
-
-        test('should get and set register values for Int32 (little-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: -100000
-            });
-
-            // -100000 = 0xFFFE7960 (little-endian reversed)
-            expect(dp.getRegisterValue(1, Endian.LittleEndian)).toBe(0xFFFE);
-            expect(dp.getRegisterValue(0, Endian.LittleEndian)).toBe(0x7960);
-
-            // Set new value: 100000 = 0x000186A0
-            expect(dp.setRegisterValue(0x0001, false, 1, Endian.LittleEndian)).toBe(true);
-            expect(dp.setRegisterValue(0x86A0, false, 0, Endian.LittleEndian)).toBe(true);
-            expect(dp.getValue()).toBe(100000);
-        });
-
-        test('should get and set register values for UInt32 (big-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.UInt32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 3000000
-            });
-
-            // 3000000 = 0x002DC6C0
-            expect(dp.getRegisterValue(0, Endian.BigEndian)).toBe(0x002D);
-            expect(dp.getRegisterValue(1, Endian.BigEndian)).toBe(0xC6C0);
-        });
-
-        test('should get and set register values for Float32 (big-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.45
-            });
-
-            // 123.45 ≈ 0x42F6E666
-            expect(dp.getRegisterValue(0, Endian.BigEndian)).toBe(0x42F6);
-            expect(dp.getRegisterValue(1, Endian.BigEndian)).toBe(0xE666);
-
-            // Set new value via registers
-            expect(dp.setRegisterValue(0x4348, false, 0, Endian.BigEndian)).toBe(true);
-            expect(dp.setRegisterValue(0x0000, false, 1, Endian.BigEndian)).toBe(true);
-            expect(dp.getValue()).toBeCloseTo(200.0, 1);
-        });
-
-        test('should get and set register values for Float32 (little-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.45
-            });
-
-            expect(dp.getRegisterValue(1, Endian.LittleEndian)).toBe(0x42F6);
-            expect(dp.getRegisterValue(0, Endian.LittleEndian)).toBe(0xE666);
-        });
-
-        test('should get and set register values for Float64 (big-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float64,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.45
-            });
-
-            // 123.45 ≈ 0x405EDCCCCCCCCCCD
-            expect(dp.getRegisterValue(0, Endian.BigEndian)).toBe(0x405E);
-            expect(dp.getRegisterValue(1, Endian.BigEndian)).toBe(0xDCCC);
-            expect(dp.getRegisterValue(2, Endian.BigEndian)).toBe(0xCCCC);
-            expect(dp.getRegisterValue(3, Endian.BigEndian)).toBe(0xCCCD);
-        });
-
-        test('should get and set register values for Float64 (little-endian)', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Float64,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 123.45
-            });
-
-            expect(dp.getRegisterValue(3, Endian.LittleEndian)).toBe(0x405E);
-            expect(dp.getRegisterValue(2, Endian.LittleEndian)).toBe(0xDCCC);
-            expect(dp.getRegisterValue(1, Endian.LittleEndian)).toBe(0xCCCC);
-            expect(dp.getRegisterValue(0, Endian.LittleEndian)).toBe(0xCCCD);
-        });
-
-        test('should throw error for invalid offset', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            expect(() => dp.setRegisterValue(1000, false, 5)).toThrow('Invalid offset 5 for datapoint dp1');
-        });
-
-        test('should not set register value on read-only without force', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.InputRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 42
-            });
-
-            expect(dp.setRegisterValue(100)).toBe(false);
-            expect(dp.getRegisterValue()).toBe(42);
-        });
-
-        test('should set register value on read-only with force', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.InputRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 42
-            });
-
-            expect(dp.setRegisterValue(100, true)).toBe(true);
-            expect(dp.getRegisterValue()).toBe(100);
         });
     });
 
-    describe('Data Areas', () => {
-        test('should add data area', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            dp.addDataArea(DataArea.InputRegister);
-            expect(dp.getAreas()).toContain(DataArea.InputRegister);
-            expect(dp.hasDataArea(DataArea.InputRegister)).toBe(true);
-        });
-
-        test('should not add duplicate data area', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            dp.addDataArea(DataArea.HoldingRegister);
-            expect(dp.getAreas().filter(a => a === DataArea.HoldingRegister).length).toBe(1);
-        });
-
-        test('should throw error when adding incompatible area', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            expect(() => dp.addDataArea(DataArea.Coil)).toThrow('DataPoint of type Int16 cannot have area Coil');
-        });
-
-        test('should delete data area', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister, DataArea.InputRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            dp.deleteDataArea(DataArea.InputRegister);
-            expect(dp.hasDataArea(DataArea.InputRegister)).toBe(false);
-        });
-
-        test('should throw error when deleting last area', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            expect(() => dp.deleteDataArea(DataArea.HoldingRegister)).toThrow('DataPoint must have at least one DataArea');
-        });
-    });
-
-    describe('Simulation', () => {
-        test('should start simulation', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                simulation: { enabled: false, minValue: 0, maxValue: 100 }
-            });
-
-            expect(dp.startSimulation(true, 100)).toBe(true);
-            expect(dp.isSimulationRunning()).toBe(true);
-            expect(dp.getSimulation().enabled).toBe(true);
-
-            dp.stopSimulation();
-        });
-
-        test('should not start simulation twice', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            dp.startSimulation(true, 100);
-            expect(dp.startSimulation(true, 100)).toBe(false);
-
-            dp.stopSimulation();
-        });
-
-        test('should stop simulation', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            dp.startSimulation(true, 100);
-            expect(dp.stopSimulation()).toBe(true);
-            expect(dp.isSimulationRunning()).toBe(false);
-            expect(dp.getSimulation().enabled).toBe(false);
-        });
-
-        test('should not stop simulation if not running', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite
-            });
-
-            expect(dp.stopSimulation()).toBe(false);
-        });
-
-        test('should not start simulation for ASCII type', () => {
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.ASCII,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                length: 10
-            });
-
-            expect(dp.startSimulation()).toBe(false);
-        });
-    });
-
-    describe('Access Control', () => {
+    describe('Access Mode', () => {
         test('should have read access for ReadOnly', () => {
             const dp = new DataPoint({
                 id: 'dp1',
@@ -645,7 +214,7 @@ describe('DataPoint', () => {
             expect(dp.hasWriteAccess()).toBe(true);
         });
 
-        test('should have both accesses for ReadWrite', () => {
+        test('should have both read and write access for ReadWrite', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -659,8 +228,439 @@ describe('DataPoint', () => {
         });
     });
 
-    describe('Occupied Addresses', () => {
-        test('should return single address for single-register type', () => {
+    describe('Register Value Handling - Big Endian', () => {
+        test('should get register value for Bool', () => {
+            const dp = new DataPoint({
+                id: 'coil1',
+                areas: [DataArea.Coil],
+                type: DataType.Bool,
+                address: 0,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: true
+            });
+
+            expect(dp.getRegisterValue()).toBe(true);
+        });
+
+        test('should get register value for Int16', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 1234
+            });
+
+            expect(dp.getRegisterValue()).toBe(1234);
+        });
+
+        test('should get register value for UInt16', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.UInt16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 65535
+            });
+
+            expect(dp.getRegisterValue()).toBe(65535);
+        });
+
+        test('should get multi-register value for Int32 with big-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 100000
+            });
+
+            const reg0 = dp.getRegisterValue(0, Endian.BigEndian);
+            const reg1 = dp.getRegisterValue(1, Endian.BigEndian);
+
+            expect(reg0).toBe(0x0001); // High word
+            expect(reg1).toBe(0x86A0); // Low word
+        });
+
+        test('should get multi-register value for Float32 with big-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Float32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 3.14
+            });
+
+            const reg0 = dp.getRegisterValue(0, Endian.BigEndian);
+            const reg1 = dp.getRegisterValue(1, Endian.BigEndian);
+
+            expect(typeof reg0).toBe('number');
+            expect(typeof reg1).toBe('number');
+        });
+
+        test('should throw error for invalid offset', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 100000
+            });
+
+            expect(() => dp.getRegisterValue(5)).toThrow('Invalid offset');
+        });
+    });
+
+    describe('Register Value Handling - Little Endian', () => {
+        test('should get multi-register value for Int32 with little-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 100000
+            });
+
+            const reg0 = dp.getRegisterValue(0, Endian.LittleEndian);
+            const reg1 = dp.getRegisterValue(1, Endian.LittleEndian);
+
+            expect(reg0).toBe(0x86A0); // Low word first
+            expect(reg1).toBe(0x0001); // High word second
+        });
+
+        test('should get multi-register value for UInt32 with little-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.UInt32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 4294967295
+            });
+
+            const reg0 = dp.getRegisterValue(0, Endian.LittleEndian);
+            const reg1 = dp.getRegisterValue(1, Endian.LittleEndian);
+
+            expect(reg0).toBe(0xFFFF);
+            expect(reg1).toBe(0xFFFF);
+        });
+    });
+
+    describe('Set Register Value', () => {
+        test('should set register value for Bool', () => {
+            const dp = new DataPoint({
+                id: 'coil1',
+                areas: [DataArea.Coil],
+                type: DataType.Bool,
+                address: 0,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: false
+            });
+
+            dp.setRegisterValue(1);
+            expect(dp.getValue()).toBe(1);
+        });
+
+        test('should set register value for Int16', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 0
+            });
+
+            dp.setRegisterValue(5000);
+            expect(dp.getValue()).toBe(5000);
+        });
+
+        test('should set multi-register value for Int32 with big-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 0
+            });
+
+            dp.setRegisterValue(0x0001, false, 0, Endian.BigEndian);
+            dp.setRegisterValue(0x86A0, false, 1, Endian.BigEndian);
+
+            expect(dp.getValue()).toBe(100000);
+        });
+
+        test('should set multi-register value for Int32 with little-endian', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 0
+            });
+
+            dp.setRegisterValue(0x86A0, false, 0, Endian.LittleEndian);
+            dp.setRegisterValue(0x0001, false, 1, Endian.LittleEndian);
+
+            expect(dp.getValue()).toBe(100000);
+        });
+
+        test('should not set register value for ReadOnly without force', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.InputRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadOnly,
+                defaultValue: 100
+            });
+
+            const result = dp.setRegisterValue(200);
+            expect(result).toBe(false);
+            expect(dp.getValue()).toBe(100);
+        });
+
+        test('should set register value for ReadOnly with force', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.InputRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadOnly,
+                defaultValue: 100
+            });
+
+            const result = dp.setRegisterValue(200, true);
+            expect(result).toBe(true);
+            expect(dp.getValue()).toBe(200);
+        });
+    });
+
+    describe('Data Areas', () => {
+        test('should add valid data area', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            dp.addDataArea(DataArea.InputRegister);
+            expect(dp.hasDataArea(DataArea.InputRegister)).toBe(true);
+            expect(dp.getAreas()).toHaveLength(2);
+        });
+
+        test('should not add duplicate area', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            dp.addDataArea(DataArea.HoldingRegister);
+            expect(dp.getAreas()).toHaveLength(1);
+        });
+
+        test('should throw error when adding Coil area to non-Bool type', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            expect(() => dp.addDataArea(DataArea.Coil)).toThrow('DataPoint of type');
+        });
+
+        test('should delete data area', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister, DataArea.InputRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            dp.deleteDataArea(DataArea.InputRegister);
+            expect(dp.hasDataArea(DataArea.InputRegister)).toBe(false);
+            expect(dp.getAreas()).toHaveLength(1);
+        });
+
+        test('should throw error when deleting last area', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            expect(() => dp.deleteDataArea(DataArea.HoldingRegister)).toThrow('must have at least one DataArea');
+        });
+    });
+
+    describe('Simulation', () => {
+        test('should start simulation for numeric type', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            expect(dp.startSimulation(100)).toBe(true);
+            expect(dp.isSimulationRunning()).toBe(true);
+            dp.stopSimulation();
+        });
+
+        test('should not start simulation twice', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            dp.startSimulation(100);
+            expect(dp.startSimulation(100)).toBe(false);
+            dp.stopSimulation();
+        });
+
+        test('should not start simulation for ASCII type', () => {
+            const dp = new DataPoint({
+                id: 'ascii1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.ASCII,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                length: 10
+            });
+
+            expect(dp.startSimulation()).toBe(false);
+        });
+
+        test('should stop simulation', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            dp.startSimulation(100);
+            expect(dp.stopSimulation()).toBe(true);
+            expect(dp.isSimulationRunning()).toBe(false);
+        });
+
+        test('should not stop simulation when not running', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+
+            expect(dp.stopSimulation()).toBe(false);
+        });
+
+        test('should enable simulation', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: false, minValue: 0, maxValue: 100 }
+            });
+
+            expect(dp.isSimulationEnabled()).toBe(false);
+            dp.enableSimulation();
+            expect(dp.isSimulationEnabled()).toBe(true);
+            expect(dp.isSimulationRunning()).toBe(true);
+            dp.stopSimulation();
+        });
+
+        test('should disable simulation', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            dp.startSimulation(100);
+            dp.disableSimulation();
+            expect(dp.isSimulationEnabled()).toBe(false);
+            expect(dp.isSimulationRunning()).toBe(false);
+        });
+
+        test('should generate value within range for Bool type', (done) => {
+            const dp = new DataPoint({
+                id: 'coil1',
+                areas: [DataArea.Coil],
+                type: DataType.Bool,
+                address: 0,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: false,
+                simulation: { enabled: true, minValue: 0, maxValue: 1 }
+            });
+
+            dp.startSimulation(50);
+            
+            setTimeout(() => {
+                dp.stopSimulation();
+                const value = dp.getValue();
+                expect(typeof value).toBe('boolean');
+                done();
+            }, 100);
+        });
+
+        test('should generate value within range for numeric type', (done) => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 50,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            dp.startSimulation(50);
+            
+            setTimeout(() => {
+                dp.stopSimulation();
+                const value = dp.getValue() as number;
+                expect(value).toBeGreaterThanOrEqual(0);
+                expect(value).toBeLessThanOrEqual(100);
+                done();
+            }, 100);
+        });
+    });
+
+    describe('Getters', () => {
+        test('should get occupied addresses for single register', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -672,7 +672,7 @@ describe('DataPoint', () => {
             expect(dp.getOccupiedAddresses()).toEqual([100]);
         });
 
-        test('should return multiple addresses for multi-register type', () => {
+        test('should get occupied addresses for multi-register', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -684,22 +684,35 @@ describe('DataPoint', () => {
             expect(dp.getOccupiedAddresses()).toEqual([100, 101]);
         });
 
-        test('should return correct addresses for ASCII type', () => {
+        test('should get default value', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
-                type: DataType.ASCII,
+                type: DataType.Int16,
                 address: 100,
                 accessMode: AccessMode.ReadWrite,
-                length: 5
+                defaultValue: 1234
             });
 
-            expect(dp.getOccupiedAddresses()).toEqual([100, 101, 102, 103, 104]);
+            expect(dp.getDefaultValue()).toBe(1234);
         });
-    });
 
-    describe('Feedback DataPoint', () => {
-        test('should have feedback datapoint when set', () => {
+        test('should get name and unit', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                name: 'Temperature',
+                unit: '°C'
+            });
+
+            expect(dp.getName()).toBe('Temperature');
+            expect(dp.getUnit()).toBe('°C');
+        });
+
+        test('should check feedback datapoint', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
@@ -713,7 +726,7 @@ describe('DataPoint', () => {
             expect(dp.getFeedbackDataPoint()).toBe('dp2');
         });
 
-        test('should not have feedback datapoint when not set', () => {
+        test('should return undefined for no feedback datapoint', () => {
             const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],

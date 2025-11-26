@@ -37,7 +37,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
             throw new Error('ModbusDevice must have a valid non-empty filename');
 
         // Check if filename ends with .json.
-        if (props.filename.endsWith('.json'))
+        if (!props.filename.endsWith('.json'))
             throw new Error('ModbusDevice filename must end with .json');
 
         // Check if port is valid.
@@ -47,6 +47,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
         this.filename       = props.filename;
         this.enabled        = props.enabled;
         this.port           = props.port;
+        this.endian         = props.endian      ?? Endian.BigEndian;
         this.name           = props.name        ?? this.filename.replace('.json', '');
         this.vendor         = props.vendor      ?? '';
         this.description    = props.description ?? '';

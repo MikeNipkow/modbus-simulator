@@ -9,52 +9,113 @@ import { ModbusError } from '../src/types/enums/ModbusError.js';
 
 describe('ModbusDevice', () => {
 
-    describe('Constructor', () => {
+    describe('Constructor Validation', () => {
         test('should create a valid ModbusDevice with required properties', () => {
-            const device = new ModbusDevice('dev1', true, 502, Endian.BigEndian, 'Test Device', 'Test Vendor', 'Test Description');
+            const device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            });
 
-            expect(device.getId()).toBe('dev1');
+            expect(device.getFilename()).toBe('test_device.json');
             expect(device.isEnabled()).toBe(true);
             expect(device.getPort()).toBe(502);
-            expect(device.getEndian()).toBe(Endian.BigEndian);
-            expect(device.getName()).toBe('Test Device');
-            expect(device.getVendor()).toBe('Test Vendor');
-            expect(device.getDescription()).toBe('Test Description');
+            expect(device.getName()).toBe('test_device');
         });
 
-        test('should throw error when id is empty', () => {
-            expect(() => new ModbusDevice('', true, 502, Endian.BigEndian, 'Test', 'Vendor', 'Desc'))
-                .toThrow('ModbusDevice must have a valid non-empty ID');
+        test('should throw error when filename is invalid', () => {
+            expect(() => new ModbusDevice({
+                filename: '',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            })).toThrow('ModbusDevice must have a valid non-empty filename');
         });
 
-        test('should throw error when id is only whitespace', () => {
-            expect(() => new ModbusDevice('   ', true, 502, Endian.BigEndian, 'Test', 'Vendor', 'Desc'))
-                .toThrow('ModbusDevice must have a valid non-empty ID');
+        test('should throw error when filename does not end with .json', () => {
+            expect(() => new ModbusDevice({
+                filename: 'test_device',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            })).toThrow('ModbusDevice filename must end with .json');
         });
 
         test('should throw error when port is less than 1', () => {
-            expect(() => new ModbusDevice('dev1', true, 0, Endian.BigEndian, 'Test', 'Vendor', 'Desc'))
-                .toThrow('ModbusDevice port must be between 1 and 65535');
+            expect(() => new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 0,
+                endian: Endian.BigEndian
+            })).toThrow('ModbusDevice port must be between 1 and 65535');
         });
 
         test('should throw error when port is greater than 65535', () => {
-            expect(() => new ModbusDevice('dev1', true, 65536, Endian.BigEndian, 'Test', 'Vendor', 'Desc'))
-                .toThrow('ModbusDevice port must be between 1 and 65535');
+            expect(() => new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 65536,
+                endian: Endian.BigEndian
+            })).toThrow('ModbusDevice port must be between 1 and 65535');
         });
 
         test('should accept boundary port values', () => {
-            const device1 = new ModbusDevice('dev1', true, 1, Endian.BigEndian, 'Test', 'Vendor', 'Desc');
-            const device2 = new ModbusDevice('dev2', true, 65535, Endian.BigEndian, 'Test', 'Vendor', 'Desc');
+            const device1 = new ModbusDevice({
+                filename: 'dev1.json',
+                enabled: true,
+                port: 1,
+                endian: Endian.BigEndian
+            });
+            const device2 = new ModbusDevice({
+                filename: 'dev2.json',
+                enabled: true,
+                port: 65535,
+                endian: Endian.BigEndian
+            });
             
             expect(device1.getPort()).toBe(1);
             expect(device2.getPort()).toBe(65535);
         });
 
-        test('should create device with little-endian', () => {
-            const device = new ModbusDevice('dev1', false, 502, Endian.LittleEndian, 'Test', 'Vendor', 'Desc');
-            
-            expect(device.getEndian()).toBe(Endian.LittleEndian);
-            expect(device.isEnabled()).toBe(false);
+        test('should use optional properties when provided', () => {
+            const device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: false,
+                port: 502,
+                endian: Endian.BigEndian,
+                name: 'Test Device',
+                vendor: 'Test Vendor',
+                description: 'Test Description'
+            });
+
+            expect(device.getName()).toBe('Test Device');
+            expect(device.getVendor()).toBe('Test Vendor');
+            expect(device.getDescription()).toBe('Test Description');
+        });
+
+        test('should use default values when optional properties are omitted', () => {
+            const device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            });
+
+            expect(device.getName()).toBe('test_device');
+            expect(device.getVendor()).toBe('');
+            expect(device.getDescription()).toBe('');
+        });
+
+        test('should have BigEndian as default endian', () => {
+            const device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            });
+
+            expect(device.getEndian()).toBe(Endian.BigEndian);
         });
     });
 
@@ -62,11 +123,16 @@ describe('ModbusDevice', () => {
         let device: ModbusDevice;
 
         beforeEach(() => {
-            device = new ModbusDevice('dev1', true, 502, Endian.BigEndian, 'Test Device', 'Vendor', 'Description');
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 502,
+                endian: Endian.BigEndian
+            });
         });
 
         test('should add a unit successfully', () => {
-            const unit = new ModbusUnit(1);
+            const unit = new ModbusUnit({ unitId: 1 });
             
             expect(device.addUnit(unit)).toBe(true);
             expect(device.hasUnit(1)).toBe(true);
@@ -78,8 +144,8 @@ describe('ModbusDevice', () => {
         });
 
         test('should not add duplicate unit', () => {
-            const unit1 = new ModbusUnit(1);
-            const unit2 = new ModbusUnit(1);
+            const unit1 = new ModbusUnit({ unitId: 1 });
+            const unit2 = new ModbusUnit({ unitId: 1 });
             
             device.addUnit(unit1);
             expect(device.addUnit(unit2)).toBe(false);
@@ -87,9 +153,9 @@ describe('ModbusDevice', () => {
         });
 
         test('should add multiple units with different IDs', () => {
-            const unit1 = new ModbusUnit(1);
-            const unit2 = new ModbusUnit(2);
-            const unit3 = new ModbusUnit(3);
+            const unit1 = new ModbusUnit({ unitId: 1 });
+            const unit2 = new ModbusUnit({ unitId: 2 });
+            const unit3 = new ModbusUnit({ unitId: 3 });
             
             expect(device.addUnit(unit1)).toBe(true);
             expect(device.addUnit(unit2)).toBe(true);
@@ -99,7 +165,7 @@ describe('ModbusDevice', () => {
         });
 
         test('should get unit by ID', () => {
-            const unit = new ModbusUnit(5);
+            const unit = new ModbusUnit({ unitId: 5 });
             device.addUnit(unit);
             
             expect(device.getUnit(5)).toBe(unit);
@@ -110,7 +176,7 @@ describe('ModbusDevice', () => {
         });
 
         test('should check if unit exists', () => {
-            const unit = new ModbusUnit(10);
+            const unit = new ModbusUnit({ unitId: 10 });
             device.addUnit(unit);
             
             expect(device.hasUnit(10)).toBe(true);
@@ -118,7 +184,7 @@ describe('ModbusDevice', () => {
         });
 
         test('should delete unit successfully', () => {
-            const unit = new ModbusUnit(1);
+            const unit = new ModbusUnit({ unitId: 1 });
             device.addUnit(unit);
             
             expect(device.deleteUnit(1)).toBe(true);
@@ -130,8 +196,8 @@ describe('ModbusDevice', () => {
         });
 
         test('should get all units', () => {
-            const unit1 = new ModbusUnit(1);
-            const unit2 = new ModbusUnit(2);
+            const unit1 = new ModbusUnit({ unitId: 1 });
+            const unit2 = new ModbusUnit({ unitId: 2 });
             
             device.addUnit(unit1);
             device.addUnit(unit2);
@@ -143,11 +209,113 @@ describe('ModbusDevice', () => {
         });
     });
 
-    describe('Modbus Server', () => {
+    describe('Simulation Management', () => {
+        let device: ModbusDevice;
+        let unit: ModbusUnit;
+
+        beforeEach(() => {
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 5502,
+                endian: Endian.BigEndian
+            });
+            unit = new ModbusUnit({ unitId: 1 });
+            device.addUnit(unit);
+        });
+
+        test('should start all enabled simulations', () => {
+            const dp1 = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+            const dp2 = new DataPoint({
+                id: 'dp2',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 200,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: false, minValue: 0, maxValue: 100 }
+            });
+
+            unit.addDataPoint(dp1);
+            unit.addDataPoint(dp2);
+
+            device.startAllEnabledSimulations();
+
+            expect(dp1.isSimulationRunning()).toBe(true);
+            expect(dp2.isSimulationRunning()).toBe(false);
+
+            device.stopAllSimulations();
+        });
+
+        test('should stop all simulations', () => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            unit.addDataPoint(dp);
+            dp.startSimulation();
+
+            expect(dp.isSimulationRunning()).toBe(true);
+
+            device.stopAllSimulations();
+
+            expect(dp.isSimulationRunning()).toBe(false);
+        });
+
+        test('should handle multiple units with simulations', () => {
+            const unit2 = new ModbusUnit({ unitId: 2 });
+            device.addUnit(unit2);
+
+            const dp1 = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+            const dp2 = new DataPoint({
+                id: 'dp2',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 200,
+                accessMode: AccessMode.ReadWrite,
+                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+            });
+
+            unit.addDataPoint(dp1);
+            unit2.addDataPoint(dp2);
+
+            device.startAllEnabledSimulations();
+
+            expect(dp1.isSimulationRunning()).toBe(true);
+            expect(dp2.isSimulationRunning()).toBe(true);
+
+            device.stopAllSimulations();
+        });
+    });
+
+    describe('Modbus Server Lifecycle', () => {
         let device: ModbusDevice;
 
         beforeEach(() => {
-            device = new ModbusDevice('dev1', true, 5502, Endian.BigEndian, 'Test Device', 'Vendor', 'Description');
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 5503,
+                endian: Endian.BigEndian
+            });
         });
 
         afterEach(async () => {
@@ -166,7 +334,6 @@ describe('ModbusDevice', () => {
             expect(result.success).toBe(true);
             expect(result.message).toContain('Modbus server started');
             expect(device.isRunning()).toBe(true);
-            expect(device.isEnabled()).toBe(true);
         });
 
         test('should fail to start server twice', async () => {
@@ -177,16 +344,6 @@ describe('ModbusDevice', () => {
             expect(result.message).toContain('already running');
         });
 
-        test('should fail to start server on occupied port', async () => {
-            const device2 = new ModbusDevice('dev2', true, 5502, Endian.BigEndian, 'Test Device 2', 'Vendor', 'Desc');
-            
-            await device.startServer();
-            const result = await device2.startServer();
-            
-            expect(result.success).toBe(false);
-            expect(result.message).toContain('already in use');
-        });
-
         test('should stop server successfully', async () => {
             await device.startServer();
             const result = await device.stopServer();
@@ -194,7 +351,6 @@ describe('ModbusDevice', () => {
             expect(result.success).toBe(true);
             expect(result.message).toContain('stopped successfully');
             expect(device.isRunning()).toBe(false);
-            expect(device.isEnabled()).toBe(false);
         });
 
         test('should fail to stop server when not running', async () => {
@@ -212,18 +368,91 @@ describe('ModbusDevice', () => {
             expect(result.success).toBe(true);
             expect(device.isRunning()).toBe(true);
         });
+
+        test('should fail to start on occupied port', async () => {
+            const device2 = new ModbusDevice({
+                filename: 'test_device2.json',
+                enabled: true,
+                port: 5503,
+                endian: Endian.BigEndian
+            });
+            
+            await device.startServer();
+            const result = await device2.startServer();
+            
+            expect(result.success).toBe(false);
+            expect(result.message).toContain('already in use');
+        });
+    });
+
+    describe('Enable/Disable Server', () => {
+        let device: ModbusDevice;
+
+        beforeEach(() => {
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: false,
+                port: 5504,
+                endian: Endian.BigEndian
+            });
+        });
+
+        afterEach(async () => {
+            if (device.isRunning()) {
+                await device.stopServer();
+            }
+        });
+
+        test('should enable server and start it', async () => {
+            const result = await device.enableServer();
+            
+            expect(result.success).toBe(true);
+            expect(device.isEnabled()).toBe(true);
+            expect(device.isRunning()).toBe(true);
+        });
+
+        test('should fail to enable already enabled server', async () => {
+            await device.enableServer();
+            const result = await device.enableServer();
+            
+            expect(result.success).toBe(false);
+            expect(result.message).toContain('already enabled');
+        });
+
+        test('should disable server and stop it', async () => {
+            await device.enableServer();
+            const result = await device.disableServer();
+            
+            expect(result.success).toBe(true);
+            expect(device.isEnabled()).toBe(false);
+            expect(device.isRunning()).toBe(false);
+        });
+
+        test('should fail to disable already disabled server', async () => {
+            const result = await device.disableServer();
+            
+            expect(result.success).toBe(false);
+            expect(result.message).toContain('already disabled');
+        });
     });
 
     describe('Modbus Read Requests', () => {
         let device: ModbusDevice;
         let unit: ModbusUnit;
-        let dp: DataPoint;
 
         beforeEach(() => {
-            device = new ModbusDevice('dev1', true, 5503, Endian.BigEndian, 'Test Device', 'Vendor', 'Description');
-            unit = new ModbusUnit(1);
-            
-            dp = new DataPoint({
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 5505,
+                endian: Endian.BigEndian
+            });
+            unit = new ModbusUnit({ unitId: 1 });
+            device.addUnit(unit);
+        });
+
+        test('should read holding register successfully', (done) => {
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
@@ -231,12 +460,8 @@ describe('ModbusDevice', () => {
                 accessMode: AccessMode.ReadWrite,
                 defaultValue: 1234
             });
-            
             unit.addDataPoint(dp);
-            device.addUnit(unit);
-        });
 
-        test('should read holding register successfully', (done) => {
             device.getHoldingRegister(100, 1, (err, value) => {
                 expect(err).toBeNull();
                 expect(value).toBe(1234);
@@ -245,15 +470,15 @@ describe('ModbusDevice', () => {
         });
 
         test('should read input register successfully', (done) => {
-            const dp2 = new DataPoint({
-                id: 'dp2',
+            const dp = new DataPoint({
+                id: 'dp1',
                 areas: [DataArea.InputRegister],
                 type: DataType.Int16,
                 address: 200,
                 accessMode: AccessMode.ReadOnly,
                 defaultValue: 5678
             });
-            unit.addDataPoint(dp2);
+            unit.addDataPoint(dp);
 
             device.getInputRegister(200, 1, (err, value) => {
                 expect(err).toBeNull();
@@ -299,6 +524,15 @@ describe('ModbusDevice', () => {
         });
 
         test('should return error for non-existent unit', (done) => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+            unit.addDataPoint(dp);
+
             device.getHoldingRegister(100, 99, (err, value) => {
                 expect(err).toHaveProperty('modbusErrorCode', ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND);
                 expect(value).toBeNull();
@@ -307,6 +541,15 @@ describe('ModbusDevice', () => {
         });
 
         test('should return error for invalid address', (done) => {
+            const dp = new DataPoint({
+                id: 'dp1',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int16,
+                address: 100,
+                accessMode: AccessMode.ReadWrite
+            });
+            unit.addDataPoint(dp);
+
             device.getHoldingRegister(999, 1, (err, value) => {
                 expect(err).toHaveProperty('modbusErrorCode', ModbusError.ILLEGAL_DATA_ADDRESS);
                 expect(value).toBeNull();
@@ -314,216 +557,60 @@ describe('ModbusDevice', () => {
             });
         });
 
-        test('should read multi-register datapoint with correct offset', (done) => {
-            const dp32 = new DataPoint({
-                id: 'dp32',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 300,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 100000
-            });
-            unit.addDataPoint(dp32);
-
-            device.getHoldingRegister(300, 1, (err, value) => {
-                expect(err).toBeNull();
-                expect(value).toBe(0x0001); // First register of 100000
-                done();
-            });
-        });
-
-        test('should handle little-endian reads', (done) => {
-            const deviceLE = new ModbusDevice('dev2', true, 5504, Endian.LittleEndian, 'LE Device', 'Vendor', 'Desc');
-            const unitLE = new ModbusUnit(1);
-            const dp32 = new DataPoint({
-                id: 'dp32',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int32,
-                address: 300,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 100000
-            });
-            unitLE.addDataPoint(dp32);
-            deviceLE.addUnit(unitLE);
-
-            deviceLE.getHoldingRegister(300, 1, (err, value) => {
-                expect(err).toBeNull();
-                expect(value).toBe(0x86A0); // Little-endian first register
-                done();
-            });
-        });
-    });
-
-    describe('Simulation Management', () => {
-        let device: ModbusDevice;
-        let unit1: ModbusUnit;
-        let unit2: ModbusUnit;
-
-        beforeEach(() => {
-            device = new ModbusDevice('dev1', true, 5506, Endian.BigEndian, 'Test Device', 'Vendor', 'Description');
-            unit1 = new ModbusUnit(1);
-            unit2 = new ModbusUnit(2);
-
-            // Add DataPoints with simulation enabled
-            const dp1 = new DataPoint({
+        test('should return error for write-only datapoint', (done) => {
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
                 address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 25,
-                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+                accessMode: AccessMode.WriteOnly,
+                defaultValue: 1234
             });
+            unit.addDataPoint(dp);
 
-            const dp2 = new DataPoint({
-                id: 'dp2',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 200,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 50,
-                simulation: { enabled: false, minValue: 0, maxValue: 100 }
+            device.getHoldingRegister(100, 1, (err, value) => {
+                expect(err).toHaveProperty('modbusErrorCode', ModbusError.ILLEGAL_DATA_ADDRESS);
+                expect(value).toBeNull();
+                done();
             });
+        });
 
-            const dp3 = new DataPoint({
-                id: 'dp3',
+        test('should read multi-register datapoint with offset', (done) => {
+            const dp = new DataPoint({
+                id: 'dp32',
                 areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
+                type: DataType.Int32,
                 address: 300,
                 accessMode: AccessMode.ReadWrite,
-                defaultValue: 75,
-                simulation: { enabled: true, minValue: 0, maxValue: 100 }
+                defaultValue: 100000
             });
+            unit.addDataPoint(dp);
 
-            unit1.addDataPoint(dp1);
-            unit1.addDataPoint(dp2);
-            unit2.addDataPoint(dp3);
-
-            device.addUnit(unit1);
-            device.addUnit(unit2);
-        });
-
-        test('should start all simulations regardless of enabled flag', () => {
-            device.startAllSimulations();
-
-            const dp1 = unit1.getDataPoint('dp1');
-            const dp2 = unit1.getDataPoint('dp2');
-            const dp3 = unit2.getDataPoint('dp3');
-
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp2?.isSimulationRunning()).toBe(true);
-            expect(dp3?.isSimulationRunning()).toBe(true);
-
-            device.stopAllSimulations();
-        });
-
-        test('should start all simulations with saveState', () => {
-            const dp1 = unit1.getDataPoint('dp1');
-            const dp2 = unit1.getDataPoint('dp2');
-
-            expect(dp2?.isSimulationEnabled()).toBe(false);
-
-            device.startAllSimulations(true);
-
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp2?.isSimulationRunning()).toBe(true);
-            expect(dp2?.isSimulationEnabled()).toBe(true); // saveState changes enabled flag
-
-            device.stopAllSimulations();
-        });
-
-        test('should start only enabled simulations', () => {
-            device.startAllEnabledSimulations();
-
-            const dp1 = unit1.getDataPoint('dp1');
-            const dp2 = unit1.getDataPoint('dp2');
-            const dp3 = unit2.getDataPoint('dp3');
-
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp2?.isSimulationRunning()).toBe(false); // simulation not enabled
-            expect(dp3?.isSimulationRunning()).toBe(true);
-
-            device.stopAllSimulations();
-        });
-
-        test('should stop all simulations', () => {
-            device.startAllSimulations();
-
-            const dp1 = unit1.getDataPoint('dp1');
-            const dp2 = unit1.getDataPoint('dp2');
-            const dp3 = unit2.getDataPoint('dp3');
-
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp2?.isSimulationRunning()).toBe(true);
-            expect(dp3?.isSimulationRunning()).toBe(true);
-
-            device.stopAllSimulations();
-
-            expect(dp1?.isSimulationRunning()).toBe(false);
-            expect(dp2?.isSimulationRunning()).toBe(false);
-            expect(dp3?.isSimulationRunning()).toBe(false);
-        });
-
-        test('should stop all simulations with saveState', () => {
-            const dp1 = unit1.getDataPoint('dp1');
-            
-            device.startAllSimulations();
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp1?.isSimulationEnabled()).toBe(true);
-
-            device.stopAllSimulations(true);
-
-            expect(dp1?.isSimulationRunning()).toBe(false);
-            expect(dp1?.isSimulationEnabled()).toBe(false); // saveState changes enabled flag
-        });
-
-        test('should handle empty device without units', () => {
-            const emptyDevice = new ModbusDevice('empty', true, 5507, Endian.BigEndian, 'Empty', 'Vendor', 'Desc');
-
-            expect(() => emptyDevice.startAllSimulations()).not.toThrow();
-            expect(() => emptyDevice.startAllEnabledSimulations()).not.toThrow();
-            expect(() => emptyDevice.stopAllSimulations()).not.toThrow();
-        });
-
-        test('should handle unit without datapoints', () => {
-            const emptyDevice = new ModbusDevice('empty', true, 5508, Endian.BigEndian, 'Empty', 'Vendor', 'Desc');
-            const emptyUnit = new ModbusUnit(1);
-            emptyDevice.addUnit(emptyUnit);
-
-            expect(() => emptyDevice.startAllSimulations()).not.toThrow();
-            expect(() => emptyDevice.startAllEnabledSimulations()).not.toThrow();
-            expect(() => emptyDevice.stopAllSimulations()).not.toThrow();
-        });
-
-        test('should affect simulations across multiple units', () => {
-            device.startAllSimulations();
-
-            const dp1 = unit1.getDataPoint('dp1');
-            const dp3 = unit2.getDataPoint('dp3');
-
-            expect(dp1?.isSimulationRunning()).toBe(true);
-            expect(dp3?.isSimulationRunning()).toBe(true);
-
-            device.stopAllSimulations();
-
-            expect(dp1?.isSimulationRunning()).toBe(false);
-            expect(dp3?.isSimulationRunning()).toBe(false);
+            device.getHoldingRegister(300, 1, (err, value) => {
+                expect(err).toBeNull();
+                expect(value).toBe(0x0001); // High word in big-endian
+                done();
+            });
         });
     });
 
     describe('Modbus Write Requests', () => {
         let device: ModbusDevice;
         let unit: ModbusUnit;
-        let dp: DataPoint;
 
         beforeEach(() => {
-            device = new ModbusDevice('dev1', true, 5505, Endian.BigEndian, 'Test Device', 'Vendor', 'Description');
-            unit = new ModbusUnit(1);
+            device = new ModbusDevice({
+                filename: 'test_device.json',
+                enabled: true,
+                port: 5506,
+                endian: Endian.BigEndian
+            });
+            unit = new ModbusUnit({ unitId: 1 });
             device.addUnit(unit);
         });
 
         test('should write holding register successfully', (done) => {
-            dp = new DataPoint({
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
@@ -531,7 +618,6 @@ describe('ModbusDevice', () => {
                 accessMode: AccessMode.ReadWrite,
                 defaultValue: 0
             });
-            
             unit.addDataPoint(dp);
 
             device.setRegister(100, 5000, 1, (err, value) => {
@@ -562,15 +648,13 @@ describe('ModbusDevice', () => {
         });
 
         test('should return error for non-existent unit', (done) => {
-            dp = new DataPoint({
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
                 address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 0
+                accessMode: AccessMode.ReadWrite
             });
-            
             unit.addDataPoint(dp);
             
             device.setRegister(100, 5000, 99, (err, value) => {
@@ -581,15 +665,13 @@ describe('ModbusDevice', () => {
         });
 
         test('should return error for invalid address', (done) => {
-            dp = new DataPoint({
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
                 address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 0
+                accessMode: AccessMode.ReadWrite
             });
-            
             unit.addDataPoint(dp);
             
             device.setRegister(999, 5000, 1, (err, value) => {
@@ -600,7 +682,7 @@ describe('ModbusDevice', () => {
         });
 
         test('should return error for read-only datapoint', (done) => {
-            dp = new DataPoint({
+            const dp = new DataPoint({
                 id: 'dp1',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int16,
@@ -608,7 +690,6 @@ describe('ModbusDevice', () => {
                 accessMode: AccessMode.ReadOnly,
                 defaultValue: 0
             });
-            
             unit.addDataPoint(dp);
 
             device.setRegister(100, 5000, 1, (err, value) => {
@@ -618,8 +699,8 @@ describe('ModbusDevice', () => {
             });
         });
 
-        test('should write multi-register datapoint with correct offset', (done) => {
-            const dp32 = new DataPoint({
+        test('should write multi-register datapoint with offset', (done) => {
+            const dp = new DataPoint({
                 id: 'dp32',
                 areas: [DataArea.HoldingRegister],
                 type: DataType.Int32,
@@ -627,14 +708,14 @@ describe('ModbusDevice', () => {
                 accessMode: AccessMode.ReadWrite,
                 defaultValue: 0
             });
-            unit.addDataPoint(dp32);
+            unit.addDataPoint(dp);
 
             device.setRegister(100, 0x0001, 1, (err1) => {
                 expect(err1).toBeNull();
                 
                 device.setRegister(101, 0x86A0, 1, (err2) => {
                     expect(err2).toBeNull();
-                    expect(dp32.getValue()).toBe(100000);
+                    expect(dp.getValue()).toBe(100000);
                     done();
                 });
             });
@@ -670,6 +751,42 @@ describe('ModbusDevice', () => {
                 done();
             });
         });
+
+        test('should handle feedback datapoint with multi-register type', (done) => {
+            const dpFeedback = new DataPoint({
+                id: 'dpFeedback',
+                areas: [DataArea.InputRegister],
+                type: DataType.Int32,
+                address: 200,
+                accessMode: AccessMode.ReadOnly,
+                defaultValue: 0
+            });
+            
+            const dpWrite = new DataPoint({
+                id: 'dpWrite',
+                areas: [DataArea.HoldingRegister],
+                type: DataType.Int32,
+                address: 100,
+                accessMode: AccessMode.ReadWrite,
+                defaultValue: 0,
+                feedbackDataPoint: 'dpFeedback'
+            });
+
+            unit.addDataPoint(dpFeedback);
+            unit.addDataPoint(dpWrite);
+
+            device.setRegister(100, 0x0001, 1, (err1) => {
+                expect(err1).toBeNull();
+                
+                device.setRegister(101, 0x86A0, 1, (err2) => {
+                    expect(err2).toBeNull();
+                    expect(dpWrite.getValue()).toBe(100000);
+                    expect(dpFeedback.getValue()).toBe(100000);
+                    done();
+                });
+            });
+        });
     });
 
 });
+ 

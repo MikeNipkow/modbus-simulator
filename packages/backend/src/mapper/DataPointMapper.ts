@@ -101,19 +101,15 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
     if (errors.length > 0)
         return { success : false, errors  : errors };
 
-    // Check if defaultValue is provided.
-    if (obj.defaultValue === undefined) {
-        errors.push('DataPoint must have a defaultValue');
-        return { success : false, errors  : errors };
-    }
-
     // Check if defaultValue is valid for type.
-    const defaultValue = deserializeValue(obj.defaultValue);
-    if (typeof defaultValue !== getJSTypeFromDataType(obj.type)) {
-        errors.push(`DataPoint defaultValue type does not match DataType ${obj.type}`);
-        return { success : false, errors  : errors };
+    let defaultValue = obj.defaultValue;
+    if (obj.defaultValue !== undefined) {
+        defaultValue = deserializeValue(obj.defaultValue);
+        if (typeof defaultValue !== getJSTypeFromDataType(obj.type)) {
+            errors.push(`DataPoint defaultValue type does not match DataType ${obj.type}`);
+            return { success : false, errors  : errors };
+        }
     }
-
     
     // ~~~~~ Create DataPointProps ~~~~~
 
@@ -122,8 +118,8 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
     const type          = obj.type;
     const address       = obj.address;
     const accessMode    = obj.accessMode;
-    const name          = obj.name ?? '';
-    const unit          = obj.unit ?? '';
+    const name          = obj.name;
+    const unit          = obj.unit;
 
     // Create DataPointProps.
     const props: DataPointProps = {
@@ -157,7 +153,7 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
     }
     
     // Add simulation if provided.
-    if (obj.simulation !== undefined) {
+    if (obj.simulation !== undefined && obj.type !== DataType.ASCII) {
         // Validate simulation object.
         if (typeof obj.simulation !== 'object') {
             errors.push('DataPoint simulation must be an object');

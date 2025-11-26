@@ -1,911 +1,912 @@
-import { ModbusDevice } from '../src/ModbusDevice.js';
-import { ModbusUnit } from '../src/ModbusUnit.js';
-import { DataPoint } from '../src/DataPoint.js';
-import { toJSON, fromJSON } from '../src/mapper/ModbusDeviceMapper.js';
-import { AccessMode } from '../src/types/enums/AccessMode.js';
-import { DataArea } from '../src/types/enums/DataArea.js';
-import { DataType } from '../src/types/enums/DataType.js';
-import { Endian } from '../src/types/enums/Endian.js';
+import { ModbusDevice } from "../src/ModbusDevice.js";
+import { ModbusUnit } from "../src/ModbusUnit.js";
+import { DataPoint } from "../src/DataPoint.js";
+import { deviceFromObject, deviceToDeviceProps } from "../src/mapper/ModbusDeviceMapper.js";
+import { Endian } from "../src/types/enums/Endian.js";
+import { AccessMode } from "../src/types/enums/AccessMode.js";
+import { DataArea } from "../src/types/enums/DataArea.js";
+import { DataType } from "../src/types/enums/DataType.js";
 
 describe('ModbusDeviceMapper', () => {
+    describe('deviceToDeviceProps', () => {
+        describe('Valid Conversions', () => {
+            test('should convert a ModbusDevice without units to ModbusDeviceProps', () => {
+                const device = new ModbusDevice({
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                });
 
-    describe('toJSON', () => {
-        test('should serialize basic ModbusDevice without units', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
+                const props = deviceToDeviceProps(device);
 
-            const json = toJSON(device);
+                expect(props.filename).toBe('test.json');
+                expect(props.enabled).toBe(true);
+                expect(props.port).toBe(502);
+                expect(props.endian).toBe(Endian.BigEndian);
+                expect(props.modbusUnits).toEqual([]);
+            });
 
-            expect(json).toEqual({
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: []
+            test('should convert a ModbusDevice with optional properties', () => {
+                const device = new ModbusDevice({
+                    filename: 'device.json',
+                    enabled: false,
+                    port: 5020,
+                    endian: Endian.LittleEndian,
+                    name: 'Test Device',
+                    vendor: 'Test Vendor',
+                    description: 'Test Description'
+                });
+
+                const props = deviceToDeviceProps(device);
+
+                expect(props.filename).toBe('device.json');
+                expect(props.enabled).toBe(false);
+                expect(props.port).toBe(5020);
+                expect(props.endian).toBe(Endian.LittleEndian);
+                expect(props.name).toBe('Test Device');
+                expect(props.vendor).toBe('Test Vendor');
+                expect(props.description).toBe('Test Description');
+            });
+
+            test('should convert a ModbusDevice with one unit', () => {
+                const device = new ModbusDevice({
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                });
+
+                const unit = new ModbusUnit({ unitId: 1 });
+                device.addUnit(unit);
+
+                const props = deviceToDeviceProps(device);
+
+                expect(props.modbusUnits).toHaveLength(1);
+                expect(props.modbusUnits).toBeDefined();
+                expect(props.modbusUnits![0]!.unitId).toBe(1);
+            });
+
+            test('should convert a ModbusDevice with multiple units', () => {
+                const device = new ModbusDevice({
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                });
+
+                const unit1 = new ModbusUnit({ unitId: 1 });
+                const unit2 = new ModbusUnit({ unitId: 2 });
+                const unit3 = new ModbusUnit({ unitId: 3 });
+
+                device.addUnit(unit1);
+                device.addUnit(unit2);
+                device.addUnit(unit3);
+
+                const props = deviceToDeviceProps(device);
+
+                expect(props.modbusUnits).toHaveLength(3);
+                expect(props.modbusUnits).toBeDefined();
+                expect(props.modbusUnits![0]!.unitId).toBe(1);
+                expect(props.modbusUnits![1]!.unitId).toBe(2);
+                expect(props.modbusUnits![2]!.unitId).toBe(3);
+            });
+
+            test('should convert a ModbusDevice with units containing DataPoints', () => {
+                const device = new ModbusDevice({
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                });
+
+                const unit = new ModbusUnit({ unitId: 1 });
+                const dataPoint = new DataPoint({
+                    id: 'dp1',
+                    areas: [DataArea.HoldingRegister],
+                    type: DataType.Int16,
+                    address: 100,
+                    accessMode: AccessMode.ReadWrite,
+                    defaultValue: 42
+                });
+                unit.addDataPoint(dataPoint);
+                device.addUnit(unit);
+
+                const props = deviceToDeviceProps(device);
+
+                expect(props.modbusUnits).toHaveLength(1);
+                expect(props.modbusUnits).toBeDefined();
+                expect(props.modbusUnits![0]!.dataPoints).toHaveLength(1);
+                expect(props.modbusUnits![0]!.dataPoints).toBeDefined();
+                expect(props.modbusUnits![0]!.dataPoints![0]!.id).toBe('dp1');
+            });
+
+            test('should preserve all properties of complex device', () => {
+                const device = new ModbusDevice({
+                    filename: 'complex.json',
+                    enabled: true,
+                    port: 5502,
+                    endian: Endian.LittleEndian,
+                    name: 'Complex Device',
+                    vendor: 'ACME Corp',
+                    description: 'A complex test device'
+                });
+
+                const unit1 = new ModbusUnit({ unitId: 1 });
+                const dp1 = new DataPoint({
+                    id: 'temp',
+                    areas: [DataArea.InputRegister],
+                    type: DataType.Float32,
+                    address: 0,
+                    accessMode: AccessMode.ReadOnly,
+                    defaultValue: 20.5,
+                    name: 'Temperature',
+                    unit: '°C'
+                });
+                unit1.addDataPoint(dp1);
+
+                const unit2 = new ModbusUnit({ unitId: 2 });
+                const dp2 = new DataPoint({
+                    id: 'pressure',
+                    areas: [DataArea.HoldingRegister],
+                    type: DataType.UInt16,
+                    address: 100,
+                    accessMode: AccessMode.ReadWrite,
+                    defaultValue: 1013
+                });
+                unit2.addDataPoint(dp2);
+
+                device.addUnit(unit1);
+                device.addUnit(unit2);
+
+                const props = deviceToDeviceProps(device);
+
+                expect(props.filename).toBe('complex.json');
+                expect(props.enabled).toBe(true);
+                expect(props.port).toBe(5502);
+                expect(props.endian).toBe(Endian.LittleEndian);
+                expect(props.name).toBe('Complex Device');
+                expect(props.vendor).toBe('ACME Corp');
+                expect(props.description).toBe('A complex test device');
+                expect(props.modbusUnits).toHaveLength(2);
             });
         });
 
-        test('should serialize enabled ModbusDevice', () => {
-            const device = new ModbusDevice(
-                'device1',
-                true,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-
-            const json = toJSON(device);
-
-            expect((json as any).enabled).toBe(true);
-        });
-
-        test('should serialize ModbusDevice with little-endian', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.LittleEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-
-            const json = toJSON(device);
-
-            expect((json as any).endian).toBe(Endian.LittleEndian);
-        });
-
-        test('should serialize ModbusDevice with custom port', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                5020,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-
-            const json = toJSON(device);
-
-            expect((json as any).port).toBe(5020);
-        });
-
-        test('should serialize ModbusDevice with single unit', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-            const unit = new ModbusUnit(1);
-            device.addUnit(unit);
-
-            const json = toJSON(device);
-
-            expect((json as any).units).toHaveLength(1);
-            expect((json as any).units[0].unitId).toBe(1);
-        });
-
-        test('should serialize ModbusDevice with multiple units', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-            const unit1 = new ModbusUnit(1);
-            const unit2 = new ModbusUnit(2);
-            const unit3 = new ModbusUnit(3);
-            
-            device.addUnit(unit1);
-            device.addUnit(unit2);
-            device.addUnit(unit3);
-
-            const json = toJSON(device);
-
-            expect((json as any).units).toHaveLength(3);
-            expect((json as any).units[0].unitId).toBe(1);
-            expect((json as any).units[1].unitId).toBe(2);
-            expect((json as any).units[2].unitId).toBe(3);
-        });
-
-        test('should serialize ModbusDevice with units containing DataPoints', () => {
-            const device = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-            const unit = new ModbusUnit(1);
-            const dp = new DataPoint({
-                id: 'dp1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 1234
+        describe('Error Handling', () => {
+            test('should throw error for null ModbusDevice', () => {
+                expect(() => deviceToDeviceProps(null as any)).toThrow('Invalid ModbusDevice');
             });
-            unit.addDataPoint(dp);
-            device.addUnit(unit);
 
-            const json = toJSON(device);
-
-            expect((json as any).units[0].dataPoints).toHaveLength(1);
-            expect((json as any).units[0].dataPoints[0].id).toBe('dp1');
-            expect((json as any).units[0].dataPoints[0].address).toBe(100);
-        });
-
-        test('should serialize complete ModbusDevice with all features', () => {
-            const device = new ModbusDevice(
-                'plc1',
-                true,
-                5020,
-                Endian.LittleEndian,
-                'Industrial PLC',
-                'Siemens',
-                'S7-1200 Simulator'
-            );
-
-            const unit1 = new ModbusUnit(1);
-            unit1.addDataPoint(new DataPoint({
-                id: 'temp',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 25,
-                name: 'Temperature',
-                unit: '°C'
-            }));
-
-            const unit2 = new ModbusUnit(2);
-            unit2.addDataPoint(new DataPoint({
-                id: 'pressure',
-                areas: [DataArea.InputRegister],
-                type: DataType.Float32,
-                address: 200,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 101.325,
-                name: 'Pressure',
-                unit: 'kPa'
-            }));
-
-            device.addUnit(unit1);
-            device.addUnit(unit2);
-
-            const json = toJSON(device);
-
-            expect((json as any).id).toBe('plc1');
-            expect((json as any).enabled).toBe(true);
-            expect((json as any).port).toBe(5020);
-            expect((json as any).endian).toBe(Endian.LittleEndian);
-            expect((json as any).name).toBe('Industrial PLC');
-            expect((json as any).vendor).toBe('Siemens');
-            expect((json as any).description).toBe('S7-1200 Simulator');
-            expect((json as any).units).toHaveLength(2);
+            test('should throw error for undefined ModbusDevice', () => {
+                expect(() => deviceToDeviceProps(undefined as any)).toThrow('Invalid ModbusDevice');
+            });
         });
     });
 
-    describe('fromJSON', () => {
-        test('should deserialize basic ModbusDevice without units', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: []
-            };
+    describe('deviceFromObject', () => {
+        describe('Valid Object Conversions', () => {
+            test('should create ModbusDevice from valid minimal object', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getId()).toBe('device1');
-                expect(result.value.isEnabled()).toBe(false);
-                expect(result.value.getPort()).toBe(502);
-                expect(result.value.getEndian()).toBe(Endian.BigEndian);
-                expect(result.value.getName()).toBe('Test Device');
-                expect(result.value.getVendor()).toBe('Test Vendor');
-                expect(result.value.getDescription()).toBe('A test device');
-                expect(result.value.getAllUnits()).toHaveLength(0);
-            }
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    expect(result.value).toBeInstanceOf(ModbusDevice);
+                    expect(result.value.getFilename()).toBe('test.json');
+                    expect(result.value.isEnabled()).toBe(true);
+                    expect(result.value.getPort()).toBe(502);
+                    expect(result.value.getEndian()).toBe(Endian.BigEndian);
+                }
+            });
+
+            test('should create ModbusDevice with optional properties', () => {
+                const obj = {
+                    filename: 'device.json',
+                    enabled: false,
+                    port: 5020,
+                    endian: Endian.LittleEndian,
+                    name: 'Test Device',
+                    vendor: 'Test Vendor',
+                    description: 'Test Description'
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    expect(result.value.getName()).toBe('Test Device');
+                    expect(result.value.getVendor()).toBe('Test Vendor');
+                    expect(result.value.getDescription()).toBe('Test Description');
+                }
+            });
+
+            test('should create ModbusDevice with one unit', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        { unitId: 1 }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const units = result.value.getAllUnits();
+                    expect(units).toHaveLength(1);
+                    expect(units[0]!.getId()).toBe(1);
+                }
+            });
+
+            test('should create ModbusDevice with multiple units', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        { unitId: 1 },
+                        { unitId: 2 },
+                        { unitId: 3 }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const units = result.value.getAllUnits();
+                    expect(units).toHaveLength(3);
+                    expect(units[0]!.getId()).toBe(1);
+                    expect(units[1]!.getId()).toBe(2);
+                    expect(units[2]!.getId()).toBe(3);
+                }
+            });
+
+            test('should create ModbusDevice with units containing DataPoints', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        {
+                            unitId: 1,
+                            dataPoints: [
+                                {
+                                    id: 'dp1',
+                                    areas: [DataArea.HoldingRegister],
+                                    type: DataType.Int16,
+                                    address: 100,
+                                    accessMode: AccessMode.ReadWrite,
+                                    defaultValue: 42
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const units = result.value.getAllUnits();
+                    expect(units).toHaveLength(1);
+                    const dataPoints = units[0]!.getAllDataPoints();
+                    expect(dataPoints).toHaveLength(1);
+                    expect(dataPoints[0]!.getId()).toBe('dp1');
+                }
+            });
+
+            test('should create ModbusDevice with boundary port values', () => {
+                const obj1 = {
+                    filename: 'test1.json',
+                    enabled: true,
+                    port: 1,
+                    endian: Endian.BigEndian
+                };
+                const obj2 = {
+                    filename: 'test2.json',
+                    enabled: true,
+                    port: 65535,
+                    endian: Endian.BigEndian
+                };
+
+                const result1 = deviceFromObject(obj1);
+                const result2 = deviceFromObject(obj2);
+
+                expect(result1.success).toBe(true);
+                expect(result2.success).toBe(true);
+                if (result1.success) expect(result1.value.getPort()).toBe(1);
+                if (result2.success) expect(result2.value.getPort()).toBe(65535);
+            });
+
+            test('should handle empty modbusUnits array', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: []
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    expect(result.value.getAllUnits()).toHaveLength(0);
+                }
+            });
+
+            test('should accept both BigEndian and LittleEndian', () => {
+                const obj1 = {
+                    filename: 'test1.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
+                const obj2 = {
+                    filename: 'test2.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.LittleEndian
+                };
+
+                const result1 = deviceFromObject(obj1);
+                const result2 = deviceFromObject(obj2);
+
+                expect(result1.success).toBe(true);
+                expect(result2.success).toBe(true);
+                if (result1.success) expect(result1.value.getEndian()).toBe(Endian.BigEndian);
+                if (result2.success) expect(result2.value.getEndian()).toBe(Endian.LittleEndian);
+            });
         });
 
-        test('should deserialize enabled ModbusDevice', () => {
-            const json = {
-                id: 'device1',
-                enabled: true,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: []
-            };
+        describe('Invalid Object - Null/Invalid Type', () => {
+            test('should fail for null object', () => {
+                const result = deviceFromObject(null);
 
-            const result = fromJSON(json);
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('Invalid object for ModbusDevice');
+                }
+            });
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.isEnabled()).toBe(true);
-            }
+            test('should fail for undefined object', () => {
+                const result = deviceFromObject(undefined);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('Invalid object for ModbusDevice');
+                }
+            });
+
+            test('should fail for non-object types', () => {
+                const result = deviceFromObject('string');
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('Invalid object for ModbusDevice');
+                }
+            });
         });
 
-        test('should deserialize ModbusDevice with little-endian', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.LittleEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: []
-            };
+        describe('Invalid Filename', () => {
+            test('should fail for missing filename', () => {
+                const obj = {
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getEndian()).toBe(Endian.LittleEndian);
-            }
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('valid filename'))).toBe(true);
+                }
+            });
+
+            test('should fail for empty filename', () => {
+                const obj = {
+                    filename: '',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('valid filename'))).toBe(true);
+                }
+            });
+
+            test('should fail for non-string filename', () => {
+                const obj = {
+                    filename: 123,
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('valid filename'))).toBe(true);
+                }
+            });
+
+            test('should fail for filename without .json extension', () => {
+                const obj = {
+                    filename: 'test.txt',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('end with .json'))).toBe(true);
+                }
+            });
         });
 
-        test('should deserialize ModbusDevice with single unit', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: [
-                    {
-                        unitId: 1,
-                        dataPoints: []
-                    }
-                ]
-            };
+        describe('Invalid Enabled', () => {
+            test('should fail for non-boolean enabled', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: 'true',
+                    port: 502,
+                    endian: Endian.BigEndian
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getAllUnits()).toHaveLength(1);
-                expect(result.value.hasUnit(1)).toBe(true);
-            }
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid enabled boolean');
+                }
+            });
         });
 
-        test('should deserialize ModbusDevice with multiple units', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: [
-                    { unitId: 1, dataPoints: [] },
-                    { unitId: 2, dataPoints: [] },
-                    { unitId: 3, dataPoints: [] }
-                ]
-            };
+        describe('Invalid Port', () => {
+            test('should fail for missing port', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    endian: Endian.BigEndian
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getAllUnits()).toHaveLength(3);
-                expect(result.value.hasUnit(1)).toBe(true);
-                expect(result.value.hasUnit(2)).toBe(true);
-                expect(result.value.hasUnit(3)).toBe(true);
-            }
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid port number');
+                }
+            });
+
+            test('should fail for non-number port', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: '502',
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid port number');
+                }
+            });
+
+            test('should fail for port less than 1', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 0,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice port must be between 1 and 65535');
+                }
+            });
+
+            test('should fail for negative port', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: -1,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice port must be between 1 and 65535');
+                }
+            });
+
+            test('should fail for port greater than 65535', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 65536,
+                    endian: Endian.BigEndian
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice port must be between 1 and 65535');
+                }
+            });
         });
 
-        test('should deserialize ModbusDevice with units containing DataPoints', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: [
-                    {
-                        unitId: 1,
-                        dataPoints: [
-                            {
-                                id: 'dp1',
-                                areas: [DataArea.HoldingRegister],
-                                type: DataType.Int16,
-                                address: 100,
-                                accessMode: AccessMode.ReadWrite,
-                                defaultValue: 1234
-                            }
-                        ]
-                    }
-                ]
-            };
+        describe('Invalid Endian', () => {
+            test('should fail for missing endian', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(true);
-            if (result.success) {
-                const unit = result.value.getUnit(1);
-                expect(unit).toBeDefined();
-                expect(unit?.getAllDataPoints()).toHaveLength(1);
-                const dp = unit?.getDataPoint('dp1');
-                expect(dp?.getValue()).toBe(1234);
-            }
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid endian string');
+                }
+            });
+
+            test('should fail for non-string endian', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: 123
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid endian string');
+                }
+            });
+
+            test('should fail for invalid endian value', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: 'InvalidEndian'
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('BigEndian') && e.includes('LittleEndian'))).toBe(true);
+                }
+            });
         });
 
-        test('should fail when JSON is null', () => {
-            const result = fromJSON(null);
+        describe('Invalid Optional Properties', () => {
+            test('should fail for non-string name', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    name: 123
+                };
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('Invalid JSON object for ModbusDevice');
-            }
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid name string');
+                }
+            });
+
+            test('should fail for non-string vendor', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    vendor: 123
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid vendor string');
+                }
+            });
+
+            test('should fail for non-string description', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    description: 123
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors).toContain('ModbusDevice must have a valid description string');
+                }
+            });
         });
 
-        test('should fail when JSON is not an object', () => {
-            const result = fromJSON('invalid');
+        describe('Invalid ModbusUnits', () => {
+            test('should fail when unit has invalid unitId', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        { unitId: 0 }
+                    ]
+                };
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('Invalid JSON object for ModbusDevice');
-            }
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('ModbusUnit error'))).toBe(true);
+                    expect(result.errors.some(e => e.includes('unitId must be between 1 and 254'))).toBe(true);
+                }
+            });
+
+            test('should fail when unit contains invalid DataPoint', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        {
+                            unitId: 1,
+                            dataPoints: [
+                                {
+                                    id: '',
+                                    areas: [DataArea.HoldingRegister],
+                                    type: DataType.Int16,
+                                    address: 100,
+                                    accessMode: AccessMode.ReadWrite
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('ModbusUnit error'))).toBe(true);
+                    expect(result.errors.some(e => e.includes('DataPoint error'))).toBe(true);
+                }
+            });
+
+            test('should fail when duplicate unit IDs exist', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        { unitId: 1 },
+                        { unitId: 1 }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.some(e => e.includes('already exists'))).toBe(true);
+                }
+            });
+
+            test('should fail when multiple units have validation errors', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: [
+                        { unitId: 0 },
+                        { unitId: 255 }
+                    ]
+                };
+
+                const result = deviceFromObject(obj);
+
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.length).toBeGreaterThan(1);
+                }
+            });
         });
 
-        test('should fail when id is missing', () => {
-            const json = {
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
+        describe('Multiple Errors', () => {
+            test('should accumulate multiple validation errors', () => {
+                const obj = {
+                    filename: '',
+                    enabled: 'true',
+                    port: -1,
+                    endian: 'InvalidEndian'
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid id string');
-            }
+                expect(result.success).toBe(false);
+                if (!result.success) {
+                    expect(result.errors.length).toBeGreaterThan(3);
+                }
+            });
         });
 
-        test('should fail when id is empty string', () => {
-            const json = {
-                id: '',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
+        describe('Round-trip Conversion', () => {
+            test('should preserve all properties in round-trip conversion', () => {
+                const originalDevice = new ModbusDevice({
+                    filename: 'roundtrip.json',
+                    enabled: true,
+                    port: 5502,
+                    endian: Endian.LittleEndian,
+                    name: 'Round Trip Device',
+                    vendor: 'Test Vendor',
+                    description: 'Round trip test'
+                });
 
-            const result = fromJSON(json);
+                const unit = new ModbusUnit({ unitId: 42 });
+                const dp = new DataPoint({
+                    id: 'temp',
+                    areas: [DataArea.InputRegister],
+                    type: DataType.Float32,
+                    address: 0,
+                    accessMode: AccessMode.ReadOnly,
+                    defaultValue: 20.5,
+                    name: 'Temperature',
+                    unit: '°C'
+                });
+                unit.addDataPoint(dp);
+                originalDevice.addUnit(unit);
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid id string');
-            }
+                const props = deviceToDeviceProps(originalDevice);
+                const result = deviceFromObject(props);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const newDevice = result.value;
+                    expect(newDevice.getFilename()).toBe(originalDevice.getFilename());
+                    expect(newDevice.isEnabled()).toBe(originalDevice.isEnabled());
+                    expect(newDevice.getPort()).toBe(originalDevice.getPort());
+                    expect(newDevice.getEndian()).toBe(originalDevice.getEndian());
+                    expect(newDevice.getName()).toBe(originalDevice.getName());
+                    expect(newDevice.getVendor()).toBe(originalDevice.getVendor());
+                    expect(newDevice.getDescription()).toBe(originalDevice.getDescription());
+                    
+                    const originalUnits = originalDevice.getAllUnits();
+                    const newUnits = newDevice.getAllUnits();
+                    expect(newUnits).toHaveLength(originalUnits.length);
+                    expect(newUnits[0]!.getId()).toBe(originalUnits[0]!.getId());
+                }
+            });
+
+            test('should preserve minimal device in round-trip conversion', () => {
+                const originalDevice = new ModbusDevice({
+                    filename: 'minimal.json',
+                    enabled: false,
+                    port: 502,
+                    endian: Endian.BigEndian
+                });
+
+                const props = deviceToDeviceProps(originalDevice);
+                const result = deviceFromObject(props);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    expect(result.value.getFilename()).toBe('minimal.json');
+                    expect(result.value.isEnabled()).toBe(false);
+                    expect(result.value.getPort()).toBe(502);
+                    expect(result.value.getEndian()).toBe(Endian.BigEndian);
+                }
+            });
+
+            test('should preserve complex device with multiple units in round-trip', () => {
+                const originalDevice = new ModbusDevice({
+                    filename: 'complex.json',
+                    enabled: true,
+                    port: 5020,
+                    endian: Endian.BigEndian,
+                    name: 'Complex',
+                    vendor: 'Vendor',
+                    description: 'Desc'
+                });
+
+                const unit1 = new ModbusUnit({ unitId: 1 });
+                unit1.addDataPoint(new DataPoint({
+                    id: 'dp1',
+                    areas: [DataArea.HoldingRegister],
+                    type: DataType.Int16,
+                    address: 100,
+                    accessMode: AccessMode.ReadWrite
+                }));
+
+                const unit2 = new ModbusUnit({ unitId: 2 });
+                unit2.addDataPoint(new DataPoint({
+                    id: 'dp2',
+                    areas: [DataArea.Coil],
+                    type: DataType.Bool,
+                    address: 0,
+                    accessMode: AccessMode.ReadWrite
+                }));
+
+                originalDevice.addUnit(unit1);
+                originalDevice.addUnit(unit2);
+
+                const props = deviceToDeviceProps(originalDevice);
+                const result = deviceFromObject(props);
+
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    const newUnits = result.value.getAllUnits();
+                    expect(newUnits).toHaveLength(2);
+                    expect(newUnits[0]!.getAllDataPoints()).toHaveLength(1);
+                    expect(newUnits[1]!.getAllDataPoints()).toHaveLength(1);
+                }
+            });
         });
 
-        test('should fail when id is not a string', () => {
-            const json = {
-                id: 123,
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
+        describe('Edge Cases', () => {
+            test('should handle non-array modbusUnits property', () => {
+                const obj = {
+                    filename: 'test.json',
+                    enabled: true,
+                    port: 502,
+                    endian: Endian.BigEndian,
+                    modbusUnits: 'not an array'
+                };
 
-            const result = fromJSON(json);
+                const result = deviceFromObject(obj);
 
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid id string');
-            }
-        });
-
-        test('should fail when enabled is missing', () => {
-            const json = {
-                id: 'device1',
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid enabled boolean');
-            }
-        });
-
-        test('should fail when enabled is not a boolean', () => {
-            const json = {
-                id: 'device1',
-                enabled: 'true',
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid enabled boolean');
-            }
-        });
-
-        test('should fail when port is missing', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid port number');
-            }
-        });
-
-        test('should fail when port is not a number', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: '502',
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid port number');
-            }
-        });
-
-        test('should fail when endian is missing', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid endian string');
-            }
-        });
-
-        test('should fail when endian is not a string', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: 1,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid endian string');
-            }
-        });
-
-        test('should fail when name is missing', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid name string');
-            }
-        });
-
-        test('should fail when vendor is missing', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid vendor string');
-            }
-        });
-
-        test('should fail when description is missing', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors).toContain('ModbusDevice must have a valid description string');
-            }
-        });
-
-        test('should handle missing units field', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device'
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getAllUnits()).toHaveLength(0);
-            }
-        });
-
-        test('should fail when units contains invalid unit JSON', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: [
-                    {
-                        unitId: 'invalid',
-                        dataPoints: []
-                    }
-                ]
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors.some(e => e.includes('ModbusUnit error:'))).toBe(true);
-            }
-        });
-
-        test('should fail when duplicate unit IDs are present', () => {
-            const json = {
-                id: 'device1',
-                enabled: false,
-                port: 502,
-                endian: Endian.BigEndian,
-                name: 'Test Device',
-                vendor: 'Test Vendor',
-                description: 'A test device',
-                units: [
-                    { unitId: 1, dataPoints: [] },
-                    { unitId: 1, dataPoints: [] }
-                ]
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors.some(e => e.includes('already exists'))).toBe(true);
-            }
-        });
-
-        test('should collect multiple errors', () => {
-            const json = {
-                enabled: 'invalid',
-                port: 'invalid',
-                endian: 123,
-                name: 123,
-                vendor: null,
-                description: false
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(false);
-            if (!result.success) {
-                expect(result.errors.length).toBeGreaterThan(1);
-            }
-        });
-
-        test('should deserialize complete ModbusDevice with all features', () => {
-            const json = {
-                id: 'plc1',
-                enabled: true,
-                port: 5020,
-                endian: Endian.LittleEndian,
-                name: 'Industrial PLC',
-                vendor: 'Siemens',
-                description: 'S7-1200 Simulator',
-                units: [
-                    {
-                        unitId: 1,
-                        dataPoints: [
-                            {
-                                id: 'temp',
-                                areas: [DataArea.HoldingRegister],
-                                type: DataType.Int16,
-                                address: 100,
-                                accessMode: AccessMode.ReadWrite,
-                                defaultValue: 25,
-                                name: 'Temperature',
-                                unit: '°C'
-                            }
-                        ]
-                    },
-                    {
-                        unitId: 2,
-                        dataPoints: [
-                            {
-                                id: 'pressure',
-                                areas: [DataArea.InputRegister],
-                                type: DataType.Float32,
-                                address: 200,
-                                accessMode: AccessMode.ReadOnly,
-                                defaultValue: 101.325,
-                                name: 'Pressure',
-                                unit: 'kPa'
-                            }
-                        ]
-                    }
-                ]
-            };
-
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getId()).toBe('plc1');
-                expect(result.value.isEnabled()).toBe(true);
-                expect(result.value.getPort()).toBe(5020);
-                expect(result.value.getEndian()).toBe(Endian.LittleEndian);
-                expect(result.value.getName()).toBe('Industrial PLC');
-                expect(result.value.getVendor()).toBe('Siemens');
-                expect(result.value.getDescription()).toBe('S7-1200 Simulator');
-                expect(result.value.getAllUnits()).toHaveLength(2);
-            }
+                // Should succeed but ignore invalid modbusUnits
+                expect(result.success).toBe(true);
+                if (result.success) {
+                    expect(result.value.getAllUnits()).toHaveLength(0);
+                }
+            });
         });
     });
-
-    describe('Serialization Round-Trip', () => {
-        test('should maintain basic device through round-trip', () => {
-            const original = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-
-            const json = toJSON(original);
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getId()).toBe(original.getId());
-                expect(result.value.isEnabled()).toBe(original.isEnabled());
-                expect(result.value.getPort()).toBe(original.getPort());
-                expect(result.value.getEndian()).toBe(original.getEndian());
-                expect(result.value.getName()).toBe(original.getName());
-                expect(result.value.getVendor()).toBe(original.getVendor());
-                expect(result.value.getDescription()).toBe(original.getDescription());
-                expect(result.value.getAllUnits()).toHaveLength(0);
-            }
-        });
-
-        test('should maintain device with units through round-trip', () => {
-            const original = new ModbusDevice(
-                'device1',
-                true,
-                502,
-                Endian.LittleEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-            const unit1 = new ModbusUnit(1);
-            const unit2 = new ModbusUnit(2);
-            original.addUnit(unit1);
-            original.addUnit(unit2);
-
-            const json = toJSON(original);
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getAllUnits()).toHaveLength(2);
-                expect(result.value.hasUnit(1)).toBe(true);
-                expect(result.value.hasUnit(2)).toBe(true);
-            }
-        });
-
-        test('should maintain complete device configuration through round-trip', () => {
-            const original = new ModbusDevice(
-                'plc1',
-                true,
-                5020,
-                Endian.LittleEndian,
-                'Industrial PLC',
-                'Siemens',
-                'S7-1200 Simulator'
-            );
-
-            const unit1 = new ModbusUnit(1);
-            unit1.addDataPoint(new DataPoint({
-                id: 'temp',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.Int16,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: 25,
-                name: 'Temperature',
-                unit: '°C',
-                simulation: { enabled: true, minValue: -40, maxValue: 85 }
-            }));
-
-            const unit2 = new ModbusUnit(2);
-            unit2.addDataPoint(new DataPoint({
-                id: 'pressure',
-                areas: [DataArea.InputRegister],
-                type: DataType.Float32,
-                address: 200,
-                accessMode: AccessMode.ReadOnly,
-                defaultValue: 101.325,
-                name: 'Pressure',
-                unit: 'kPa'
-            }));
-            unit2.addDataPoint(new DataPoint({
-                id: 'alarm',
-                areas: [DataArea.Coil],
-                type: DataType.Bool,
-                address: 0,
-                accessMode: AccessMode.ReadWrite,
-                defaultValue: false
-            }));
-
-            original.addUnit(unit1);
-            original.addUnit(unit2);
-
-            const json = toJSON(original);
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                expect(result.value.getId()).toBe('plc1');
-                expect(result.value.isEnabled()).toBe(true);
-                expect(result.value.getPort()).toBe(5020);
-                expect(result.value.getEndian()).toBe(Endian.LittleEndian);
-                expect(result.value.getAllUnits()).toHaveLength(2);
-
-                const restoredUnit1 = result.value.getUnit(1);
-                expect(restoredUnit1?.getAllDataPoints()).toHaveLength(1);
-                expect(restoredUnit1?.getDataPoint('temp')?.getValue()).toBe(25);
-
-                const restoredUnit2 = result.value.getUnit(2);
-                expect(restoredUnit2?.getAllDataPoints()).toHaveLength(2);
-                expect(restoredUnit2?.getDataPoint('pressure')?.getValue()).toBeCloseTo(101.325, 3);
-                expect(restoredUnit2?.getDataPoint('alarm')?.getValue()).toBe(false);
-            }
-        });
-
-        test('should maintain ASCII DataPoints through round-trip', () => {
-            const original = new ModbusDevice(
-                'device1',
-                false,
-                502,
-                Endian.BigEndian,
-                'Test Device',
-                'Test Vendor',
-                'A test device'
-            );
-            const unit = new ModbusUnit(1);
-            unit.addDataPoint(new DataPoint({
-                id: 'ascii1',
-                areas: [DataArea.HoldingRegister],
-                type: DataType.ASCII,
-                address: 100,
-                accessMode: AccessMode.ReadWrite,
-                length: 10,
-                defaultValue: 'HELLO'
-            }));
-            original.addUnit(unit);
-
-            const json = toJSON(original);
-            const result = fromJSON(json);
-
-            expect(result.success).toBe(true);
-            if (result.success) {
-                const restoredUnit = result.value.getUnit(1);
-                const restoredDp = restoredUnit?.getDataPoint('ascii1');
-                expect(restoredDp?.getLength()).toBe(10);
-                expect(restoredDp?.getValue()).toBe('HELLO');
-            }
-        });
-    });
-
 });

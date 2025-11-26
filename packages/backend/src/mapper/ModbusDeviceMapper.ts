@@ -48,10 +48,12 @@ export function deviceFromObject(obj: any): ParseResult<ModbusDevice> {
         errors.push('ModbusDevice must have a valid filename string');
     else if (!isValidFilename(filename))
         errors.push(`ModbusDevice filename '${filename}' is not valid`);
+    else if (!filename.endsWith('.json'))
+        errors.push(`ModbusDevice filename '${filename}' must end with .json`);
 
     // Check enabled.
     const enabled = obj.enabled;
-    if (enabled === undefined || typeof enabled !== 'boolean')
+    if (enabled !== undefined && typeof enabled !== 'boolean')
         errors.push('ModbusDevice must have a valid enabled boolean');
 
     // Check port.
@@ -70,17 +72,17 @@ export function deviceFromObject(obj: any): ParseResult<ModbusDevice> {
 
     // Check name.
     const name = obj.name;
-    if (name === undefined || typeof name !== 'string')
+    if (name !== undefined && typeof name !== 'string')
         errors.push('ModbusDevice must have a valid name string');
 
     // Check vendor.
     const vendor = obj.vendor;
-    if (vendor === undefined || typeof vendor !== 'string')
+    if (vendor !== undefined && typeof vendor !== 'string')
         errors.push('ModbusDevice must have a valid vendor string');
 
     // Check description.
     const description = obj.description;
-    if (description === undefined || typeof description !== 'string')
+    if (description !== undefined && typeof description !== 'string')
         errors.push('ModbusDevice must have a valid description string');
 
     // Check if any errors occurred.

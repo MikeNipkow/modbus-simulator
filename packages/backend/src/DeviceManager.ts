@@ -1,8 +1,8 @@
 import path from "path";
-import { toJSON as deviceToJSON, fromJSON as deviceFromJSON } from "./mapper/ModbusDeviceMapper.js";
 import { ModbusDevice } from "./ModbusDevice.js";
 import * as fs from "fs";
 import { ParseResult } from "./types/enums/ParseResult.js";
+import { deviceFromObject } from "./mapper/ModbusDeviceMapper.js";
 
 /**
  * Manages Modbus devices stored in a specified directory.
@@ -154,7 +154,7 @@ export class DeviceManager {
                 }
                 
                 // Deserialize JSON object into ModbusDevice instance.
-                const result: ParseResult<ModbusDevice> = deviceFromJSON(json);
+                const result: ParseResult<ModbusDevice> = deviceFromObject(json);
 
                 // Check for deserialization errors.
                 if (!result.success) {
@@ -217,4 +217,8 @@ export class DeviceManager {
         return Array.from(this.devices.values());
     }
 
+}
+
+function deviceToJSON(device: ModbusDevice) {
+    throw new Error("Function not implemented.");
 }
