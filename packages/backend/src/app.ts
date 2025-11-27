@@ -41,7 +41,7 @@ deviceErrors.forEach(err => console.error(err));
 console.log(deviceManager.getDevices().length + " devices loaded");
 
 // Sample device
-if (true) {
+if (false) {
     const deviceProps: ModbusDeviceProps = {
         filename            : "sample_device.json",
         enabled             : true,

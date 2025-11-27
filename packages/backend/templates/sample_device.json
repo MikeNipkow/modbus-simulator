@@ -1,12 +1,12 @@
 {
-  "id": "sample_device.json",
+  "filename": "sample_device.json",
   "enabled": true,
   "port": 502,
   "endian": "BigEndian",
   "name": "Sample Device",
   "vendor": "Sample Vendor",
   "description": "Sample Description",
-  "units": [
+  "modbusUnits": [
     {
       "unitId": 1,
       "dataPoints": [

@@ -6,7 +6,7 @@ import { SimulationProps } from "./SimulationProps.js";
 /**
  * Properties for a DataPoint.
  */
-export interface DataPointProps {
+export type DataPointProps = {
     id                  : string;               // Unique identifier for the DataPoint.
     areas               : DataArea[];           // DataAreas where this DataPoint is located.
     type                : DataType;             // Data type of the DataPoint.

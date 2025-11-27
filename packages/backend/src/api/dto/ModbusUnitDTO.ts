@@ -1,6 +1,7 @@
-import { DataPointDTO } from "./DataPointDTO.js";
+import { ModbusUnitProps } from "../../types/ModbusUnitProps.js";
 
-export type ModbusUnitDTO = {
-    id          : number;
-    dataPoints  : DataPointDTO[];
-};
+/**
+ * Data Transfer Object for a Modbus Unit.
+ */
+export type ModbusUnitDTO = ModbusUnitProps & {
+}

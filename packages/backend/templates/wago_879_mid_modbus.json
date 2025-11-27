@@ -1,12 +1,12 @@
 {
-  "id": "wago_879_4pu_4ps_2puct_modbus.json",
+  "filename": "wago_879_4pu_4ps_2puct_modbus.json",
   "enabled": true,
   "port": 503,
   "endian": "BigEndian",
   "name": "WAGO Energy Meters 4PU/4PS/2PU CT (MID)",
   "vendor": "WAGO",
   "description": "Modbus RTU mapping for WAGO MID energy meters 4PU, 4PS and 2PU CT based on operating instructions 082022V1.6.",
-  "units": [
+  "modbusUnits": [
     {
       "unitId": 1,
       "dataPoints": [

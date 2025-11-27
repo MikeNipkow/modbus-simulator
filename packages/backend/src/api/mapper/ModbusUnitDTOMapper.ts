@@ -1,104 +1,81 @@
+import { unitFromObject, unitToUnitProps } from "../../mapper/ModbusUnitMapper.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
-import { DataPointDTO } from "../dto/DataPointDTO.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
-import { dataPointFromDTO, fromDataPoint } from "./DataPointDTOMapper.js";
-import { fromJSON as dataPointFromJSON } from "./DataPointDTOMapper.js";
 
-export function fromModbusUnit(unit: ModbusUnit): ModbusUnitDTO {
-    return {
-        id          : unit.getId(),
-        dataPoints  : unit.getAllDataPoints().map(dp => fromDataPoint(dp))
-    };
-}
+/**
+ * Converts a ModbusUnit to a ModbusUnitDTO.
+ * @param unit The ModbusUnit to convert.
+ * @returns The corresponding ModbusUnitDTO.
+ * @throws Error if the unit is invalid.
+ */
+export function unitToUnitDTO(unit: ModbusUnit): ModbusUnitDTO {
+    // Check if unit is valid.
+    if (!unit)
+        throw new Error('Cannot convert undefined ModbusUnit to ModbusUnitDTO');
 
-export function fromJSON(json: any): ParseResult<ModbusUnitDTO> {
-    const errors: string[] = [];
-    
-    if (json === null || typeof json !== 'object') {
-        errors.push('Invalid JSON object for ModbusUnit');
-        return { success: false, errors: errors };
-    }
-
-    if (json.id === undefined || typeof json.id !== 'number')   errors.push('ModbusUnit must have a valid unitId');
-
-    if (errors.length > 0)
-        return { success: false, errors: errors };
-
-    // Check Unit ID.
-    const unitId: number = json.id;
-    if (unitId < 1 || unitId > 254) {
-        errors.push('ModbusUnit unitId must be between 1 and 254');
-        return { success: false, errors: errors };
-    }
-
-    const dataPoints: DataPointDTO[] = [];
-
-    // Parse DataPoints.
-    if (json.dataPoints && Array.isArray(json.dataPoints)) {
-        for (const dpJson of json.dataPoints) {
-            const dpResult = dataPointFromJSON(dpJson);
-            if (!dpResult.success) {
-                errors.push(...dpResult.errors.map(err => `DataPoint error: ${err}`));
-                continue;
-            }
-
-            const dp = dpResult.value;
-            dataPoints.push(dp);
-        }
-    }
-    
-    if (errors.length > 0)
-        return { success: false, errors: errors };
-
-    const unitDTO = {
-        id: unitId,
-        dataPoints: dataPoints
+    const props = unitToUnitProps(unit);
+    const dto: ModbusUnitDTO = {
+        ...props
     };
     
-    return { success: true, value: unitDTO };
+    return dto;
 }
 
-export function modbusUnitFromDTO(dto: ModbusUnitDTO): ParseResult<ModbusUnit> {
+/**
+ * Creates a ModbusUnitDTO from a plain object.
+ * @param obj Object to convert to ModbusUnitDTO.
+ * @returns ParseResult containing the ModbusUnitDTO or errors.
+ * @throws Error if the object is invalid.
+ */
+export function unitDTOFromObject(obj: any): ParseResult<ModbusUnitDTO> {
+    // Collect errors.
     const errors: string[] = [];
 
-    if (dto === null || typeof dto !== 'object') {
+    // Check if obj is valid.
+    if (obj === null || typeof obj !== 'object') {
         errors.push('Invalid object for ModbusUnitDTO');
         return { success: false, errors: errors };
     }
 
-    if (dto.id === undefined || typeof dto.id !== 'number')   errors.push('ModbusUnitDTO must have a valid id');
-
-    if (errors.length > 0)
-        return { success: false, errors: errors };
-
-    // Check Unit ID.
-    const unitId: number = dto.id;
-    if (unitId < 1 || unitId > 254) {
-        errors.push('ModbusUnit unitId must be between 1 and 254');
+    // Try to parse ModbusUnit.
+    const unitResult = unitFromObject(obj);
+    if (!unitResult.success) {
+        errors.push(...unitResult.errors);
         return { success: false, errors: errors };
     }
 
-    const unit = new ModbusUnit(unitId);
+    // Get props from unit.
+    const unit      = unitResult.value;
+    const unitProps = unitToUnitProps(unit);
+    const dto: ModbusUnitDTO = {
+        ...unitProps
+    };
 
-    // Parse DataPoints.
-    if (dto.dataPoints && Array.isArray(dto.dataPoints)) {
-        for (const dpDTO of dto.dataPoints) {
-            const dpResult = dataPointFromDTO(dpDTO);
-            if (!dpResult.success) {
-                errors.push(...dpResult.errors.map(err => `DataPoint error: ${err}`));
-                continue;
-            }
+    return { success: true, value: dto };
+}
 
-            const dp = dpResult.value;
-            const addResult = unit.addDataPoint(dp);
-            if (!addResult.success)
-                errors.push(...addResult.errors);
-        }
+/**
+ * Creates a ModbusUnit from a ModbusUnitDTO.
+ * @param dto ModbusUnitDTO to convert.
+ * @returns ParseResult containing the ModbusUnit or errors.
+ * @throws Error if the dto is invalid.
+ */
+export function modbusUnitFromDTO(dto: ModbusUnitDTO): ParseResult<ModbusUnit> {
+    // Collect errors.
+    const errors: string[] = [];
+
+    // Check if dto is valid.
+    if (dto === null || typeof dto !== 'object') {
+        errors.push('Invalid ModbusUnitDTO object');
+        return { success: false, errors: errors };
     }
 
-    if (errors.length > 0)
+    const parseResult = unitFromObject(dto);
+    if (!parseResult.success) {
+        errors.push(...parseResult.errors);
         return { success: false, errors: errors };
+    }
 
-    return { success: true, value: unit };
+    return { success: true, value: parseResult.value };
 }

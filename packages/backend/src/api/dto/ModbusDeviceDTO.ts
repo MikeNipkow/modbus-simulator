@@ -1,15 +1,8 @@
-import { Endian } from "../../types/enums/Endian.js";
-import { ModbusUnitDTO } from "./ModbusUnitDTO.js";
+import { ModbusDeviceProps } from "../../types/ModbusDeviceProps.js";
 
-export interface ModbusDeviceDTO {
-    fileName    : string;
-    enabled     : boolean;
-    port        : number;
-    endian      : Endian;
-    name        : string;
-    vendor      : string;
-    description : string;
-    units       : ModbusUnitDTO[];
-
-    running     : boolean;
+/**
+ * Data Transfer Object for a Modbus Device, including its running status.
+ */
+export type ModbusDeviceDTO = ModbusDeviceProps & {
+    running     : boolean;  // Indicates if the device is currently running.
 }
