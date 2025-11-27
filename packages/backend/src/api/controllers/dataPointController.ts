@@ -2,8 +2,7 @@ import { Request, Response } from "express";
 import { getUnitFromRequest } from "./unitController.js";
 import { DataPoint } from "../../DataPoint.js";
 import { dataPointDTOFromObject, dataPointFromDTO, dataPointToDataPointDTO } from "../mapper/DataPointDTOMapper.js";
-import { getDeviceFromRequest } from "./deviceController.js";
-import deviceManager from "../../app.js";
+import { getDeviceFromRequest, getDeviceManagerByEndpoint } from "./deviceController.js";
 
 /**
  * Helper function to get a DataPoint by ID from request parameters.
@@ -74,6 +73,13 @@ export const getDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const createDataPointRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Retrieve unit.
     const unit = getUnitFromRequest(req, res);
     if (!unit) 
@@ -115,6 +121,13 @@ export const createDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const deleteDataPointRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Retrieve device.
     const device = getDeviceFromRequest(req, res);
     if (!device) 
@@ -145,6 +158,13 @@ export const deleteDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const updateDataPointRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Retrieve device.
     const device = getDeviceFromRequest(req, res);
     if (!device) 

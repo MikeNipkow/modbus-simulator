@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
-import { getDeviceFromRequest } from "./deviceController.js";
+import { getDeviceFromRequest, getDeviceManagerByEndpoint } from "./deviceController.js";
 import { modbusUnitFromDTO, unitDTOFromObject, unitToUnitDTO } from "../mapper/ModbusUnitDTOMapper.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
-import deviceManager from "../../app.js";
 
 /**
  * Helper function to get a ModbusUnit by ID from request parameters.
@@ -81,6 +80,13 @@ export const getUnitRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const createUnitRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+
     // Retrieve device.
     const device = getDeviceFromRequest(req, res);
     if (!device) 
@@ -124,6 +130,13 @@ export const createUnitRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const deleteUnitRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+
     // Retrieve device.
     const device = getDeviceFromRequest(req, res);
     if (!device) 
@@ -149,6 +162,13 @@ export const deleteUnitRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const updateUnitRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Retrieve device.
     const device = getDeviceFromRequest(req, res);
     if (!device) 

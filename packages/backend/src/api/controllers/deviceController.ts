@@ -4,6 +4,25 @@ import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
 import { deviceDTOFromObject, deviceFromDTO, deviceToDeviceDTO } from "../mapper/ModbusDeviceDTOMapper.js";
+import { DeviceManager } from "../../DeviceManager.js";
+
+/**
+ * Helper function to get the appropriate DeviceManager based on the API endpoint.
+ * @param req Express request object.
+ * @returns The corresponding DeviceManager or undefined if not found.
+ */
+export const getDeviceManagerByEndpoint = (req: Request): DeviceManager | undefined => {
+    // Get base URL.
+    const baseUrl = req.originalUrl;
+    
+    // Determine correct device manager.
+    if (baseUrl.startsWith('/api/v1/devices'))
+        return deviceManager;
+    if (baseUrl.startsWith('/api/v1/templates'))
+        return templateManager;
+
+    return undefined;
+}
 
 /**
  * Helper function to get a device by ID from request parameters.
@@ -13,6 +32,13 @@ import { deviceDTOFromObject, deviceFromDTO, deviceToDeviceDTO } from "../mapper
  * @returns The device if found, undefined otherwise.
  */
 export const getDeviceFromRequest = (req: Request, res: Response, template: boolean = false): ModbusDevice | undefined => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Check for device id parameter.
     const deviceId = req.params.id;
     if (!deviceId) {
@@ -21,7 +47,7 @@ export const getDeviceFromRequest = (req: Request, res: Response, template: bool
     }
 
     // Check if device exists.
-    const device = !template ? deviceManager.getDevice(deviceId) : templateManager.getDevice(deviceId);
+    const device = deviceManager.getDevice(deviceId);
     if (!device) {
         res.status(404).json({ error: !template ? `Device with id ${deviceId} not found` : `Template with id ${deviceId} not found` });
         return undefined;
@@ -36,6 +62,13 @@ export const getDeviceFromRequest = (req: Request, res: Response, template: bool
  * @param res Express response object.
  */
 export const getDevicesRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+
     // Collect device DTOs.
     const devicesDTO: ModbusDeviceDTO[] = [];
     deviceManager.getDevices().map((device) => devicesDTO.push(deviceToDeviceDTO(device)));
@@ -66,6 +99,13 @@ export const getDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const createDeviceRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Parse device DTO from request body.
     const result: ParseResult<ModbusDeviceDTO> = deviceDTOFromObject(req.body);
     if (!result.success) {
@@ -101,6 +141,13 @@ export const createDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const deleteDeviceRoute = (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Check for device.
     const device = getDeviceFromRequest(req, res);
     if (!device)
@@ -118,6 +165,13 @@ export const deleteDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const updateDeviceRoute = async (req: Request, res: Response) => {
+    // Get appropriate device manager.
+    const deviceManager = getDeviceManagerByEndpoint(req);
+    if (!deviceManager) {
+        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
+        return undefined;
+    }
+    
     // Check for existing device.
     const device = getDeviceFromRequest(req, res);
     if (!device)

@@ -27,6 +27,24 @@ export function initializeApiServer() {
     app.delete  ('/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId', deleteDataPointRoute);
     app.put     ('/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId', updateDataPointRoute);
 
+    app.get     ('/api/v1/templates', getDevicesRoute);
+    app.get     ('/api/v1/templates/:id', getDeviceRoute);
+    app.post    ('/api/v1/templates', createDeviceRoute);
+    app.delete  ('/api/v1/templates/:id', deleteDeviceRoute);
+    app.put     ('/api/v1/templates/:id', updateDeviceRoute);
+    
+    app.get     ('/api/v1/templates/:id/units', getUnitsRoute);
+    app.get     ('/api/v1/templates/:id/units/:unitId', getUnitRoute);
+    app.post    ('/api/v1/templates/:id/units', createUnitRoute);
+    app.delete  ('/api/v1/templates/:id/units/:unitId', deleteUnitRoute);
+    app.put     ('/api/v1/templates/:id/units/:unitId', updateUnitRoute);
+
+    app.get     ('/api/v1/templates/:id/units/:unitId/dataPoints', getDataPointsRoute);
+    app.get     ('/api/v1/templates/:id/units/:unitId/dataPoints/:dataPointId', getDataPointRoute);
+    app.post    ('/api/v1/templates/:id/units/:unitId/dataPoints', createDataPointRoute);
+    app.delete  ('/api/v1/templates/:id/units/:unitId/dataPoints/:dataPointId', deleteDataPointRoute);
+    app.put     ('/api/v1/templates/:id/units/:unitId/dataPoints/:dataPointId', updateDataPointRoute);
+
     const port = 3001;
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);
