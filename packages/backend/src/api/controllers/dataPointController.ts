@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { getUnitFromRequest } from "./unitController.js";
 import { DataPoint } from "../../DataPoint.js";
 import { dataPointDTOFromObject, dataPointFromDTO, dataPointToDataPointDTO } from "../mapper/DataPointDTOMapper.js";
-import { getDeviceFromRequest, getDeviceManagerByEndpoint } from "./deviceController.js";
+import { getDeviceFromRequest, getDeviceManagerByEndpoint, isTemplateEndpoint } from "./deviceController.js";
 
 /**
  * Helper function to get a DataPoint by ID from request parameters.
@@ -213,6 +213,10 @@ export const updateDataPointRoute = (req: Request, res: Response) => {
         res.status(400).json({ errors: addResult.errors });
         return;
     }
+
+    // Start simulation if enabled.
+    if (newDp.isSimulationEnabled() && !isTemplateEndpoint(req))
+        newDp.startSimulation();
 
     // Save device in json file.
     deviceManager.saveDevice(device.getFilename());

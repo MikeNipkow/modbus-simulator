@@ -7,19 +7,38 @@ import { deviceDTOFromObject, deviceFromDTO, deviceToDeviceDTO } from "../mapper
 import { DeviceManager } from "../../DeviceManager.js";
 
 /**
+ * Helper function to determine if the request is for a template.
+ * @param req Express request object.
+ * @returns True if the endpoint is for templates, false otherwise.
+ */
+export const isTemplateEndpoint = (req: Request): boolean => {
+    const originalUrl = req.originalUrl;
+    return originalUrl.startsWith('/api/v1/templates');
+}
+
+/**
+ * Helper function to determine if the request is for a device.
+ * @param req Express request object.
+ * @returns True if the endpoint is for devices, false otherwise.
+ */
+export const isDeviceEndpoint = (req: Request): boolean => {
+    const originalUrl = req.originalUrl;
+    return originalUrl.startsWith('/api/v1/devices');
+}
+
+/**
  * Helper function to get the appropriate DeviceManager based on the API endpoint.
  * @param req Express request object.
  * @returns The corresponding DeviceManager or undefined if not found.
  */
 export const getDeviceManagerByEndpoint = (req: Request): DeviceManager | undefined => {
-    // Get base URL.
-    const baseUrl = req.originalUrl;
-    
-    // Determine correct device manager.
-    if (baseUrl.startsWith('/api/v1/devices'))
-        return deviceManager;
-    if (baseUrl.startsWith('/api/v1/templates'))
+    // Check if the endpoint is for templates.
+    if (isTemplateEndpoint(req))
         return templateManager;
+
+    // Check if the endpoint is for devices.
+    if (isDeviceEndpoint(req))
+        return deviceManager;
 
     return undefined;
 }
@@ -226,7 +245,7 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
 
     // Save new device and start server if enabled.
     deviceManager.saveDevice(newDevice.getFilename());
-    if (newDevice.isEnabled())
+    if (newDevice.isEnabled() && !isTemplateEndpoint(req))
         await newDevice.startServer();
     
     res.status(200).json(deviceToDeviceDTO(newDevice));
