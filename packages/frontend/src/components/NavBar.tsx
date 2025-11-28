@@ -23,7 +23,7 @@ function NavBar() {
             </Text>
 
             <Spacer />
-            <Text>v1.0.0</Text>
+            <Text fontSize="sm" color="gray.400">v1.0.0</Text>
         </HStack>
     );
 }
