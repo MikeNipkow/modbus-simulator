@@ -1,6 +1,6 @@
 import { Button, HStack, Icon, Text } from "@chakra-ui/react";
 import type { ElementType } from "react";
-import { FaChevronDown, FaChevronUp } from "react-icons/fa";
+import { FaChevronDown } from "react-icons/fa";
 
 interface DeviceListButtonProps {
     title: string;
@@ -26,7 +26,12 @@ function DeviceListButton({ title, icon, isOpen, onClick }: DeviceListButtonProp
                 <Text flex={1} textAlign="left" fontWeight="semibold">
                     {title}
                 </Text>
-                <Icon as={isOpen ? FaChevronUp : FaChevronDown} boxSize={3} />
+                <Icon 
+                    as={FaChevronDown} 
+                    boxSize={3}
+                    transform={isOpen ? "rotate(180deg)" : "rotate(0deg)"}
+                    transition="transform 0.2s ease-in-out"
+                />
             </HStack>
         </Button>
     );
