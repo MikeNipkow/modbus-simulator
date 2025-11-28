@@ -4,7 +4,7 @@ import type { ModbusUnit } from "./ModbusUnit";
 /**
  * Properties for a Modbus Device.
  */
-export type ModbusDeviceProps = {
+export type ModbusDevice = {
     filename            : string;               // Filename of the Modbus Device.
     enabled             : boolean;              // Whether the Modbus Device is enabled.
     port                : number;               // Port number for the Modbus Device.
