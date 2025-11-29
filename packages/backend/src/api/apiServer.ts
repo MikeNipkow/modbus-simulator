@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import { createDeviceRoute, deleteDeviceRoute, getDeviceRoute, getDevicesRoute, updateDeviceRoute } from './controllers/deviceController.js';
 import { createUnitRoute, deleteUnitRoute, getUnitRoute, getUnitsRoute, updateUnitRoute } from './controllers/unitController.js';
 import { getDataPointsRoute, getDataPointRoute, deleteDataPointRoute, createDataPointRoute, updateDataPointRoute } from './controllers/dataPointController.js';
@@ -6,7 +7,18 @@ import { getDataPointsRoute, getDataPointRoute, deleteDataPointRoute, createData
 export function initializeApiServer() {
     const app = express();
     
+    // Enable CORS for all routes
+    app.use(cors());
+    
     app.use(express.json());
+
+    // Disable caching for API responses
+    app.use('/api', (req, res, next) => {
+        res.set('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+        res.set('Pragma', 'no-cache');
+        res.set('Expires', '0');
+        next();
+    });
 
     // Routes
     app.get     ('/api/v1/devices', getDevicesRoute);
@@ -45,7 +57,7 @@ export function initializeApiServer() {
     app.delete  ('/api/v1/templates/:id/units/:unitId/dataPoints/:dataPointId', deleteDataPointRoute);
     app.put     ('/api/v1/templates/:id/units/:unitId/dataPoints/:dataPointId', updateDataPointRoute);
 
-    const port = 3001;
+    const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
     app.listen(port, () => {
         console.log(`Server running on port ${port}`);
     });
