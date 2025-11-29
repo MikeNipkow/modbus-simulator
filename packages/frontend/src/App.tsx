@@ -1,18 +1,18 @@
-import { Box, Grid, GridItem } from "@chakra-ui/react"
+import { Grid, GridItem } from "@chakra-ui/react"
 import NavBar from "./components/NavBar"
 import DeviceList from "./components/DeviceList"
 import DeviceButton from "./components/DeviceButton"
-import type { ModbusDevice } from "./types/ModbusDevice"
-import { Endian } from "./types/enums/Endian"
 import { FaNetworkWired } from "react-icons/fa6"
 import { FaBook } from "react-icons/fa"
+import type { ModbusDevice } from "./types/ModbusDevice"
+import { Endian } from "./types/enums/Endian"
 
 function App() {
   const mockDevices: ModbusDevice[] = [
     { filename: "Device1.json", enabled: true, port: 5020, endian: Endian.BigEndian, running: true },
     { filename: "Device2.json", enabled: false, port: 5021, endian: Endian.BigEndian, running: false },
-    { filename: "Device3.json", enabled: true, port: 5022, endian: Endian.LittleEndian, running: true },
-  ]
+    { filename: "wago_879_mid_modbus.json", enabled: true, port: 5022, endian: Endian.LittleEndian, running: true },
+  ];
 
   return (
     <Grid

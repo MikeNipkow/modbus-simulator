@@ -9,7 +9,7 @@ interface DeviceListProps {
 }
 
 function DeviceList({ title, icon, children }: DeviceListProps) {
-    const [isOpen, setIsOpen] = useState(true);
+    const [isOpen, setIsOpen] = useState(false);
 
     return (
         <Box>
@@ -19,7 +19,14 @@ function DeviceList({ title, icon, children }: DeviceListProps) {
                 isOpen={isOpen} 
                 onClick={() => setIsOpen(!isOpen)} 
             />
-            {isOpen && children}
+            <Box
+                overflow="hidden"
+                maxHeight={isOpen ? "1000px" : "0"}
+                opacity={isOpen ? 1 : 0}
+                transition="max-height 0.3s ease-in-out, opacity 0.2s ease-in-out"
+            >
+                {children}
+            </Box>
         </Box>
     );
 }
