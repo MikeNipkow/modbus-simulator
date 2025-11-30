@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { useState, type ElementType, type ReactNode } from "react";
-import DeviceListButton from "./DeviceListButton";
+import DeviceListButton from "../DeviceListButton";
 
 interface DeviceListProps {
     title: string;
@@ -12,7 +12,7 @@ function DeviceList({ title, icon, children }: DeviceListProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     return (
-        <Box>
+        <>
             <DeviceListButton 
                 title={title}
                 icon={icon}
@@ -27,7 +27,7 @@ function DeviceList({ title, icon, children }: DeviceListProps) {
             >
                 {children}
             </Box>
-        </Box>
+        </>
     );
 }
 

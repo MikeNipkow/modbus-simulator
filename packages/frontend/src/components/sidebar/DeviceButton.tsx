@@ -4,11 +4,12 @@ import { FaCircle } from "react-icons/fa";
 
 interface DeviceButtonProps {
     device: ModbusDevice;
+    showState?: boolean;
     isSelected?: boolean;
     onClick?: () => void;
 }
 
-function DeviceButton({ device, isSelected = false, onClick }: DeviceButtonProps) {
+function DeviceButton({ device, showState = true, isSelected = false, onClick }: DeviceButtonProps) {
     return (
         <Button
             width="100%"
@@ -35,11 +36,12 @@ function DeviceButton({ device, isSelected = false, onClick }: DeviceButtonProps
                     {device.filename}
                 </Text>
 
-                <HStack gap={2} flexShrink={0}>
-                    <Text 
-                        fontSize="xs" 
-                        color="gray.500"
-                    >
+                {showState && (
+                    <HStack gap={2} flexShrink={0}>
+                        <Text 
+                            fontSize="xs" 
+                            color="gray.500"
+                        >
                         Port {device.port}
                     </Text>
 
@@ -49,6 +51,7 @@ function DeviceButton({ device, isSelected = false, onClick }: DeviceButtonProps
                         color={device.running ? "green.500" : "red.500"}
                     />
                 </HStack>
+                )}
             </HStack>
         </Button>
     );
