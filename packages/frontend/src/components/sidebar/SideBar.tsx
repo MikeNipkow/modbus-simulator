@@ -4,8 +4,14 @@ import useDevices from "@/hooks/useDevices";
 import DeviceButton from "./DeviceButton";
 import useTemplates from "@/hooks/useTemplates";
 import { Center, Spinner, Text } from "@chakra-ui/react";
+import type { ModbusDevice } from "@/types/ModbusDevice";
 
-function SideBar() {
+interface SideBarProps {
+    selectedDevice: ModbusDevice | null;
+    onSelectDevice: (device: ModbusDevice) => void;
+}
+
+function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
     const { data: devices, error: devicesError, isLoading: devicesLoading } = useDevices();
     const { data: templates, error: templatesError, isLoading: templatesLoading } = useTemplates();
 
@@ -25,7 +31,9 @@ function SideBar() {
                 {!devicesLoading && devices.map((device) => (
                     <DeviceButton 
                         key={device.filename}
-                        device={device} 
+                        device={device}
+                        isSelected={selectedDevice?.filename === device.filename}
+                        onClick={() => onSelectDevice(device)}
                     />
                 ))}
             </DeviceList>
@@ -45,6 +53,8 @@ function SideBar() {
                         key={template.filename}
                         device={template} 
                         showState={false}
+                        isSelected={selectedDevice?.filename === template.filename}
+                        onClick={() => onSelectDevice(template)}
                     />
                 ))}
             </DeviceList>

@@ -1,9 +1,12 @@
 import { Grid, GridItem } from "@chakra-ui/react"
 import NavBar from "./components/NavBar"
-import { Test } from "./components/Test"
 import SideBar from "./components/sidebar/SideBar"
+import DeviceEditor from "./components/device/DeviceEditor"
+import { useState } from "react"
+import type { ModbusDevice } from "@/types/ModbusDevice"
 
 function App() {
+  const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(null);
 
   return (
     <Grid
@@ -21,12 +24,24 @@ function App() {
 
       {/* Sidebar */}
       <GridItem borderRight="2px solid" borderColor="brand">
-        <SideBar />
+        <SideBar 
+          selectedDevice={selectedDevice}
+          onSelectDevice={setSelectedDevice}
+        />
       </GridItem>
 
       {/* Main Content */}
       <GridItem>
-        <Test />
+        {selectedDevice && (
+          <DeviceEditor 
+            device={selectedDevice}
+            onSave={(updatedDevice) => {
+              console.log("Device saved:", updatedDevice);
+              // TODO: API Call zum Speichern
+            }}
+            onCancel={() => setSelectedDevice(null)}
+          />
+        )}
       </GridItem>
     </Grid>
   )
