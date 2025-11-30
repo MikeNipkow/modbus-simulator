@@ -13,7 +13,8 @@ function useData<T>(endpoint: string) {
         fetch(devicesEndpoint)
             .then(response  => response.json())
             .then(data      => setData(data))
-            .catch(error    => setError(error.message));
+            .catch(error    => setError(error.message))
+            .finally(()     => setLoading(false));
     }, []);
 
     return { data, error, isLoading };
