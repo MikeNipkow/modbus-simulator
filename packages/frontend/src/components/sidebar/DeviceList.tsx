@@ -1,5 +1,5 @@
 import { Box } from "@chakra-ui/react";
-import { useState, type ElementType, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ElementType, type ReactNode } from "react";
 import DeviceListButton from "./DeviceListButton";
 
 interface DeviceListProps {
@@ -10,6 +10,14 @@ interface DeviceListProps {
 
 function DeviceList({ title, icon, children }: DeviceListProps) {
     const [isOpen, setIsOpen] = useState(true);
+    const [height, setHeight] = useState<number>(0);
+    const contentRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (contentRef.current) {
+            setHeight(contentRef.current.scrollHeight);
+        }
+    }, [children]);
 
     return (
         <>
@@ -21,11 +29,12 @@ function DeviceList({ title, icon, children }: DeviceListProps) {
             />
             <Box
                 overflow="hidden"
-                maxHeight={isOpen ? "1000px" : "0"}
-                opacity={isOpen ? 1 : 0}
-                transition="max-height 0.3s ease-in-out, opacity 0.2s ease-in-out"
+                maxHeight={isOpen ? `${height}px` : "0"}
+                transition="max-height 0.2s linear"
             >
-                {children}
+                <div ref={contentRef}>
+                    {children}
+                </div>
             </Box>
         </>
     );
