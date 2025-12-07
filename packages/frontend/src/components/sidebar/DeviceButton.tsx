@@ -40,7 +40,7 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
                     <HStack gap={2} flexShrink={0}>
                         <Text 
                             fontSize="xs" 
-                            color="gray.500"
+                            color={isSelected ? "whiteAlpha.800" : "gray.500"}
                         >
                         Port {device.port}
                     </Text>
@@ -49,6 +49,7 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
                         as={FaCircle} 
                         boxSize={3} 
                         color={device.running ? "green.500" : "red.500"}
+                        filter={isSelected ? "brightness(1.8)" : "none"}
                     />
                 </HStack>
                 )}
