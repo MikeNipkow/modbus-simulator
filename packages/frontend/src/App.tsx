@@ -6,7 +6,7 @@ import { useState } from "react"
 import type { ModbusDevice } from "@/types/ModbusDevice"
 
 function App() {
-  const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(null);
+  const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | undefined>(undefined);
 
   return (
     <Grid
@@ -23,7 +23,7 @@ function App() {
       </GridItem>
 
       {/* Sidebar */}
-      <GridItem borderRight="2px solid" borderColor="brand">
+      <GridItem borderRight="1px solid" borderColor="brand">
         <SideBar 
           selectedDevice={selectedDevice}
           onSelectDevice={setSelectedDevice}
@@ -39,7 +39,7 @@ function App() {
               console.log("Device saved:", updatedDevice);
               // TODO: API Call zum Speichern
             }}
-            onCancel={() => setSelectedDevice(null)}
+            onCancel={() => setSelectedDevice(undefined)}
           />
         )}
       </GridItem>

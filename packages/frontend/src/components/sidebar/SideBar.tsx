@@ -1,14 +1,14 @@
-import { FaNetworkWired, FaBook } from "react-icons/fa";
+import { FaNetworkWired, FaBook, FaHome } from "react-icons/fa";
 import DeviceList from "./DeviceList";
 import useDevices from "@/hooks/useDevices";
 import DeviceButton from "./DeviceButton";
 import useTemplates from "@/hooks/useTemplates";
-import { Center, Spinner, Text } from "@chakra-ui/react";
+import { Center, Spinner, Text, Button, Icon } from "@chakra-ui/react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 
 interface SideBarProps {
-    selectedDevice: ModbusDevice | null;
-    onSelectDevice: (device: ModbusDevice) => void;
+    selectedDevice: ModbusDevice | undefined;
+    onSelectDevice: (device: ModbusDevice | undefined) => void;
 }
 
 function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
@@ -17,6 +17,22 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
 
     return (
         <>
+            <Button
+                width="100%"
+                justifyContent="flex-start"
+                variant={selectedDevice === null ? "solid" : "ghost"}
+                colorPalette={selectedDevice === null ? "brand" : undefined}
+                onClick={() => onSelectDevice(undefined)}
+                padding="12px"
+                height="auto"
+                borderRadius={0}
+                gap={2}
+            >
+                <Icon as={FaHome} boxSize={4} />
+                <Text fontWeight="semibold">
+                    Home
+                </Text>
+            </Button>
             <DeviceList title="Devices" icon={FaNetworkWired}>
                 {devicesLoading && (
                     <Center p={4}>

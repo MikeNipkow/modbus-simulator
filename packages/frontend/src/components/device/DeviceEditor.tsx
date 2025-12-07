@@ -1,5 +1,5 @@
 import { Box, Heading, VStack, HStack, Input, Text, Button, Flex } from "@chakra-ui/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
 
@@ -11,6 +11,10 @@ interface DeviceEditorProps {
 
 function DeviceEditor({ device, onSave, onCancel }: DeviceEditorProps) {
     const [editedDevice, setEditedDevice] = useState<ModbusDevice>(device);
+
+    useEffect(() => {
+        setEditedDevice(device);
+    }, [device]);
 
     const handleChange = (field: keyof ModbusDevice, value: string | number | boolean) => {
         setEditedDevice({ ...editedDevice, [field]: value });
