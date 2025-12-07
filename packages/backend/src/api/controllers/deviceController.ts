@@ -90,7 +90,7 @@ export const getDevicesRoute = (req: Request, res: Response) => {
 
     // Collect device DTOs.
     const devicesDTO: ModbusDeviceDTO[] = [];
-    deviceManager.getDevices().map((device) => devicesDTO.push(deviceToDeviceDTO(device)));
+    deviceManager.getDevices().map((device) => devicesDTO.push(deviceToDeviceDTO(device, !isDeviceEndpoint(req))));
 
     res.json(devicesDTO);
 };
@@ -107,7 +107,7 @@ export const getDeviceRoute = (req: Request, res: Response) => {
         return;
 
     // Convert to DTO.
-    const deviceDTO = deviceToDeviceDTO(device);
+    const deviceDTO = deviceToDeviceDTO(device, !isDeviceEndpoint(req));
 
     res.json(deviceDTO);
 }
@@ -151,7 +151,7 @@ export const createDeviceRoute = (req: Request, res: Response) => {
     // Save device in json file.
     deviceManager.saveDevice(device.getFilename());
 
-    res.status(201).json(deviceToDeviceDTO(device));
+    res.status(201).json(deviceToDeviceDTO(device, !isDeviceEndpoint(req)));
 }
 
 /**
@@ -248,5 +248,5 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
     if (newDevice.isEnabled() && !isTemplateEndpoint(req))
         await newDevice.startServer();
     
-    res.status(200).json(deviceToDeviceDTO(newDevice));
+    res.status(200).json(deviceToDeviceDTO(newDevice, !isDeviceEndpoint(req)));
 };
