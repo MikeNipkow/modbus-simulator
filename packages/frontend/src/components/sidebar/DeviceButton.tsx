@@ -15,7 +15,7 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
             width="100%"
             justifyContent="flex-start"
             variant={isSelected ? "solid" : "ghost"}
-            colorScheme={isSelected ? "brand" : "gray"}
+            colorPalette={isSelected ? "brand" : undefined}
             onClick={onClick}
             padding="12px"
             height="auto"

@@ -6,7 +6,14 @@ const config = defineConfig(
             tokens: {
                 colors: {
                     brand: {
-                        value: '#81A938'
+                        value: "#81A938"
+                    }
+                }
+            },
+            semanticTokens: {
+                colors: {
+                    brand: {
+                        solid: { value: '{colors.brand}' }
                     }
                 }
             }

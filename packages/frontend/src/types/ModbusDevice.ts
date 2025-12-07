@@ -13,5 +13,6 @@ export type ModbusDevice = {
     vendor?             : string;               // Vendor of the Modbus Device.
     description?        : string;               // Description of the Modbus Device.
     modbusUnits?        : ModbusUnit[];         // Array of Modbus Units in this Modbus Device.
+    template            : boolean;              // Indicates if the device is a template.
     running             : boolean;              // Indicates if the device is currently running.
 };

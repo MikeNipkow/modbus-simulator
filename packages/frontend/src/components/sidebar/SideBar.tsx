@@ -32,7 +32,7 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
                     <DeviceButton 
                         key={device.filename}
                         device={device}
-                        isSelected={selectedDevice?.filename === device.filename}
+                        isSelected={selectedDevice?.template === device.template && selectedDevice?.filename === device.filename}
                         onClick={() => onSelectDevice(device)}
                     />
                 ))}
@@ -53,7 +53,7 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
                         key={template.filename}
                         device={template} 
                         showState={false}
-                        isSelected={selectedDevice?.filename === template.filename}
+                        isSelected={selectedDevice?.template === template.template && selectedDevice?.filename === template.filename}
                         onClick={() => onSelectDevice(template)}
                     />
                 ))}
