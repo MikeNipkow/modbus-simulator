@@ -2,7 +2,7 @@ import path from "path";
 import { ModbusDevice } from "./ModbusDevice.js";
 import * as fs from "fs";
 import { ParseResult } from "./types/enums/ParseResult.js";
-import { deviceFromObject } from "./mapper/ModbusDeviceMapper.js";
+import { deviceFromObject, deviceToDeviceProps } from "./mapper/ModbusDeviceMapper.js";
 
 /**
  * Manages Modbus devices stored in a specified directory.
@@ -97,11 +97,14 @@ export class DeviceManager {
             return false;
 
         // Serialize device to JSON.
-        const json = deviceToJSON(device);
+        const props = deviceToDeviceProps(device) as any;
+        
+        // Remove filename.
+        delete props.filename;
 
         // Write JSON to file.
         const filePath = path.join(this.deviceDir, filename);
-        fs.writeFileSync(filePath, JSON.stringify(json, null, 2), { encoding: 'utf-8', flag: 'w' });
+        fs.writeFileSync(filePath, JSON.stringify(props, null, 2), { encoding: 'utf-8', flag: 'w' });
 
         return true;
     }
@@ -154,7 +157,7 @@ export class DeviceManager {
                 }
                 
                 // Deserialize JSON object into ModbusDevice instance.
-                const result: ParseResult<ModbusDevice> = deviceFromObject(json);
+                const result: ParseResult<ModbusDevice> = deviceFromObject(json, file);
 
                 // Check for deserialization errors.
                 if (!result.success) {
@@ -219,6 +222,3 @@ export class DeviceManager {
 
 }
 
-function deviceToJSON(device: ModbusDevice) {
-    throw new Error("Function not implemented.");
-}

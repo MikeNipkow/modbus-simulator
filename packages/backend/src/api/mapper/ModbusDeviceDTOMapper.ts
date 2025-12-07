@@ -1,6 +1,7 @@
 import { deviceFromObject, deviceToDeviceProps } from "../../mapper/ModbusDeviceMapper.js";
 import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
+import { isValidFilename } from "../../util/fileUtils.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 
 /**
@@ -43,8 +44,15 @@ export function deviceDTOFromObject(obj: any, template: boolean = false): ParseR
         return { success: false, errors: errors };
     }
 
+    // Check if filename is valid.
+    const filename = obj.filename;
+    if (!isValidFilename(filename)) {
+        errors.push(`ModbusDeviceDTO filename '${filename}' is not valid`);
+        return { success: false, errors: errors };
+    }
+
     // Try to parse ModbusDevice.
-    const deviceResult = deviceFromObject(obj);
+    const deviceResult = deviceFromObject(obj, filename);
     if (!deviceResult.success) {
         errors.push(...deviceResult.errors);
         return { success: false, errors: errors };
@@ -81,7 +89,7 @@ export function deviceFromDTO(dto: ModbusDeviceDTO): ParseResult<ModbusDevice> {
     }
 
     // Try to create ModbusDevice from DTO.
-    const deviceResult = deviceFromObject(dto);
+    const deviceResult = deviceFromObject(dto, dto.filename);
     if (!deviceResult.success) {
         errors.push(...deviceResult.errors);
         return { success: false, errors: errors };

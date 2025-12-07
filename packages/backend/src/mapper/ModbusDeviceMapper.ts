@@ -32,7 +32,7 @@ export function deviceToDeviceProps(device: ModbusDevice): ModbusDeviceProps {
  * @param obj Object to convert to ModbusDevice.
  * @returns ParseResult containing the ModbusDevice or errors.
  */
-export function deviceFromObject(obj: any): ParseResult<ModbusDevice> {
+export function deviceFromObject(obj: any, filename: string): ParseResult<ModbusDevice> {
     // Collect errors.
     const errors: string[] = [];
 
@@ -43,7 +43,6 @@ export function deviceFromObject(obj: any): ParseResult<ModbusDevice> {
     }
 
     // Check filename.
-    const filename = obj.filename;
     if (filename === undefined || typeof filename !== 'string' || filename.length === 0)
         errors.push('ModbusDevice must have a valid filename string');
     else if (!isValidFilename(filename))

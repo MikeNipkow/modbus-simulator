@@ -187,13 +187,12 @@ describe('ModbusDeviceMapper', () => {
         describe('Valid Object Conversions', () => {
             test('should create ModbusDevice from valid minimal object', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -207,7 +206,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should create ModbusDevice with optional properties', () => {
                 const obj = {
-                    filename: 'device.json',
                     enabled: false,
                     port: 5020,
                     endian: Endian.LittleEndian,
@@ -216,7 +214,7 @@ describe('ModbusDeviceMapper', () => {
                     description: 'Test Description'
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'device.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -228,7 +226,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should create ModbusDevice with one unit', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -237,7 +234,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -249,7 +246,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should create ModbusDevice with multiple units', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -260,7 +256,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -274,7 +270,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should create ModbusDevice with units containing DataPoints', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -295,7 +290,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -309,20 +304,18 @@ describe('ModbusDeviceMapper', () => {
 
             test('should create ModbusDevice with boundary port values', () => {
                 const obj1 = {
-                    filename: 'test1.json',
                     enabled: true,
                     port: 1,
                     endian: Endian.BigEndian
                 };
                 const obj2 = {
-                    filename: 'test2.json',
                     enabled: true,
                     port: 65535,
                     endian: Endian.BigEndian
                 };
 
-                const result1 = deviceFromObject(obj1);
-                const result2 = deviceFromObject(obj2);
+                const result1 = deviceFromObject(obj1, 'test1.json');
+                const result2 = deviceFromObject(obj2, 'test2.json');
 
                 expect(result1.success).toBe(true);
                 expect(result2.success).toBe(true);
@@ -332,14 +325,13 @@ describe('ModbusDeviceMapper', () => {
 
             test('should handle empty modbusUnits array', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
                     modbusUnits: []
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -349,20 +341,18 @@ describe('ModbusDeviceMapper', () => {
 
             test('should accept both BigEndian and LittleEndian', () => {
                 const obj1 = {
-                    filename: 'test1.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian
                 };
                 const obj2 = {
-                    filename: 'test2.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.LittleEndian
                 };
 
-                const result1 = deviceFromObject(obj1);
-                const result2 = deviceFromObject(obj2);
+                const result1 = deviceFromObject(obj1, 'test1.json');
+                const result2 = deviceFromObject(obj2, 'test2.json');
 
                 expect(result1.success).toBe(true);
                 expect(result2.success).toBe(true);
@@ -373,7 +363,7 @@ describe('ModbusDeviceMapper', () => {
 
         describe('Invalid Object - Null/Invalid Type', () => {
             test('should fail for null object', () => {
-                const result = deviceFromObject(null);
+                const result = deviceFromObject(null, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -382,7 +372,7 @@ describe('ModbusDeviceMapper', () => {
             });
 
             test('should fail for undefined object', () => {
-                const result = deviceFromObject(undefined);
+                const result = deviceFromObject(undefined, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -391,7 +381,7 @@ describe('ModbusDeviceMapper', () => {
             });
 
             test('should fail for non-object types', () => {
-                const result = deviceFromObject('string');
+                const result = deviceFromObject('string', 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -408,7 +398,7 @@ describe('ModbusDeviceMapper', () => {
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, '');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -418,13 +408,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for empty filename', () => {
                 const obj = {
-                    filename: '',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, '');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -434,13 +423,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for non-string filename', () => {
                 const obj = {
-                    filename: 123,
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 123 as any);
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -448,15 +436,14 @@ describe('ModbusDeviceMapper', () => {
                 }
             });
 
-            test('should fail for filename without .json extension', () => {
+            test('should fail for invalid file extension', () => {
                 const obj = {
-                    filename: 'test.txt',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.txt');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -468,13 +455,12 @@ describe('ModbusDeviceMapper', () => {
         describe('Invalid Enabled', () => {
             test('should fail for non-boolean enabled', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: 'true',
                     port: 502,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -486,12 +472,11 @@ describe('ModbusDeviceMapper', () => {
         describe('Invalid Port', () => {
             test('should fail for missing port', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -501,13 +486,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for non-number port', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: '502',
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -517,13 +501,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for port less than 1', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 0,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -533,13 +516,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for negative port', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: -1,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -549,13 +531,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for port greater than 65535', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 65536,
                     endian: Endian.BigEndian
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -567,12 +548,11 @@ describe('ModbusDeviceMapper', () => {
         describe('Invalid Endian', () => {
             test('should fail for missing endian', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -582,13 +562,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for non-string endian', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: 123
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -598,13 +577,12 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for invalid endian value', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: 'InvalidEndian'
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -616,14 +594,13 @@ describe('ModbusDeviceMapper', () => {
         describe('Invalid Optional Properties', () => {
             test('should fail for non-string name', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
                     name: 123
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -633,14 +610,13 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for non-string vendor', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
                     vendor: 123
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -650,14 +626,13 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail for non-string description', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
                     description: 123
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -669,7 +644,6 @@ describe('ModbusDeviceMapper', () => {
         describe('Invalid ModbusUnits', () => {
             test('should fail when unit has invalid unitId', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -678,7 +652,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -689,7 +663,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail when unit contains invalid DataPoint', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -709,7 +682,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -720,7 +693,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail when duplicate unit IDs exist', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -730,7 +702,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -740,7 +712,6 @@ describe('ModbusDeviceMapper', () => {
 
             test('should fail when multiple units have validation errors', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
@@ -750,7 +721,7 @@ describe('ModbusDeviceMapper', () => {
                     ]
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -762,13 +733,12 @@ describe('ModbusDeviceMapper', () => {
         describe('Multiple Errors', () => {
             test('should accumulate multiple validation errors', () => {
                 const obj = {
-                    filename: '',
                     enabled: 'true',
                     port: -1,
                     endian: 'InvalidEndian'
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, '');
 
                 expect(result.success).toBe(false);
                 if (!result.success) {
@@ -804,7 +774,7 @@ describe('ModbusDeviceMapper', () => {
                 originalDevice.addUnit(unit);
 
                 const props = deviceToDeviceProps(originalDevice);
-                const result = deviceFromObject(props);
+                const result = deviceFromObject(props, 'roundtrip.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -833,7 +803,7 @@ describe('ModbusDeviceMapper', () => {
                 });
 
                 const props = deviceToDeviceProps(originalDevice);
-                const result = deviceFromObject(props);
+                const result = deviceFromObject(props, 'minimal.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -877,7 +847,7 @@ describe('ModbusDeviceMapper', () => {
                 originalDevice.addUnit(unit2);
 
                 const props = deviceToDeviceProps(originalDevice);
-                const result = deviceFromObject(props);
+                const result = deviceFromObject(props, 'complex.json');
 
                 expect(result.success).toBe(true);
                 if (result.success) {
@@ -892,14 +862,13 @@ describe('ModbusDeviceMapper', () => {
         describe('Edge Cases', () => {
             test('should handle non-array modbusUnits property', () => {
                 const obj = {
-                    filename: 'test.json',
                     enabled: true,
                     port: 502,
                     endian: Endian.BigEndian,
                     modbusUnits: 'not an array'
                 };
 
-                const result = deviceFromObject(obj);
+                const result = deviceFromObject(obj, 'test.json');
 
                 // Should succeed but ignore invalid modbusUnits
                 expect(result.success).toBe(true);
