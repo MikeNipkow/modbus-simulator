@@ -1,6 +1,10 @@
 import { HStack, Image, Spacer, Text } from "@chakra-ui/react";
 
-function NavBar() {
+interface NavBarProps {
+    onHomeClick?: () => void;
+}
+
+function NavBar({ onHomeClick }: NavBarProps) {
     return (
         <HStack 
             margin="0 20px"
@@ -9,9 +13,12 @@ function NavBar() {
             position="relative">
 
             <Image 
-                height="80%"
+                height="60%"
                 src="/src/assets/logo.svg"
                 alt="Modbus Simulator Logo"
+                cursor="pointer"
+                onClick={onHomeClick}
+                _hover={{ opacity: 0.8 }}
             />
 
             <Text

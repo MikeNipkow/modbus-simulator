@@ -7,9 +7,10 @@ interface DeviceListButtonProps {
     icon: ElementType;
     isOpen: boolean;
     onClick: () => void;
+    isSelected?: boolean;
 }
 
-function DeviceListButton({ title, icon, isOpen, onClick }: DeviceListButtonProps) {
+function DeviceListButton({ title, icon, isOpen, onClick, isSelected = false }: DeviceListButtonProps) {
     return (
         <Button
             width="100%"
@@ -19,7 +20,10 @@ function DeviceListButton({ title, icon, isOpen, onClick }: DeviceListButtonProp
             padding="12px"
             height="auto"
             borderRadius={0}
-            _hover={{ bg: "gray.100" }}
+            color={isSelected ? "white" : "gray.600"}
+            bg={isSelected ? "#81A938" : undefined}
+            _hover={{ bg: isSelected ? "#81A938" : "gray.100", color: isSelected ? "white" : "#81A938" }}
+            userSelect="text"
         >
             <HStack width="100%" >
                 <Icon as={icon} boxSize={4} />
@@ -30,7 +34,7 @@ function DeviceListButton({ title, icon, isOpen, onClick }: DeviceListButtonProp
                     as={FaChevronRight} 
                     boxSize={3}
                     transform={isOpen ? "rotate(90deg)" : "rotate(0deg)"}
-                    transition="transform 0.2s ease-in-out"
+                    transition="transform 0.1s ease-in-out"
                 />
             </HStack>
         </Button>

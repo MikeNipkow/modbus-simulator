@@ -6,9 +6,10 @@ interface DeviceListProps {
     title: string;
     icon: ElementType;
     children: ReactNode;
+    isSelected?: boolean;
 }
 
-function DeviceList({ title, icon, children }: DeviceListProps) {
+function DeviceList({ title, icon, children, isSelected = false }: DeviceListProps) {
     const [isOpen, setIsOpen] = useState(true);
     const [height, setHeight] = useState<number>(0);
     const contentRef = useRef<HTMLDivElement>(null);
@@ -25,12 +26,16 @@ function DeviceList({ title, icon, children }: DeviceListProps) {
                 title={title}
                 icon={icon}
                 isOpen={isOpen} 
-                onClick={() => setIsOpen(!isOpen)} 
+                onClick={() => setIsOpen(!isOpen)}
+                isSelected={isSelected}
             />
             <Box
                 overflow="hidden"
                 maxHeight={isOpen ? `${height}px` : "0"}
-                transition="max-height 0.2s linear"
+                transition="max-height 0.1s linear"
+                bg="gray.50"
+                borderLeft="3px solid"
+                borderColor="#81A938"
             >
                 <div ref={contentRef}>
                     {children}

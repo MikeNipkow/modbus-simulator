@@ -14,18 +14,21 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
         <Button
             width="100%"
             justifyContent="flex-start"
-            variant={isSelected ? "solid" : "ghost"}
-            colorPalette={isSelected ? "brand" : undefined}
+            variant="ghost"
             onClick={onClick}
             padding="12px"
+            paddingLeft="20px"
             height="auto"
             borderRadius={0}
+            color={isSelected ? "#81A938" : "gray.600"}
+            fontWeight={isSelected ? "bold" : "normal"}
+            _hover={!isSelected ? { color: "#81A938" } : undefined}
+            userSelect="text"
         >
             <HStack width="100%" gap={2} overflow="hidden">
                 <Text 
                     flex={1} 
                     textAlign="left" 
-                    fontWeight={isSelected ? "semibold" : "normal"}
                     truncate
                     minWidth={0}
                     overflow="hidden"
@@ -40,7 +43,8 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
                     <HStack gap={2} flexShrink={0}>
                         <Text 
                             fontSize="xs" 
-                            color={isSelected ? "whiteAlpha.800" : "gray.500"}
+                            color="gray.400"
+                            fontWeight="normal"
                         >
                         Port {device.port}
                     </Text>
@@ -49,7 +53,6 @@ function DeviceButton({ device, showState = true, isSelected = false, onClick }:
                         as={FaCircle} 
                         boxSize={3} 
                         color={device.running ? "green.500" : "red.500"}
-                        filter={isSelected ? "brightness(1.8)" : "none"}
                     />
                 </HStack>
                 )}

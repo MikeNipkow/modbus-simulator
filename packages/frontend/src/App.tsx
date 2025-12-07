@@ -10,20 +10,40 @@ function App() {
 
   return (
     <Grid
-      minH="100vh"
-      templateRows="80px 1fr"
+      h="100vh"
+      templateRows="60px 1fr"
       templateColumns="300px 1fr"
       gap={0}
     >
       {/* Navbar */}
       <GridItem colSpan={2} 
-        borderBottom="2px solid" borderColor="brand" 
+        borderBottom="1px solid" borderColor="brand" 
         boxShadow="0 4px 8px -2px rgba(0, 0, 0, 0.2)">
-        <NavBar />
+        <NavBar onHomeClick={() => setSelectedDevice(undefined)} />
       </GridItem>
 
       {/* Sidebar */}
-      <GridItem borderRight="1px solid" borderColor="brand">
+      <GridItem 
+        borderRight="1px solid" 
+        borderColor="brand" 
+        bg="gray.50" 
+        overflowY="auto"
+        css={{
+          '&::-webkit-scrollbar': {
+            width: '2px',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: 'transparent',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            background: '#81A938',
+            borderRadius: '0',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#6d8f30',
+          },
+        }}
+      >
         <SideBar 
           selectedDevice={selectedDevice}
           onSelectDevice={setSelectedDevice}
@@ -31,7 +51,7 @@ function App() {
       </GridItem>
 
       {/* Main Content */}
-      <GridItem>
+      <GridItem bg="gray.100">
         {selectedDevice && (
           <DeviceEditor 
             device={selectedDevice}

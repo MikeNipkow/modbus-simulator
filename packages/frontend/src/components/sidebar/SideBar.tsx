@@ -2,6 +2,7 @@ import { FaNetworkWired, FaBook, FaHome } from "react-icons/fa";
 import DeviceList from "./DeviceList";
 import useDevices from "@/hooks/useDevices";
 import DeviceButton from "./DeviceButton";
+import DeviceAddButton from "./DeviceAddButton";
 import useTemplates from "@/hooks/useTemplates";
 import { Center, Spinner, Text, Button, Icon } from "@chakra-ui/react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
@@ -20,20 +21,27 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
             <Button
                 width="100%"
                 justifyContent="flex-start"
-                variant={selectedDevice === null ? "solid" : "ghost"}
-                colorPalette={selectedDevice === null ? "brand" : undefined}
+                variant="ghost"
                 onClick={() => onSelectDevice(undefined)}
                 padding="12px"
                 height="auto"
                 borderRadius={0}
                 gap={2}
+                color={selectedDevice === undefined ? "white" : "gray.600"}
+                bg={selectedDevice === undefined ? "#81A938" : undefined}
+                _hover={{ bg: selectedDevice === undefined ? "#81A938" : "gray.100", color: selectedDevice === undefined ? "white" : "#81A938" }}
+                userSelect="text"
             >
                 <Icon as={FaHome} boxSize={4} />
                 <Text fontWeight="semibold">
                     Home
                 </Text>
             </Button>
-            <DeviceList title="Devices" icon={FaNetworkWired}>
+            <DeviceList 
+                title="Devices" 
+                icon={FaNetworkWired}
+                isSelected={selectedDevice !== undefined && !selectedDevice.template}
+            >
                 {devicesLoading && (
                     <Center p={4}>
                         <Spinner size="sm" />
@@ -44,6 +52,7 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
                          Failed to load devices
                     </Text>
                 )}
+                <DeviceAddButton label="Add Device" onClick={() => console.log("Add new device")} />
                 {!devicesLoading && devices.map((device) => (
                     <DeviceButton 
                         key={device.filename}
@@ -53,7 +62,11 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
                     />
                 ))}
             </DeviceList>
-            <DeviceList title="Templates" icon={FaBook}>
+            <DeviceList 
+                title="Templates" 
+                icon={FaBook}
+                isSelected={selectedDevice !== undefined && selectedDevice.template === true}
+            >
                 {templatesLoading && (
                     <Center p={4}>
                         <Spinner size="sm" />
@@ -64,6 +77,7 @@ function SideBar({ selectedDevice, onSelectDevice }: SideBarProps) {
                          Failed to load templates
                     </Text>
                 )}
+                <DeviceAddButton label="Add Template" onClick={() => console.log("Add new template")} />
                 {!templatesLoading && templates.map((template) => (
                     <DeviceButton 
                         key={template.filename}

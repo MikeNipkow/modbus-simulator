@@ -7,6 +7,9 @@ const config = defineConfig(
                 colors: {
                     brand: {
                         value: "#81A938"
+                    },
+                    fg: {
+                        default: { value: "#718096" }
                     }
                 }
             },
