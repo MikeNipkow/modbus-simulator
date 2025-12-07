@@ -10,7 +10,7 @@ function NavBar() {
 
             <Image 
                 height="80%"
-                src="/src/assets/logo.png"
+                src="/src/assets/logo.svg"
                 alt="Modbus Simulator Logo"
             />
 
