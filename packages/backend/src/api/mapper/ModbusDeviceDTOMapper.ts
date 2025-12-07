@@ -6,10 +6,11 @@ import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 /**
  * Converts a ModbusDevice to a ModbusDeviceDTO.
  * @param device The ModbusDevice to convert.
+ * @param template Indicates if the device is a template.
  * @returns The corresponding ModbusDeviceDTO.
  * @throws Error if the device is invalid.
  */
-export function deviceToDeviceDTO(device: ModbusDevice): ModbusDeviceDTO {
+export function deviceToDeviceDTO(device: ModbusDevice, template: boolean = false): ModbusDeviceDTO {
     // Check if device is valid.
     if (!device)
         throw new Error('Invalid ModbusDevice object');
@@ -18,6 +19,7 @@ export function deviceToDeviceDTO(device: ModbusDevice): ModbusDeviceDTO {
     const props = deviceToDeviceProps(device);
     const dto : ModbusDeviceDTO = {
         ...props,
+        template : template,
         running : device.isRunning()
     };
 
@@ -27,10 +29,11 @@ export function deviceToDeviceDTO(device: ModbusDevice): ModbusDeviceDTO {
 /**
  * Creates a ModbusDeviceDTO from a plain object.
  * @param obj Object to convert to ModbusDeviceDTO.
+ * @param template Indicates if the device is a template.
  * @returns ParseResult containing the ModbusDeviceDTO or errors.
  * @throws Error if the object is invalid.
  */
-export function deviceDTOFromObject(obj: any): ParseResult<ModbusDeviceDTO> {
+export function deviceDTOFromObject(obj: any, template: boolean = false): ParseResult<ModbusDeviceDTO> {
     // Collect errors.
     const errors: string[] = [];
 
@@ -54,6 +57,7 @@ export function deviceDTOFromObject(obj: any): ParseResult<ModbusDeviceDTO> {
     // Create DTO.
     const dto: ModbusDeviceDTO = {
         ...deviceProps,
+        template : template,
         running : device.isRunning()
     };
 
