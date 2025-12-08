@@ -31,11 +31,13 @@ const SidebarDropdownButton = ({ icon, text, isOpen, children }: Props) => {
         <Icon
           as={FaChevronRight}
           transform={open ? "rotate(90deg)" : "rotate(0deg)"}
+          transition="0.1s linear"
         />
       </Button>
       <Box
         ref={contentRef}
         maxHeight={open ? `${height}px` : "0"}
+        transition="0.1s linear"
         overflow="hidden"
       >
         {children}
