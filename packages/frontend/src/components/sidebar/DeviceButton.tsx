@@ -11,6 +11,7 @@ const DeviceButton = ({ device, isSelected = false, onClick }: Props) => {
   return (
     <Button
       variant={"sidebar"}
+      paddingLeft={"20px"}
       justifyContent={"space-between"}
       borderLeft={"4px solid"}
       borderColor={"brand"}

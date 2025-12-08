@@ -1,4 +1,4 @@
-import { FaBook, FaHome, FaNetworkWired } from "react-icons/fa";
+import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
 import SidebarButton from "./SidebarButton";
 import SidebarDropdownButton from "./SidebarDropdownButton";
 import { VStack } from "@chakra-ui/react";
@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import apiClient from "@/services/api-client";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import DeviceButton from "./DeviceButton";
+import DeviceAddButton from "./DeviceAddButton";
 
 interface Props {
   selectedDevice?: ModbusDevice | null;
@@ -39,6 +40,7 @@ const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
       />
 
       <SidebarDropdownButton icon={FaNetworkWired} text="Devices">
+        <DeviceAddButton title="Add Device" />
         {devices.map((device) => (
           <DeviceButton
             key={device.filename}
@@ -53,6 +55,7 @@ const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
       </SidebarDropdownButton>
 
       <SidebarDropdownButton icon={FaBook} text="Templates">
+        <DeviceAddButton title="Add Template" />
         {templates.map((device) => (
           <DeviceButton
             key={device.filename}

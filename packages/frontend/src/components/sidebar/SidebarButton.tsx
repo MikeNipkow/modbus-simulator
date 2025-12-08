@@ -10,7 +10,7 @@ interface Props {
 const SidebarButton = ({ icon, text, onClick }: Props) => {
   return (
     <Button variant={"sidebar"} onClick={onClick}>
-      <Icon as={icon} />
+      <Icon as={icon} boxSize={4} />
       <Text>{text}</Text>
     </Button>
   );

@@ -25,11 +25,12 @@ const SidebarDropdownButton = ({ icon, text, isOpen, children }: Props) => {
   return (
     <>
       <Button variant={"sidebar"} onClick={() => setOpen(!open)}>
-        <Icon as={icon} />
+        <Icon as={icon} boxSize={4} />
         <Text>{text}</Text>
         <Spacer />
         <Icon
           as={FaChevronRight}
+          boxSize={4}
           transform={open ? "rotate(90deg)" : "rotate(0deg)"}
           transition="0.1s linear"
         />

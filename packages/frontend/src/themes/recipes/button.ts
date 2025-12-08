@@ -9,6 +9,7 @@ export const buttonRecipe = defineRecipe({
       sidebar: {
         width: "100%",
         justifyContent: "flex-start",
+        padding: "12px",
         border: "none",
         borderRadius: "0",
         color: "gray.600",
