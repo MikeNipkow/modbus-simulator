@@ -1,8 +1,21 @@
-import type { ModbusDevice } from "@/types/ModbusDevice";
-import useData from "./useData";
+import type { ModbusDevice } from "@/archive/types/ModbusDevice";
+import apiClient from "@/services/api-client";
+import { useEffect, useState } from "react";
 
-function useDevices() {
-    return useData<ModbusDevice>("/devices");
-}
+const useDevices = (templates: boolean = false) => {
+  const [devices, setDevices] = useState<ModbusDevice[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
-export default useDevices;
+  useEffect(() => {
+    apiClient
+      .get(templates ? "/templates" : "/devices")
+      .then((response) => {
+        setDevices(response.data);
+      })
+      .catch((error) => {
+        setErrors((prevErrors) => [...prevErrors, error.message]);
+      });
+  }, []);
+
+  return { devices, errors };
+};
