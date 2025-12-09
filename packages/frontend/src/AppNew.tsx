@@ -4,8 +4,14 @@ import SidebarIconButton from "./components/sidebar/SidebarIconButton";
 import { FaHome, FaNetworkWired } from "react-icons/fa";
 import Sidebar from "./components/sidebar/Sidebar";
 import SidebarDropdownButton from "./components/sidebar/SidebarDropdownButton";
+import { useState } from "react";
+import type { ModbusDevice } from "./types/ModbusDevice";
 
 function AppNew() {
+  const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(
+    null,
+  );
+
   return (
     <Grid h="100vh" templateRows="60px 1fr" templateColumns="300px 1fr" gap={0}>
       {/* Navbar */}
@@ -22,7 +28,10 @@ function AppNew() {
         borderRight={"1px solid"}
         borderColor={"primary"}
       >
-        <Sidebar />
+        <Sidebar
+          selectedDevice={selectedDevice}
+          onDeviceSelect={setSelectedDevice}
+        />
       </GridItem>
 
       {/* Main Content */}
