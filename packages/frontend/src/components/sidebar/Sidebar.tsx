@@ -1,12 +1,13 @@
-import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
+import { FaBook, FaHome, FaNetworkWired } from "react-icons/fa";
 import SidebarButton from "./SidebarButton";
 import SidebarDropdownButton from "./SidebarDropdownButton";
 import { VStack } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import apiClient from "@/services/api-client";
+import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import DeviceButton from "./DeviceButton";
 import DeviceAddButton from "./DeviceAddButton";
+import AddDeviceDialog from "../dialogs/AddDeviceDialog";
+import useDevices from "@/hooks/useDevices";
 
 interface Props {
   selectedDevice?: ModbusDevice | null;
@@ -14,25 +15,42 @@ interface Props {
 }
 
 const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
-  const [devices, setDevices] = useState<ModbusDevice[]>([]);
-  const [templates, setTemplates] = useState<ModbusDevice[]>([]);
+  const {
+    devices: devices,
+    errors: devicesErrors,
+    isLoading: devicesLoading,
+  } = useDevices(false);
+  const {
+    devices: templates,
+    errors: templatesErrors,
+    isLoading: templatesLoading,
+  } = useDevices(true);
+  const [isDeviceDialogOpen, setIsDeviceDialogOpen] = useState(false);
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
 
-  useEffect(() => {
-    apiClient
-      .get<ModbusDevice[]>("/devices")
-      .then((response) => setDevices(response.data))
-      .catch((error) => console.error("Error fetching devices:", error));
-  }, []);
+  const handleAddDevice = (filename: string, templateFilename?: string) => {
+    // TODO: API call to create device
+  };
 
-  useEffect(() => {
-    apiClient
-      .get<ModbusDevice[]>("/templates")
-      .then((response) => setTemplates(response.data))
-      .catch((error) => console.error("Error fetching devices:", error));
-  }, []);
+  const handleAddTemplate = (filename: string) => {
+    // TODO: API call to create template
+  };
 
   return (
     <VStack width={"100%"} gap={0}>
+      <AddDeviceDialog
+        open={isDeviceDialogOpen}
+        onClose={() => setIsDeviceDialogOpen(false)}
+        template={false}
+        templates={templates}
+        onSubmit={handleAddDevice}
+      />
+      <AddDeviceDialog
+        open={isTemplateDialogOpen}
+        onClose={() => setIsTemplateDialogOpen(false)}
+        template={true}
+        onSubmit={handleAddTemplate}
+      />
       <SidebarButton
         icon={FaHome}
         text="Home"
@@ -40,7 +58,10 @@ const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
       />
 
       <SidebarDropdownButton icon={FaNetworkWired} text="Devices">
-        <DeviceAddButton title="Add Device" />
+        <DeviceAddButton
+          title="Add Device"
+          onClick={() => setIsDeviceDialogOpen(true)}
+        />
         {devices.map((device) => (
           <DeviceButton
             key={device.filename}
@@ -55,7 +76,10 @@ const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
       </SidebarDropdownButton>
 
       <SidebarDropdownButton icon={FaBook} text="Templates">
-        <DeviceAddButton title="Add Template" />
+        <DeviceAddButton
+          title="Add Template"
+          onClick={() => setIsTemplateDialogOpen(true)}
+        />
         {templates.map((device) => (
           <DeviceButton
             key={device.filename}

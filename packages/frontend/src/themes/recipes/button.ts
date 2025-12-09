@@ -6,6 +6,13 @@ import { defineRecipe } from "@chakra-ui/react";
 export const buttonRecipe = defineRecipe({
   variants: {
     variant: {
+      primary: {
+        bg: "brand",
+        color: "white",
+        _hover: {
+          bg: "brandDark",
+        },
+      },
       sidebar: {
         width: "100%",
         justifyContent: "flex-start",

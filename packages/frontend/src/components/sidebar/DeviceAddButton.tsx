@@ -1,5 +1,4 @@
-import type { ModbusDevice } from "@/types/ModbusDevice";
-import { Button, HStack, Icon, Status, Text } from "@chakra-ui/react";
+import { Button, Icon, Text } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 
 interface Props {

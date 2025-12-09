@@ -2,6 +2,9 @@ export const colors = {
   brand: {
     value: "#81A938",
   },
+  brandDark: {
+    value: "#6d8f30",
+  },
   bg: {
     light: { value: "{colors.white}" },
     medium: { value: "{colors.gray.50}" },
