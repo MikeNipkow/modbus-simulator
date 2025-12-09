@@ -6,7 +6,7 @@ import Sidebar from "./components/sidebar/Sidebar";
 import SidebarDropdownButton from "./components/sidebar/SidebarDropdownButton";
 import { useState } from "react";
 import type { ModbusDevice } from "./types/ModbusDevice";
-import Navbar from "./components/NavBar";
+import Navbar from "./components/Navbar";
 
 function AppNew() {
   const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(
