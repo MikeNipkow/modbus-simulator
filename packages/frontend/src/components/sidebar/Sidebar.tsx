@@ -3,14 +3,15 @@ import SidebarIconButton from "./SidebarIconButton";
 import { FaBook, FaHome, FaNetworkWired } from "react-icons/fa";
 import SidebarDropdownButton from "./SidebarDropdownButton";
 import type { ModbusDevice } from "@/archive/types/ModbusDevice";
-import { useState } from "react";
 import useDevices from "@/hooks/useDevices";
 import SidebarButton from "./SidebarButton";
 
-const Sidebar = () => {
-  const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(
-    null,
-  );
+interface Props {
+  selectedDevice: ModbusDevice | null;
+  onDeviceSelect: (device: ModbusDevice | null) => void;
+}
+
+const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
   const { devices: devices } = useDevices(false);
   const { devices: templates } = useDevices(true);
 
@@ -27,8 +28,8 @@ const Sidebar = () => {
         }
         label="Home"
         icon={FaHome}
-        data-active={selectedDevice === null ? true : undefined}
-        onClick={() => setSelectedDevice(null)}
+        data-active={selectedDevice === null ? "" : undefined}
+        onClick={() => onDeviceSelect(null)}
       />
 
       <SidebarDropdownButton
@@ -40,7 +41,7 @@ const Sidebar = () => {
         {devices.map((device) => (
           <SidebarButton
             variant="secondary"
-            onClick={() => setSelectedDevice(device)}
+            onClick={() => onDeviceSelect(device)}
             data-active={
               isDeviceSelected() && selectedDevice?.filename === device.filename
                 ? true
@@ -61,7 +62,7 @@ const Sidebar = () => {
         {templates.map((template) => (
           <SidebarButton
             variant="secondary"
-            onClick={() => setSelectedDevice(template)}
+            onClick={() => onDeviceSelect(template)}
             data-active={
               isTemplateSelected() &&
               selectedDevice?.filename === template.filename
