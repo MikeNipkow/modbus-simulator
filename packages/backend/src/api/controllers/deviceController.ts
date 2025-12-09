@@ -3,7 +3,11 @@ import deviceManager, { templateManager } from "../../app.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
 import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
-import { deviceDTOFromObject, deviceFromDTO, deviceToDeviceDTO } from "../mapper/ModbusDeviceDTOMapper.js";
+import {
+  deviceDTOFromObject,
+  deviceFromDTO,
+  deviceToDeviceDTO,
+} from "../mapper/ModbusDeviceDTOMapper.js";
 import { DeviceManager } from "../../DeviceManager.js";
 
 /**
@@ -12,9 +16,9 @@ import { DeviceManager } from "../../DeviceManager.js";
  * @returns True if the endpoint is for templates, false otherwise.
  */
 export const isTemplateEndpoint = (req: Request): boolean => {
-    const originalUrl = req.originalUrl;
-    return originalUrl.startsWith('/api/v1/templates');
-}
+  const originalUrl = req.originalUrl;
+  return originalUrl.startsWith("/api/v1/templates");
+};
 
 /**
  * Helper function to determine if the request is for a device.
@@ -22,26 +26,26 @@ export const isTemplateEndpoint = (req: Request): boolean => {
  * @returns True if the endpoint is for devices, false otherwise.
  */
 export const isDeviceEndpoint = (req: Request): boolean => {
-    const originalUrl = req.originalUrl;
-    return originalUrl.startsWith('/api/v1/devices');
-}
+  const originalUrl = req.originalUrl;
+  return originalUrl.startsWith("/api/v1/devices");
+};
 
 /**
  * Helper function to get the appropriate DeviceManager based on the API endpoint.
  * @param req Express request object.
  * @returns The corresponding DeviceManager or undefined if not found.
  */
-export const getDeviceManagerByEndpoint = (req: Request): DeviceManager | undefined => {
-    // Check if the endpoint is for templates.
-    if (isTemplateEndpoint(req))
-        return templateManager;
+export const getDeviceManagerByEndpoint = (
+  req: Request,
+): DeviceManager | undefined => {
+  // Check if the endpoint is for templates.
+  if (isTemplateEndpoint(req)) return templateManager;
 
-    // Check if the endpoint is for devices.
-    if (isDeviceEndpoint(req))
-        return deviceManager;
+  // Check if the endpoint is for devices.
+  if (isDeviceEndpoint(req)) return deviceManager;
 
-    return undefined;
-}
+  return undefined;
+};
 
 /**
  * Helper function to get a device by ID from request parameters.
@@ -50,29 +54,47 @@ export const getDeviceManagerByEndpoint = (req: Request): DeviceManager | undefi
  * @param template Whether to get the device from the template manager.
  * @returns The device if found, undefined otherwise.
  */
-export const getDeviceFromRequest = (req: Request, res: Response, template: boolean = false): ModbusDevice | undefined => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Check for device id parameter.
-    const deviceId = req.params.id;
-    if (!deviceId) {
-        res.status(400).json({ error: !template ? 'Device id parameter is required' : 'Template id parameter is required' });
-        return undefined;
-    }
+export const getDeviceFromRequest = (
+  req: Request,
+  res: Response,
+  template: boolean = false,
+): ModbusDevice | undefined => {
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Check if device exists.
-    const device = deviceManager.getDevice(deviceId);
-    if (!device) {
-        res.status(404).json({ error: !template ? `Device with id ${deviceId} not found` : `Template with id ${deviceId} not found` });
-        return undefined;
-    }
+  // Check for device id parameter.
+  const deviceId = req.params.id;
+  if (!deviceId) {
+    res.status(400).json({
+      errors: [
+        !template
+          ? "Device id parameter is required"
+          : "Template id parameter is required",
+      ],
+    });
+    return undefined;
+  }
 
-    return device;
+  // Check if device exists.
+  const device = deviceManager.getDevice(deviceId);
+  if (!device) {
+    res.status(404).json({
+      errors: [
+        !template
+          ? `Device with id ${deviceId} not found`
+          : `Template with id ${deviceId} not found`,
+      ],
+    });
+    return undefined;
+  }
+
+  return device;
 };
 
 /**
@@ -81,18 +103,24 @@ export const getDeviceFromRequest = (req: Request, res: Response, template: bool
  * @param res Express response object.
  */
 export const getDevicesRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Collect device DTOs.
-    const devicesDTO: ModbusDeviceDTO[] = [];
-    deviceManager.getDevices().map((device) => devicesDTO.push(deviceToDeviceDTO(device, !isDeviceEndpoint(req))));
+  // Collect device DTOs.
+  const devicesDTO: ModbusDeviceDTO[] = [];
+  deviceManager
+    .getDevices()
+    .map((device) =>
+      devicesDTO.push(deviceToDeviceDTO(device, !isDeviceEndpoint(req))),
+    );
 
-    res.json(devicesDTO);
+  res.json(devicesDTO);
 };
 
 /**
@@ -101,16 +129,15 @@ export const getDevicesRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const getDeviceRoute = (req: Request, res: Response) => {
-    // Retrieve device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device)
-        return;
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    // Convert to DTO.
-    const deviceDTO = deviceToDeviceDTO(device, !isDeviceEndpoint(req));
+  // Convert to DTO.
+  const deviceDTO = deviceToDeviceDTO(device, !isDeviceEndpoint(req));
 
-    res.json(deviceDTO);
-}
+  res.json(deviceDTO);
+};
 
 /**
  * Creates a new device.
@@ -118,41 +145,47 @@ export const getDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const createDeviceRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Parse device DTO from request body.
-    const result: ParseResult<ModbusDeviceDTO> = deviceDTOFromObject(req.body);
-    if (!result.success) {
-        res.status(400).json({ errors: result.errors });
-        return;
-    }
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Check for existing device.
-    const deviceDTO     = result.value;
-    const filename      = deviceDTO.filename;
-    if (deviceManager.hasDevice(filename)) {
-        res.status(409).json({ error: `Device with id ${filename} already exists` });
-        return;
-    }
+  // Parse device DTO from request body.
+  const result: ParseResult<ModbusDeviceDTO> = deviceDTOFromObject(req.body);
+  if (!result.success) {
+    res.status(400).json({ errors: result.errors });
+    return;
+  }
 
-    // Create new device.
-    const device = new ModbusDevice(deviceDTO);
-    const addResult = deviceManager.addDevice(filename, device);
-    if (!addResult) {
-        res.status(500).json({ errors: `Failed to create the device with id ${filename}` });
-        return;
-    }
+  // Check for existing device.
+  const deviceDTO = result.value;
+  const filename = deviceDTO.filename;
+  if (deviceManager.hasDevice(filename)) {
+    res
+      .status(409)
+      .json({ errors: [`Device with id ${filename} already exists`] });
+    return;
+  }
 
-    // Save device in json file.
-    deviceManager.saveDevice(device.getFilename());
+  // Create new device.
+  const device = new ModbusDevice(deviceDTO);
+  const addResult = deviceManager.addDevice(filename, device);
+  if (!addResult) {
+    res
+      .status(500)
+      .json({ errors: `Failed to create the device with id ${filename}` });
+    return;
+  }
 
-    res.status(201).json(deviceToDeviceDTO(device, !isDeviceEndpoint(req)));
-}
+  // Save device in json file.
+  deviceManager.saveDevice(device.getFilename());
+
+  res.status(201).json(deviceToDeviceDTO(device, !isDeviceEndpoint(req)));
+};
 
 /**
  * Deletes a device.
@@ -160,23 +193,24 @@ export const createDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const deleteDeviceRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Check for device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device)
-        return;
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Delete device.
-    deviceManager.deleteDevice(device.getFilename());
+  // Check for device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    res.status(204).send();
-}
+  // Delete device.
+  deviceManager.deleteDevice(device.getFilename());
+
+  res.status(204).send();
+};
 
 /**
  * Updates a device by recreating it.
@@ -184,69 +218,73 @@ export const deleteDeviceRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const updateDeviceRoute = async (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Check for existing device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device)
-        return;
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Parse new device DTO from request body.
-    const parseResult = deviceDTOFromObject(req.body);
-    if (!parseResult.success) {
-        res.status(400).json({ errors: parseResult.errors });
-        return;
-    }
-    
-    // Try to parse new device from DTO.
-    const newDeviceDTO = parseResult.value;
-    const newDeviceResult = deviceFromDTO(newDeviceDTO);
-    if (!newDeviceResult.success) {
-        res.status(400).json({ errors: newDeviceResult.errors });
-        return;
-    }
-    const newDevice = newDeviceResult.value;
+  // Check for existing device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    // Stop the old device modbus server.
-    const wasRunning = device.isRunning();
-    if (wasRunning)
-        await device.stopServer();
+  // Parse new device DTO from request body.
+  const parseResult = deviceDTOFromObject(req.body);
+  if (!parseResult.success) {
+    res.status(400).json({ errors: parseResult.errors });
+    return;
+  }
 
-    // Delete old device.
-    const deleted = deviceManager.deleteDevice(device.getFilename());
-    if (!deleted) {
-        // Restart old device if it was running.
-        if (wasRunning)
-            await device.startServer();
+  // Try to parse new device from DTO.
+  const newDeviceDTO = parseResult.value;
+  const newDeviceResult = deviceFromDTO(newDeviceDTO);
+  if (!newDeviceResult.success) {
+    res.status(400).json({ errors: newDeviceResult.errors });
+    return;
+  }
+  const newDevice = newDeviceResult.value;
 
-        res.status(500).json({ error: `Failed to delete existing device with id ${device.getFilename()}` });
-        return;
-    }
+  // Stop the old device modbus server.
+  const wasRunning = device.isRunning();
+  if (wasRunning) await device.stopServer();
 
-    // Try to add new device.
-    const addResult = deviceManager.addDevice(newDevice.getFilename(), newDevice);
-    if (!addResult) {
-        // Try to add the old device back.
-        deviceManager.addDevice(device.getFilename(), device);
-        if (wasRunning)
-            await device.startServer();
+  // Delete old device.
+  const deleted = deviceManager.deleteDevice(device.getFilename());
+  if (!deleted) {
+    // Restart old device if it was running.
+    if (wasRunning) await device.startServer();
 
-        // Save old device.
-        deviceManager.saveDevice(device.getFilename());
+    res.status(500).json({
+      errors: [
+        `Failed to delete existing device with id ${device.getFilename()}`,
+      ],
+    });
+    return;
+  }
 
-        res.status(500).json({ error: `Failed to add new device with id ${newDevice.getFilename()}` });
-        return;
-    }
+  // Try to add new device.
+  const addResult = deviceManager.addDevice(newDevice.getFilename(), newDevice);
+  if (!addResult) {
+    // Try to add the old device back.
+    deviceManager.addDevice(device.getFilename(), device);
+    if (wasRunning) await device.startServer();
 
-    // Save new device and start server if enabled.
-    deviceManager.saveDevice(newDevice.getFilename());
-    if (newDevice.isEnabled() && !isTemplateEndpoint(req))
-        await newDevice.startServer();
-    
-    res.status(200).json(deviceToDeviceDTO(newDevice, !isDeviceEndpoint(req)));
+    // Save old device.
+    deviceManager.saveDevice(device.getFilename());
+
+    res.status(500).json({
+      errors: [`Failed to add new device with id ${newDevice.getFilename()}`],
+    });
+    return;
+  }
+
+  // Save new device and start server if enabled.
+  deviceManager.saveDevice(newDevice.getFilename());
+  if (newDevice.isEnabled() && !isTemplateEndpoint(req))
+    await newDevice.startServer();
+
+  res.status(200).json(deviceToDeviceDTO(newDevice, !isDeviceEndpoint(req)));
 };

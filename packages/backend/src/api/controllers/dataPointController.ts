@@ -1,8 +1,16 @@
 import { Request, Response } from "express";
 import { getUnitFromRequest } from "./unitController.js";
 import { DataPoint } from "../../DataPoint.js";
-import { dataPointDTOFromObject, dataPointFromDTO, dataPointToDataPointDTO } from "../mapper/DataPointDTOMapper.js";
-import { getDeviceFromRequest, getDeviceManagerByEndpoint, isTemplateEndpoint } from "./deviceController.js";
+import {
+  dataPointDTOFromObject,
+  dataPointFromDTO,
+  dataPointToDataPointDTO,
+} from "../mapper/DataPointDTOMapper.js";
+import {
+  getDeviceFromRequest,
+  getDeviceManagerByEndpoint,
+  isTemplateEndpoint,
+} from "./deviceController.js";
 
 /**
  * Helper function to get a DataPoint by ID from request parameters.
@@ -10,28 +18,34 @@ import { getDeviceFromRequest, getDeviceManagerByEndpoint, isTemplateEndpoint } 
  * @param res Express response object.
  * @returns The DataPoint if found, undefined otherwise.
  */
-export const getDataPointFromRequest = (req: Request, res: Response): DataPoint | undefined => {
-    // Retrieve unit.
-    const unit = getUnitFromRequest(req, res);
-    if (!unit) 
-        return undefined;
+export const getDataPointFromRequest = (
+  req: Request,
+  res: Response,
+): DataPoint | undefined => {
+  // Retrieve unit.
+  const unit = getUnitFromRequest(req, res);
+  if (!unit) return undefined;
 
-    // Check for data point id parameter.
-    if (!req.params.dataPointId) {
-        res.status(400).json({ error: 'DataPoint id parameter is required' });
-        return undefined;
-    }
+  // Check for data point id parameter.
+  if (!req.params.dataPointId) {
+    res.status(400).json({ errors: ["DataPoint id parameter is required"] });
+    return undefined;
+  }
 
-    // Retrieve data point.
-    const dataPointId = req.params.dataPointId;
-    const dataPoint = unit.getDataPoint(dataPointId);
-    if (!dataPoint) {
-        res.status(404).json({ error: `DataPoint with id ${dataPointId} not found in unit ${unit.getId()}` });
-        return undefined;
-    }
+  // Retrieve data point.
+  const dataPointId = req.params.dataPointId;
+  const dataPoint = unit.getDataPoint(dataPointId);
+  if (!dataPoint) {
+    res.status(404).json({
+      errors: [
+        `DataPoint with id ${dataPointId} not found in unit ${unit.getId()}`,
+      ],
+    });
+    return undefined;
+  }
 
-    return dataPoint;
-}
+  return dataPoint;
+};
 
 /**
  * Retrieves all DataPoints of a ModbusUnit.
@@ -39,16 +53,17 @@ export const getDataPointFromRequest = (req: Request, res: Response): DataPoint 
  * @param res Express response object.
  */
 export const getDataPointsRoute = (req: Request, res: Response) => {
-    // Retrieve unit.
-    const unit = getUnitFromRequest(req, res);
-    if (!unit) 
-        return;
+  // Retrieve unit.
+  const unit = getUnitFromRequest(req, res);
+  if (!unit) return;
 
-    // Collect data point DTOs.
-    const dataPoints = Array.from(unit.getAllDataPoints().map(dp => dataPointToDataPointDTO(dp)));
+  // Collect data point DTOs.
+  const dataPoints = Array.from(
+    unit.getAllDataPoints().map((dp) => dataPointToDataPointDTO(dp)),
+  );
 
-    res.json(dataPoints);
-}
+  res.json(dataPoints);
+};
 
 /**
  * Retrieves a DataPoint by ID.
@@ -56,16 +71,15 @@ export const getDataPointsRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const getDataPointRoute = (req: Request, res: Response) => {
-    // Retrieve data point.
-    const dataPoint = getDataPointFromRequest(req, res);
-    if (!dataPoint) 
-        return;
+  // Retrieve data point.
+  const dataPoint = getDataPointFromRequest(req, res);
+  if (!dataPoint) return;
 
-    // Convert to DTO.
-    const dataPointDTO = dataPointToDataPointDTO(dataPoint);
+  // Convert to DTO.
+  const dataPointDTO = dataPointToDataPointDTO(dataPoint);
 
-    res.json(dataPointDTO);
-}
+  res.json(dataPointDTO);
+};
 
 /**
  * Creates a new DataPoint.
@@ -73,47 +87,47 @@ export const getDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const createDataPointRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Retrieve unit.
-    const unit = getUnitFromRequest(req, res);
-    if (!unit) 
-        return;
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Retrieve device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device) 
-        return;
+  // Retrieve unit.
+  const unit = getUnitFromRequest(req, res);
+  if (!unit) return;
 
-    // Parse data point DTO from request body.
-    const parseResult = dataPointDTOFromObject(req.body);
-    if (!parseResult.success) {
-        res.status(400).json({ errors: parseResult.errors });
-        return;
-    }
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    // Create DataPoint from DTO.
-    const dpDTO = parseResult.value;
-    const dataPoint: DataPoint= new DataPoint(dpDTO);  
-    const result = unit.addDataPoint(dataPoint);
-    if (!result.success) {
-        res.status(400).json({ errors: result.errors });
-        return;
-    }
+  // Parse data point DTO from request body.
+  const parseResult = dataPointDTOFromObject(req.body);
+  if (!parseResult.success) {
+    res.status(400).json({ errors: parseResult.errors });
+    return;
+  }
 
-    // Save device in json file.
-    deviceManager.saveDevice(device.getFilename());
+  // Create DataPoint from DTO.
+  const dpDTO = parseResult.value;
+  const dataPoint: DataPoint = new DataPoint(dpDTO);
+  const result = unit.addDataPoint(dataPoint);
+  if (!result.success) {
+    res.status(400).json({ errors: result.errors });
+    return;
+  }
 
-    // Convert to DTO.
-    const dto = dataPointToDataPointDTO(dataPoint);
+  // Save device in json file.
+  deviceManager.saveDevice(device.getFilename());
 
-    res.status(201).json(dto);
-}
+  // Convert to DTO.
+  const dto = dataPointToDataPointDTO(dataPoint);
+
+  res.status(201).json(dto);
+};
 
 /**
  * Deletes a DataPoint.
@@ -121,36 +135,35 @@ export const createDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const deleteDataPointRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Retrieve device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device) 
-        return;
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Retrieve unit.
-    const unit = getUnitFromRequest(req, res);
-    if (!unit) 
-        return;
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    // Retrieve data point.
-    const dataPoint = getDataPointFromRequest(req, res);
-    if (!dataPoint) 
-        return;
+  // Retrieve unit.
+  const unit = getUnitFromRequest(req, res);
+  if (!unit) return;
 
-    // Delete data point.
-    unit.deleteDataPoint(dataPoint.getId());
+  // Retrieve data point.
+  const dataPoint = getDataPointFromRequest(req, res);
+  if (!dataPoint) return;
 
-    // Save device in json file.
-    deviceManager.saveDevice(device.getFilename());
+  // Delete data point.
+  unit.deleteDataPoint(dataPoint.getId());
 
-    res.status(204).send();
-}
+  // Save device in json file.
+  deviceManager.saveDevice(device.getFilename());
+
+  res.status(204).send();
+};
 
 /**
  * Updates an existing DataPoint by recreating it.
@@ -158,72 +171,73 @@ export const deleteDataPointRoute = (req: Request, res: Response) => {
  * @param res Express response object.
  */
 export const updateDataPointRoute = (req: Request, res: Response) => {
-    // Get appropriate device manager.
-    const deviceManager = getDeviceManagerByEndpoint(req);
-    if (!deviceManager) {
-        res.status(500).json({ error: 'Failed to determine the appropriate device manager' });
-        return undefined;
-    }
-    
-    // Retrieve device.
-    const device = getDeviceFromRequest(req, res);
-    if (!device) 
-        return;
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
 
-    // Retrieve unit.
-    const unit = getUnitFromRequest(req, res);
-    if (!unit) 
-        return;
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
 
-    // Retrieve data point.
-    const dataPoint = getDataPointFromRequest(req, res);
-    if (!dataPoint) 
-        return;
+  // Retrieve unit.
+  const unit = getUnitFromRequest(req, res);
+  if (!unit) return;
 
-    // Parse data point DTO from request body.
-    const parseResult = dataPointDTOFromObject(req.body);
-    if (!parseResult.success) {
-        res.status(400).json({ errors: parseResult.errors });
-        return;
-    }
-    
-    // Create new DataPoint with updated properties.
-    const dpDTO = parseResult.value;
-    const newDpResult = dataPointFromDTO(dpDTO);
-    if (!newDpResult.success) {
-        res.status(400).json({ errors: newDpResult.errors });
-        return;
-    }
-    
-    // Delete and recreate approach.
-    const newDp = newDpResult.value;
-    const deleteResult = unit.deleteDataPoint(dataPoint.getId());
-    if (!deleteResult) {
-        // Internal error
-        res.status(500).json({ error: 'Failed to delete existing DataPoint for update' });
-        return;
-    }
+  // Retrieve data point.
+  const dataPoint = getDataPointFromRequest(req, res);
+  if (!dataPoint) return;
 
-    // Try to add the new DataPoint
-    const addResult = unit.addDataPoint(newDp);
-    if (!addResult.success) {
-        // Re-add the old DataPoint to maintain state
-        unit.addDataPoint(dataPoint);
+  // Parse data point DTO from request body.
+  const parseResult = dataPointDTOFromObject(req.body);
+  if (!parseResult.success) {
+    res.status(400).json({ errors: parseResult.errors });
+    return;
+  }
 
-        res.status(400).json({ errors: addResult.errors });
-        return;
-    }
+  // Create new DataPoint with updated properties.
+  const dpDTO = parseResult.value;
+  const newDpResult = dataPointFromDTO(dpDTO);
+  if (!newDpResult.success) {
+    res.status(400).json({ errors: newDpResult.errors });
+    return;
+  }
 
-    // Start simulation if enabled.
-    if (newDp.isSimulationEnabled() && !isTemplateEndpoint(req))
-        newDp.startSimulation();
+  // Delete and recreate approach.
+  const newDp = newDpResult.value;
+  const deleteResult = unit.deleteDataPoint(dataPoint.getId());
+  if (!deleteResult) {
+    // Internal error
+    res
+      .status(500)
+      .json({ errors: ["Failed to delete existing DataPoint for update"] });
+    return;
+  }
 
-    // Save device in json file.
-    deviceManager.saveDevice(device.getFilename());
+  // Try to add the new DataPoint
+  const addResult = unit.addDataPoint(newDp);
+  if (!addResult.success) {
+    // Re-add the old DataPoint to maintain state
+    unit.addDataPoint(dataPoint);
 
-    // Retrieve updated DataPoint and convert to DTO.
-    const updatedDataPoint = unit.getDataPoint(dataPoint.getId());
-    const dto = dataPointToDataPointDTO(updatedDataPoint!);
+    res.status(400).json({ errors: addResult.errors });
+    return;
+  }
 
-    res.json(dto);
-}
+  // Start simulation if enabled.
+  if (newDp.isSimulationEnabled() && !isTemplateEndpoint(req))
+    newDp.startSimulation();
+
+  // Save device in json file.
+  deviceManager.saveDevice(device.getFilename());
+
+  // Retrieve updated DataPoint and convert to DTO.
+  const updatedDataPoint = unit.getDataPoint(dataPoint.getId());
+  const dto = dataPointToDataPointDTO(updatedDataPoint!);
+
+  res.json(dto);
+};
