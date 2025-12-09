@@ -5,7 +5,7 @@ import App from "./archive/App.tsx";
 import AppNew from "./AppNew.tsx";
 import { ChakraProvider } from "@chakra-ui/react/styled-system";
 import oldsystem from "./archive/themes/theme.ts";
-import system from "./themes/theme.ts";
+import system from "./theme/theme.ts";
 import { features } from "./archive/config/features.ts";
 
 // Zeige aktive Features in der Konsole

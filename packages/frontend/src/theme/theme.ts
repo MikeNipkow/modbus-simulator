@@ -5,7 +5,8 @@ import { colors, semanticColors } from "./colors";
 const config = defineConfig({
   globalCss: {
     "html, body": {
-      color: "gray.600",
+      color: "fg",
+      background: "bg.dark",
       fontFamily: "system-ui, sans-serif",
     },
   },
