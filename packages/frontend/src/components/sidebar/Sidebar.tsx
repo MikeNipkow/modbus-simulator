@@ -1,6 +1,6 @@
 import { VStack } from "@chakra-ui/react";
 import SidebarIconButton from "./SidebarIconButton";
-import { FaBook, FaHome, FaNetworkWired } from "react-icons/fa";
+import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
 import SidebarDropdownButton from "./SidebarDropdownButton";
 import useDevices from "@/hooks/useDevices";
 import SidebarButton from "./SidebarButton";
@@ -38,6 +38,12 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
         icon={FaNetworkWired}
         data-active={isDeviceSelected() ? true : undefined}
       >
+        <SidebarIconButton
+          variant="secondary"
+          icon={FaPlus}
+          iconSize={3}
+          label="Add Device"
+        />
         {devices.map((device) => (
           <SidebarButton
             variant="secondary"
@@ -59,6 +65,12 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
         icon={FaBook}
         data-active={isTemplateSelected() ? true : undefined}
       >
+        <SidebarIconButton
+          variant="secondary"
+          icon={FaPlus}
+          iconSize={3}
+          label="Add Template"
+        />
         {templates.map((template) => (
           <SidebarButton
             variant="secondary"

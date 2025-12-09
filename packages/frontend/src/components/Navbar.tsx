@@ -15,7 +15,7 @@ const Navbar = ({ title, onHomeClick }: Props) => {
         onClick={onHomeClick}
       />
       <AbsoluteCenter axis={"horizontal"}>
-        <Text>{title}</Text>
+        <Text fontWeight={"bold"}>{title}</Text>
       </AbsoluteCenter>
       <Spacer />
       <Text>v1.0.0</Text>
