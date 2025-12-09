@@ -5,9 +5,9 @@ export const colors = {
     contrast: { value: "white" },
   },
   fg: {
-    value: { value: "{colors.gray.800}" },
-    muted: { value: "{colors.gray.600}" },
-    subtle: { value: "{colors.gray.500}" },
+    value: "colors.gray.600",
+    muted: { value: "{colors.gray.500}" },
+    subtle: { value: "{colors.gray.400}" },
   },
   bg: {
     light: { value: "{colors.white}" },
@@ -20,4 +20,5 @@ export const semanticColors = {
   primary: colors.primary,
   "primary.hover": colors.primary.hover,
   "primary.contrast": colors.primary.contrast,
+  fg: colors.fg,
 };

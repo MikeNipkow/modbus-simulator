@@ -1,4 +1,9 @@
 import { Button, Grid, GridItem } from "@chakra-ui/react";
+import SidebarButton from "./components/sidebar/SidebarButton";
+import SidebarIconButton from "./components/sidebar/SidebarIconButton";
+import { FaHome, FaNetworkWired } from "react-icons/fa";
+import Sidebar from "./components/sidebar/Sidebar";
+import SidebarDropdownButton from "./components/sidebar/SidebarDropdownButton";
 
 function AppNew() {
   return (
@@ -16,7 +21,9 @@ function AppNew() {
         background={"bg.medium"}
         borderRight={"1px solid"}
         borderColor={"primary"}
-      ></GridItem>
+      >
+        <Sidebar />
+      </GridItem>
 
       {/* Main Content */}
       <GridItem background={"bg.dark"}>
@@ -26,6 +33,24 @@ function AppNew() {
         <Button size={"2xl"} variant={"secondary"}>
           Test
         </Button>
+        <SidebarButton>Sidebar Button</SidebarButton>
+        <SidebarButton fontWeight="bold" title="Test" variant={"primary"}>
+          Sidebar Button
+        </SidebarButton>
+        <SidebarIconButton
+          fontWeight="bold"
+          label="Test"
+          variant={"primary"}
+          icon={FaHome}
+        ></SidebarIconButton>
+        <SidebarDropdownButton
+          fontWeight="bold"
+          label="Test"
+          variant={"secondary"}
+          icon={FaNetworkWired}
+        >
+          Dropdown
+        </SidebarDropdownButton>
       </GridItem>
     </Grid>
   );

@@ -1,13 +1,6 @@
 import { defineRecipe } from "@chakra-ui/react";
 
-/**
- * Button-Rezept für konsistente Button-Styles
- */
 export const buttonRecipe = defineRecipe({
-  base: {
-    fontWeight: "medium",
-    borderRadius: "md",
-  },
   variants: {
     variant: {
       primary: {
@@ -16,14 +9,19 @@ export const buttonRecipe = defineRecipe({
         _hover: {
           bg: "primary.hover",
         },
+        _active: {
+          fontWeight: "bold",
+        },
       },
       secondary: {
         bg: "transparent",
-        borderWidth: "1px",
-        borderStyle: "solid",
-        borderColor: "blackAlpha.300",
         _hover: {
+          color: "primary",
           bg: "blackAlpha.50",
+        },
+        _active: {
+          fontWeight: "bold",
+          color: "primary",
         },
       },
     },
