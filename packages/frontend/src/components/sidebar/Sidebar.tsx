@@ -15,24 +15,16 @@ interface Props {
 }
 
 const SideBar = ({ selectedDevice, onSelectDevice }: Props) => {
-  const {
-    devices: devices,
-    errors: devicesErrors,
-    isLoading: devicesLoading,
-  } = useDevices(false);
-  const {
-    devices: templates,
-    errors: templatesErrors,
-    isLoading: templatesLoading,
-  } = useDevices(true);
+  const { devices: devices } = useDevices(false);
+  const { devices: templates } = useDevices(true);
   const [isDeviceDialogOpen, setIsDeviceDialogOpen] = useState(false);
   const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
 
-  const handleAddDevice = (filename: string, templateFilename?: string) => {
+  const handleAddDevice = () => {
     // TODO: API call to create device
   };
 
-  const handleAddTemplate = (filename: string) => {
+  const handleAddTemplate = () => {
     // TODO: API call to create template
   };
 
