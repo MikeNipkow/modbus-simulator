@@ -2,9 +2,9 @@ import { VStack } from "@chakra-ui/react";
 import SidebarIconButton from "./SidebarIconButton";
 import { FaBook, FaHome, FaNetworkWired } from "react-icons/fa";
 import SidebarDropdownButton from "./SidebarDropdownButton";
-import type { ModbusDevice } from "@/archive/types/ModbusDevice";
 import useDevices from "@/hooks/useDevices";
 import SidebarButton from "./SidebarButton";
+import type { ModbusDevice } from "@/types/ModbusDevice";
 
 interface Props {
   selectedDevice: ModbusDevice | null;
