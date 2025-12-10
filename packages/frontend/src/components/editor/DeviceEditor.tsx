@@ -1,151 +1,78 @@
 import type { ModbusDevice } from "@/types/ModbusDevice";
-import {
-  Badge,
-  Button,
-  Card,
-  DownloadTrigger,
-  HStack,
-  Icon,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import { FaDownload, FaPlay, FaServer, FaStop, FaTrash } from "react-icons/fa";
-import { fetchDeviceData } from "@/services/downloadService";
-import BaseDialog from "../dialogs/BaseDialog";
-import { useState } from "react";
-import { useDeleteDevice } from "@/hooks/useDeleteDevice";
-import useStartDevice from "@/hooks/useStartDevice";
-import useStopDevice from "@/hooks/useStopDevice";
+import { VStack, Button, HStack } from "@chakra-ui/react";
+import DeviceOverviewCard from "./DeviceOverviewCard";
+import DeviceConfigurationCard from "./DeviceConfigurationCard";
+import { useState, useEffect } from "react";
+import useUpdateDevice from "@/hooks/useUpdateDevice";
+import { toaster } from "../ui/toaster";
 
 interface Props {
   device: ModbusDevice;
-  onUpdate?: () => void;
+  onUpdate?: (device: ModbusDevice) => void;
   onDelete?: () => void;
 }
 
 const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const {
-    deleteDevice,
-    isLoading: deletionLoading,
-    errors: deleteErrors,
-  } = useDeleteDevice();
+    updateDevice,
+    device: updatedDevice,
+    isLoading,
+    errors,
+  } = useUpdateDevice();
+  const [editDevice, setEditDevice] = useState<ModbusDevice>({ ...device });
 
-  const {
-    startDevice,
-    isLoading: isStarting,
-    errors: startErrors,
-  } = useStartDevice();
-  const {
-    stopDevice,
-    isLoading: isStopping,
-    errors: stopErrors,
-  } = useStopDevice();
+  useEffect(() => {
+    setEditDevice({ ...device });
+  }, [device]);
 
-  const handleDelete = async () => {
-    const success = await deleteDevice(device);
-    if (success) {
-      setDeleteDialogOpen(false);
-      onUpdate?.();
-      onDelete?.();
-    }
+  const setField = (field: keyof ModbusDevice, value: any) => {
+    setEditDevice((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleStart = async () => {
-    if (await startDevice(device)) onUpdate?.();
+  const handleReset = () => {
+    setEditDevice({ ...device });
+    toaster.create({
+      title: "Changes reset",
+      type: "success",
+      description: `Device settings for device "${device.filename}" were discarded.`,
+      closable: true,
+    });
   };
 
-  const handleStop = async () => {
-    if (await stopDevice(device)) onUpdate?.();
+  const handleSave = async () => {
+    if (await updateDevice(editDevice)) {
+      onUpdate?.(editDevice);
+      toaster.create({
+        title: "Changes saved",
+        type: "success",
+        description: `Device "${editDevice.filename}" has been updated.`,
+        closable: true,
+      });
+    } else
+      toaster.create({
+        title: "Failed to save device",
+        type: "error",
+        description: errors,
+        closable: true,
+      });
   };
 
   return (
     <VStack width="100%" alignItems="center" padding="16px">
-      <Card.Root width="80%">
-        <BaseDialog
-          open={deleteDialogOpen}
-          title="Delete Device?"
-          onClose={() => setDeleteDialogOpen(false)}
-          onSubmit={handleDelete}
-          loading={deletionLoading}
-          confirmBtnLabel="Delete"
-          confirmBtnColorPalette="red"
-          confirmBtnVariant="solid"
-          placement="top"
-        >
-          <Text>
-            Are you sure you want to delete the device "{device.filename}"?
-          </Text>
-          {deleteErrors && deleteErrors.length > 0 && (
-            <Text color="red.500">{deleteErrors[0]}</Text>
-          )}
-        </BaseDialog>
-
-        <Card.Body>
-          <HStack justifyContent="space-between">
-            <HStack>
-              <Icon as={FaServer} boxSize={10} color="primary" />
-              <VStack>
-                <Text>{device.filename}</Text>
-                <Text>{device.name}</Text>
-              </VStack>
-              <Badge
-                padding="8px 12px"
-                colorPalette={device.running ? "green" : "red"}
-              >
-                {device.running ? "Running" : "Stopped"}
-              </Badge>
-            </HStack>
-            <HStack>
-              {!device.running && (
-                <Button
-                  variant="solid"
-                  colorPalette="green"
-                  size="lg"
-                  loading={isStarting}
-                  onClick={handleStart}
-                >
-                  <Icon as={FaPlay} boxSize={4} />
-                  Start
-                </Button>
-              )}
-              {device.running && (
-                <Button
-                  variant="solid"
-                  colorPalette="red"
-                  size="lg"
-                  loading={isStopping}
-                  onClick={handleStop}
-                >
-                  <Icon as={FaStop} boxSize={4} />
-                  Stop
-                </Button>
-              )}
-
-              <DownloadTrigger
-                data={() => fetchDeviceData(device)}
-                fileName={device.filename}
-                asChild
-                mimeType={"application/json"}
-              >
-                <Button size="lg" variant="outline">
-                  <Icon as={FaDownload} boxSize={4} />
-                  Download
-                </Button>
-              </DownloadTrigger>
-              <Button
-                size="lg"
-                colorPalette="red"
-                variant="outline"
-                onClick={() => setDeleteDialogOpen(true)}
-              >
-                <Icon as={FaTrash} boxSize={4} />
-                <Text>Delete</Text>
-              </Button>
-            </HStack>
-          </HStack>
-        </Card.Body>
-      </Card.Root>
+      <DeviceOverviewCard
+        device={device}
+        onUpdate={() => onUpdate?.(editDevice)}
+        onDelete={onDelete}
+      />
+      <DeviceConfigurationCard device={editDevice} setField={setField} />
+      <HStack gap={4} marginTop={4}>
+        <Button variant="primary" onClick={handleSave}>
+          Save
+        </Button>
+        <Button variant="outline" onClick={handleReset}>
+          Reset
+        </Button>
+      </HStack>
     </VStack>
   );
 };

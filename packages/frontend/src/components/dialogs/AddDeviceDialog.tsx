@@ -11,6 +11,7 @@ import { useState } from "react";
 import { useCreateDevice } from "@/hooks/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
+import { toaster } from "../ui/toaster";
 
 interface Props {
   template: boolean;
@@ -63,7 +64,15 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
     device.filename = filename;
 
     const success = await createDevice(device, template);
-    if (success) onClose(filename);
+    if (success) {
+      toaster.create({
+        title: template ? "Template added" : "Device added",
+        type: "success",
+        description: `Created new ${template ? "template" : "device"}: "${device.filename}"`,
+        closable: true,
+      });
+      onClose(filename);
+    }
   };
 
   return (

@@ -16,7 +16,7 @@ const useStartDevice = () => {
       return true;
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.error || err.message || "Failed to start server";
+        err.response?.data?.errors || err.message || "Failed to start server";
       setErrors(errorMessage);
       return false;
     } finally {

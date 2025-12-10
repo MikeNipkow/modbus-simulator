@@ -2,21 +2,23 @@ import apiClient from "@/services/apiClient";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useState } from "react";
 
-const useStopDevice = () => {
+const useUpdateDevice = () => {
+  const [device, setDevice] = useState<ModbusDevice | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const stopDevice = async (device: ModbusDevice): Promise<boolean> => {
+  const updateDevice = async (device: ModbusDevice): Promise<boolean> => {
+    setDevice(null);
     setIsLoading(true);
     setErrors([]);
 
     try {
       const endpoint = device.template ? "templates" : "devices";
-      await apiClient.post(`/${endpoint}/${device.filename}/stop`);
+      await apiClient.put(`/${endpoint}/${device.filename}`, device);
       return true;
     } catch (err: any) {
       const errorMessage =
-        err.response?.data?.errors || err.message || "Failed to stop server";
+        err.response?.data?.errors || err.message || "Failed to update device";
       setErrors(errorMessage);
       return false;
     } finally {
@@ -24,7 +26,7 @@ const useStopDevice = () => {
     }
   };
 
-  return { stopDevice, isLoading, errors };
+  return { updateDevice, device, isLoading, errors };
 };
 
-export default useStopDevice;
+export default useUpdateDevice;
