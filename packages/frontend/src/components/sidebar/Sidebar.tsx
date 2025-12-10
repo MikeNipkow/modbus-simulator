@@ -5,15 +5,22 @@ import SidebarDropdownButton from "./SidebarDropdownButton";
 import useDevices from "@/hooks/useDevices";
 import SidebarButton from "./SidebarButton";
 import type { ModbusDevice } from "@/types/ModbusDevice";
+import { useState } from "react";
+import AddDeviceDialog from "../dialogs/AddDeviceDialog";
 
 interface Props {
   selectedDevice: ModbusDevice | null;
   onDeviceSelect: (device: ModbusDevice | null) => void;
+  templates?: ModbusDevice[];
 }
 
 const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
   const { devices: devices } = useDevices(false);
   const { devices: templates } = useDevices(true);
+
+  const [dialogVisible, setDialogVisible] = useState<
+    "template" | "device" | false
+  >(false);
 
   const isDeviceSelected = () =>
     selectedDevice !== null && !selectedDevice.template;
@@ -22,6 +29,12 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
 
   return (
     <VStack gap={0}>
+      <AddDeviceDialog
+        template={dialogVisible === "template"}
+        open={dialogVisible !== false}
+        onClose={() => setDialogVisible(false)}
+        templates={templates}
+      />
       <SidebarIconButton
         variant={
           !isDeviceSelected() && !isTemplateSelected() ? "primary" : "secondary"
@@ -43,6 +56,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
           icon={FaPlus}
           iconSize={3}
           label="Add Device"
+          onClick={() => setDialogVisible("device")}
         />
         {devices.map((device) => (
           <SidebarButton
@@ -70,6 +84,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
           icon={FaPlus}
           iconSize={3}
           label="Add Template"
+          onClick={() => setDialogVisible("template")}
         />
         {templates.map((template) => (
           <SidebarButton

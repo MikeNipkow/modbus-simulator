@@ -1,5 +1,5 @@
-import apiClient from "@/archive_1/services/api-client";
-import type { ModbusDevice } from "@/archive_1/types/ModbusDevice";
+import apiClient from "@/services/api-client";
+import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useEffect, useState } from "react";
 
 const useDevices = (templates: boolean = false) => {
