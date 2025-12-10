@@ -3,6 +3,16 @@ import { Button, Dialog, HStack } from "@chakra-ui/react";
 interface Props {
   cancelBtnLabel?: string;
   confirmBtnLabel?: string;
+  confirmBtnVariant?:
+    | "solid"
+    | "subtle"
+    | "surface"
+    | "outline"
+    | "ghost"
+    | "plain"
+    | "primary"
+    | "secondary";
+  confirmBtnColorPalette?: string;
   onClose?: () => void;
   onSubmit?: () => void;
   loading?: boolean;
@@ -12,6 +22,8 @@ interface Props {
 const DialogFooter = ({
   cancelBtnLabel,
   confirmBtnLabel,
+  confirmBtnVariant,
+  confirmBtnColorPalette,
   onClose,
   onSubmit,
   loading,
@@ -32,7 +44,8 @@ const DialogFooter = ({
         <Button
           loading={loading ? true : undefined}
           loadingText={loadingText}
-          variant="primary"
+          variant={confirmBtnVariant || "primary"}
+          colorPalette={confirmBtnColorPalette || undefined}
           size="xl"
           onClick={() => onSubmit?.()}
         >

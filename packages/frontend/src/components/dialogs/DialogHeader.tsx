@@ -3,13 +3,15 @@ import { Dialog, HStack, CloseButton, Text } from "@chakra-ui/react";
 interface Props {
   title: string;
   onClose?: () => void;
+  background?: string;
+  color?: string;
 }
 
-const DialogHeader = ({ title, onClose }: Props) => {
+const DialogHeader = ({ title, onClose, background, color }: Props) => {
   return (
     <Dialog.Header
-      background={"primary"}
-      color={"primary.contrast"}
+      background={background || "primary"}
+      color={color || "primary.contrast"}
       padding={"24px"}
     >
       <Dialog.Title width={"100%"}>

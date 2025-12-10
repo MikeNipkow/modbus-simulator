@@ -2,25 +2,35 @@ import { VStack, Separator } from "@chakra-ui/react";
 import SidebarIconButton from "./SidebarIconButton";
 import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
 import SidebarDropdownButton from "./SidebarDropdownButton";
-import useDevices from "@/hooks/useDevices";
 import SidebarButton from "./SidebarButton";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useState } from "react";
 import AddDeviceDialog from "../dialogs/AddDeviceDialog";
 
 interface Props {
-  selectedDevice: ModbusDevice | null;
   onDeviceSelect: (device: ModbusDevice | null) => void;
-  templates?: ModbusDevice[];
+  onDeviceAdd(filename: string, template: boolean): void;
+  devices: ModbusDevice[];
+  templates: ModbusDevice[];
+  selectedDevice: ModbusDevice | null;
 }
 
-const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
-  const { devices: devices } = useDevices(false);
-  const { devices: templates } = useDevices(true);
-
+const Sidebar = ({
+  onDeviceSelect,
+  onDeviceAdd,
+  devices,
+  templates,
+  selectedDevice,
+}: Props) => {
   const [dialogVisible, setDialogVisible] = useState<
     "template" | "device" | false
   >(false);
+
+  const handleDialogClose = (filename?: string) => {
+    const templateAddDialog = dialogVisible === "template";
+    setDialogVisible(false);
+    if (filename) onDeviceAdd(filename, templateAddDialog);
+  };
 
   const isDeviceSelected = () =>
     selectedDevice !== null && !selectedDevice.template;
@@ -32,7 +42,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
       <AddDeviceDialog
         template={dialogVisible === "template"}
         open={dialogVisible !== false}
-        onClose={() => setDialogVisible(false)}
+        onClose={handleDialogClose}
         templates={templates}
       />
       <SidebarIconButton
@@ -69,6 +79,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
                 ? true
                 : undefined
             }
+            key={device.filename}
           >
             {device.filename}
           </SidebarButton>
@@ -100,6 +111,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
                 ? true
                 : undefined
             }
+            key={template.filename}
           >
             {template.filename}
           </SidebarButton>

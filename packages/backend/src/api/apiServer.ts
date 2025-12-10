@@ -6,6 +6,8 @@ import {
   downloadDeviceRoute,
   getDeviceRoute,
   getDevicesRoute,
+  startDeviceRoute,
+  stopDeviceRoute,
   updateDeviceRoute,
 } from "./controllers/deviceController.js";
 import {
@@ -44,6 +46,8 @@ export function initializeApiServer() {
   app.get("/api/v1/devices/:id", getDeviceRoute);
   app.get("/api/v1/devices/:id/download", downloadDeviceRoute);
   app.post("/api/v1/devices", createDeviceRoute);
+  app.post("/api/v1/devices/:id/start", startDeviceRoute);
+  app.post("/api/v1/devices/:id/stop", stopDeviceRoute);
   app.delete("/api/v1/devices/:id", deleteDeviceRoute);
   app.put("/api/v1/devices/:id", updateDeviceRoute);
 

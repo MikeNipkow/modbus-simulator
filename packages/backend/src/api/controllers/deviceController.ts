@@ -292,6 +292,46 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
 };
 
 /**
+ * Starts a device's Modbus server.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const startDeviceRoute = async (req: Request, res: Response) => {
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
+
+  // Start device server.
+  const startResult = await device.startServer();
+  if (!startResult.success) {
+    res.status(500).json({ errors: [startResult.message] });
+    return;
+  }
+
+  res.status(200).json(deviceToDeviceDTO(device, false));
+};
+
+/**
+ * Stops a device's Modbus server.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const stopDeviceRoute = async (req: Request, res: Response) => {
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
+
+  // Start device server.
+  const stopResult = await device.stopServer();
+  if (!stopResult.success) {
+    res.status(500).json({ errors: [stopResult.message] });
+    return;
+  }
+
+  res.status(200).json(deviceToDeviceDTO(device, false));
+};
+
+/**
  * Downloads the original JSON file of a device.
  * @param req Express request object.
  * @param res Express response object.

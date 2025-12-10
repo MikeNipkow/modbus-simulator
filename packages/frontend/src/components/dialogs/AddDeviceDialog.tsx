@@ -15,7 +15,7 @@ import { Endian } from "@/types/enums/Endian";
 interface Props {
   template: boolean;
   open: boolean;
-  onClose: () => void;
+  onClose: (filename?: string) => void;
   templates?: ModbusDevice[];
 }
 
@@ -63,14 +63,14 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
     device.filename = filename;
 
     const success = await createDevice(device, template);
-    if (success) onClose();
+    if (success) onClose(filename);
   };
 
   return (
     <BaseDialog
       title={"Add " + (template ? "Template" : "Device")}
       open={open}
-      onClose={onClose}
+      onClose={() => onClose()}
       onSubmit={handleSubmit}
       loading={isLoading}
       loadingText="Saving..."
