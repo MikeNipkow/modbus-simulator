@@ -9,6 +9,8 @@ import {
   deviceToDeviceDTO,
 } from "../mapper/ModbusDeviceDTOMapper.js";
 import { DeviceManager } from "../../DeviceManager.js";
+import path from "path";
+import fs from "fs";
 
 /**
  * Helper function to determine if the request is for a template.
@@ -287,4 +289,39 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
     await newDevice.startServer();
 
   res.status(200).json(deviceToDeviceDTO(newDevice, !isDeviceEndpoint(req)));
+};
+
+/**
+ * Downloads the original JSON file of a device.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const downloadDeviceRoute = (req: Request, res: Response) => {
+  // Get appropriate device manager.
+  const deviceManager = getDeviceManagerByEndpoint(req);
+  if (!deviceManager) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to determine the appropriate device manager"] });
+    return undefined;
+  }
+
+  // Check for device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
+
+  // Get file path.
+  const filename = device.getFilename();
+  const filePath = deviceManager.getDeviceFile(filename);
+
+  // Check if file exists.
+  if (filePath === null || !fs.existsSync(filePath)) {
+    res.status(404).json({ errors: [`File not found`] });
+    return;
+  }
+
+  // Send file as download.
+  res.download(filePath, filename, (err) => {
+    if (err) res.status(500).json({ errors: ["Failed to download file"] });
+  });
 };
