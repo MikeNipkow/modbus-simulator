@@ -302,11 +302,14 @@ export const startDeviceRoute = async (req: Request, res: Response) => {
   if (!device) return;
 
   // Start device server.
-  const startResult = await device.startServer();
+  const startResult = await device.enableServer();
   if (!startResult.success) {
     res.status(500).json({ errors: [startResult.message] });
     return;
   }
+
+  // Save new device and start server if enabled.
+  deviceManager.saveDevice(device.getFilename());
 
   res.status(200).json(deviceToDeviceDTO(device, false));
 };
@@ -322,11 +325,14 @@ export const stopDeviceRoute = async (req: Request, res: Response) => {
   if (!device) return;
 
   // Start device server.
-  const stopResult = await device.stopServer();
+  const stopResult = await device.disableServer();
   if (!stopResult.success) {
     res.status(500).json({ errors: [stopResult.message] });
     return;
   }
+
+  // Save new device and start server if enabled.
+  deviceManager.saveDevice(device.getFilename());
 
   res.status(200).json(deviceToDeviceDTO(device, false));
 };
