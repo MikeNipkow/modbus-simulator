@@ -1,4 +1,4 @@
-import { VStack } from "@chakra-ui/react";
+import { VStack, Separator } from "@chakra-ui/react";
 import SidebarIconButton from "./SidebarIconButton";
 import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
 import SidebarDropdownButton from "./SidebarDropdownButton";
@@ -28,7 +28,7 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
     selectedDevice !== null && selectedDevice.template;
 
   return (
-    <VStack gap={0}>
+    <VStack gap={0} padding="12px">
       <AddDeviceDialog
         template={dialogVisible === "template"}
         open={dialogVisible !== false}
@@ -44,6 +44,8 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
         data-active={selectedDevice === null ? "" : undefined}
         onClick={() => onDeviceSelect(null)}
       />
+
+      <Separator margin="12px 0" width="100%" />
 
       <SidebarDropdownButton
         variant={isDeviceSelected() ? "primary" : "secondary"}
@@ -72,6 +74,8 @@ const Sidebar = ({ selectedDevice, onDeviceSelect }: Props) => {
           </SidebarButton>
         ))}
       </SidebarDropdownButton>
+
+      <Separator margin="12px 0" width="100%" />
 
       <SidebarDropdownButton
         variant={isTemplateSelected() ? "primary" : "secondary"}

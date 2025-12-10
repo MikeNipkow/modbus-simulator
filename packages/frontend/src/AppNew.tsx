@@ -1,12 +1,10 @@
-import { Button, Grid, GridItem } from "@chakra-ui/react";
-import SidebarButton from "./components/sidebar/SidebarButton";
-import SidebarIconButton from "./components/sidebar/SidebarIconButton";
-import { FaHome, FaNetworkWired } from "react-icons/fa";
+import { Grid, GridItem } from "@chakra-ui/react";
 import Sidebar from "./components/sidebar/Sidebar";
-import SidebarDropdownButton from "./components/sidebar/SidebarDropdownButton";
 import { useState } from "react";
 import type { ModbusDevice } from "./types/ModbusDevice";
 import Navbar from "./components/Navbar";
+import DeviceEditorOld from "./components/editor/DeviceEditor_";
+import DeviceEditor from "./components/editor/DeviceEditor";
 
 function AppNew() {
   const [selectedDevice, setSelectedDevice] = useState<ModbusDevice | null>(
@@ -23,11 +21,8 @@ function AppNew() {
         borderColor={"primary"}
       >
         <Navbar
-          title={
-            selectedDevice === null
-              ? "Modbus Simulator"
-              : selectedDevice.filename
-          }
+          title={selectedDevice === null ? "" : selectedDevice.filename}
+          onHomeClick={() => setSelectedDevice(null)}
         />
       </GridItem>
 
@@ -45,30 +40,12 @@ function AppNew() {
 
       {/* Main Content */}
       <GridItem background={"bg.dark"}>
-        <Button size={"2xl"} variant={"primary"}>
-          Test
-        </Button>
-        <Button size={"2xl"} variant={"secondary"}>
-          Test
-        </Button>
-        <SidebarButton>Sidebar Button</SidebarButton>
-        <SidebarButton fontWeight="bold" title="Test" variant={"primary"}>
-          Sidebar Button
-        </SidebarButton>
-        <SidebarIconButton
-          fontWeight="bold"
-          label="Test"
-          variant={"primary"}
-          icon={FaHome}
-        ></SidebarIconButton>
-        <SidebarDropdownButton
-          fontWeight="bold"
-          label="Test"
-          variant={"secondary"}
-          icon={FaNetworkWired}
-        >
-          Dropdown
-        </SidebarDropdownButton>
+        {selectedDevice !== null && selectedDevice.template && (
+          <DeviceEditorOld device={selectedDevice} />
+        )}
+        {selectedDevice !== null && !selectedDevice.template && (
+          <DeviceEditor device={selectedDevice} />
+        )}
       </GridItem>
     </Grid>
   );

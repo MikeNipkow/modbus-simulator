@@ -1,4 +1,4 @@
-import apiClient from "@/services/api-client";
+import apiClient from "@/services/apiClient";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useState } from "react";
 
