@@ -9,7 +9,6 @@ import {
   deviceToDeviceDTO,
 } from "../mapper/ModbusDeviceDTOMapper.js";
 import { DeviceManager } from "../../DeviceManager.js";
-import path from "path";
 import fs from "fs";
 
 /**

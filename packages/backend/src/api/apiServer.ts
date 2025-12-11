@@ -24,6 +24,7 @@ import {
   createDataPointRoute,
   updateDataPointRoute,
 } from "./controllers/dataPointController.js";
+import { getVersionRoute } from "./controllers/serverController.js";
 
 export function initializeApiServer() {
   const app = express();
@@ -42,6 +43,8 @@ export function initializeApiServer() {
   });
 
   // Routes
+  app.get("/api/v1/version", getVersionRoute);
+
   app.get("/api/v1/devices", getDevicesRoute);
   app.get("/api/v1/devices/:id", getDeviceRoute);
   app.get("/api/v1/devices/:id/download", downloadDeviceRoute);
