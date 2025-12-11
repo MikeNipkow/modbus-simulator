@@ -1,5 +1,4 @@
 import {
-  Badge,
   Button,
   Card,
   DownloadTrigger,
@@ -12,11 +11,10 @@ import BaseDialog from "../dialogs/BaseDialog";
 import { fetchDeviceData } from "@/services/downloadService";
 import { FaServer, FaPlay, FaStop, FaDownload, FaTrash } from "react-icons/fa";
 import { useDeleteDevice } from "@/hooks/useDeleteDevice";
-import useStartDevice from "@/hooks/useStartDevice";
-import useStopDevice from "@/hooks/useStopDevice";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
-import { toaster } from "@/components/ui/toaster";
+import { createErrorToast, createSuccessToast } from "@/components/ui/Toaster";
+import { useControlDevice } from "@/hooks/useControlDevice";
 
 interface Props {
   device: ModbusDevice;
@@ -25,167 +23,175 @@ interface Props {
 }
 
 const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
+  // Delete dialog to prevent accidental deletions
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Hook to delete device
   const {
     deleteDevice,
     isLoading: deletionLoading,
     errors: deleteErrors,
   } = useDeleteDevice();
 
+  // Hook to start/stop device
   const {
     startDevice,
-    isLoading: isStarting,
-    errors: startErrors,
-  } = useStartDevice();
-  const {
     stopDevice,
-    isLoading: isStopping,
-    errors: stopErrors,
-  } = useStopDevice();
+    isLoading: isControlLoading,
+    errors: controlErrors,
+  } = useControlDevice();
 
+  // ~~~~~ Function Handlers ~~~~~
+
+  // Handle device deletion
   const handleDelete = async () => {
+    // Delete device via hook
     const success = await deleteDevice(device);
+
+    // Close delete dialog if successful and trigger onUpdate and onDelete callbacks
     if (success) {
       setDeleteDialogOpen(false);
       onUpdate?.();
       onDelete?.();
-      toaster.create({
-        title: "Device deleted",
-        type: "success",
-        description: `Device "${device.filename}" has been deleted.`,
-        closable: true,
-      });
-    } else
-      toaster.create({
-        title: "Failed to delete device",
-        type: "error",
-        description: deleteErrors,
-        closable: true,
-      });
+    }
+
+    // Show toaster notification based on success or failure
+    success
+      ? createSuccessToast({
+          title: "Device deleted",
+          description: `Device "${device.filename}" has been deleted.`,
+        })
+      : createErrorToast({
+          title: "Failed to delete device",
+          description: deleteErrors,
+        });
   };
 
+  // Handle starting the device
   const handleStart = async () => {
-    if (await startDevice(device)) {
-      onUpdate?.();
-      toaster.create({
-        title: "Modbus Server started",
-        type: "success",
-        description: `Modbus Server for device "${device.filename}" has been started.`,
-        closable: true,
-      });
-    } else
-      toaster.create({
-        title: "Error starting Modbus Server",
-        type: "error",
-        description: startErrors,
-        closable: true,
-      });
+    // Start device via hook
+    const success = await startDevice(device);
+
+    // Trigger onUpdate callback if successful
+    if (success) onUpdate?.();
+
+    // Show toaster notification based on success or failure
+    success
+      ? createSuccessToast({
+          title: "Modbus Server started",
+          description: `Modbus Server for device "${device.filename}" has been started.`,
+        })
+      : createErrorToast({
+          title: "Error starting Modbus Server",
+          description: controlErrors,
+        });
   };
 
+  // Handle stopping the device
   const handleStop = async () => {
-    if (await stopDevice(device)) {
-      onUpdate?.();
-      toaster.create({
-        title: "Modbus Server stopped",
-        type: "success",
-        description: `Modbus Server for device "${device.filename}" has been stopped.`,
-        closable: true,
-      });
-    } else
-      toaster.create({
-        title: "Error stopping Modbus Server",
-        type: "error",
-        description: startErrors,
-        closable: true,
-      });
+    // Stop device via hook
+    const success = await stopDevice(device);
+
+    // Trigger onUpdate callback if successful
+    if (success) onUpdate?.();
+
+    // Show toaster notification based on success or failure
+    success
+      ? createSuccessToast({
+          title: "Modbus Server stopped",
+          description: `Modbus Server for device "${device.filename}" has been stopped.`,
+        })
+      : createErrorToast({
+          title: "Error stopping Modbus Server",
+          description: controlErrors,
+        });
   };
 
   return (
-    <Card.Root width="80%">
+    <>
+      {/* Dialog for device deletion */}
       <BaseDialog
         open={deleteDialogOpen}
         title="Delete Device?"
-        onClose={() => setDeleteDialogOpen(false)}
-        onSubmit={handleDelete}
-        loading={deletionLoading}
         confirmBtnLabel="Delete"
         confirmBtnColorPalette="red"
         confirmBtnVariant="solid"
         placement="top"
+        loading={deletionLoading}
+        onClose={() => setDeleteDialogOpen(false)}
+        onSubmit={handleDelete}
       >
         <Text>
           Are you sure you want to delete the device "{device.filename}"?
         </Text>
-        {deleteErrors && deleteErrors.length > 0 && (
+        {deleteErrors.length > 0 && (
           <Text color="red.500">{deleteErrors[0]}</Text>
         )}
       </BaseDialog>
 
-      <Card.Body>
-        <HStack justifyContent="space-between">
-          <HStack>
-            <Icon as={FaServer} boxSize={10} color="primary" />
-            <VStack>
-              <Text>{device.filename}</Text>
-              <Text>{device.name}</Text>
-            </VStack>
-            <Badge
-              padding="8px 12px"
-              colorPalette={device.running ? "green" : "red"}
-            >
-              {device.running ? "Running" : "Stopped"}
-            </Badge>
-          </HStack>
-          <HStack>
-            {!device.running && (
-              <Button
-                variant="solid"
-                colorPalette="green"
-                size="lg"
-                loading={isStarting}
-                onClick={handleStart}
-              >
-                <Icon as={FaPlay} boxSize={4} />
-                Start
-              </Button>
-            )}
-            {device.running && (
-              <Button
-                variant="solid"
-                colorPalette="red"
-                size="lg"
-                loading={isStopping}
-                onClick={handleStop}
-              >
-                <Icon as={FaStop} boxSize={4} />
-                Stop
-              </Button>
-            )}
+      {/* Card */}
+      <Card.Root width="80%" borderRadius={"2xl"} boxShadow={"xl"}>
+        <Card.Body>
+          <HStack justifyContent="space-between">
+            {/* Left: Info */}
+            <HStack gap={4}>
+              <Icon
+                as={FaServer}
+                boxSize={14}
+                color={"primary.contrast"}
+                background={"primary"}
+                padding={"12px"}
+                borderRadius={"2xl"}
+              />
+              <VStack alignItems="flex-start" gap={0}>
+                <Text fontWeight={"semibold"} fontSize={"2xl"}>
+                  {device.filename}
+                </Text>
+                <Text fontSize={"md"}>{device.name}</Text>
+              </VStack>
+            </HStack>
 
-            <DownloadTrigger
-              data={() => fetchDeviceData(device)}
-              fileName={device.filename}
-              asChild
-              mimeType={"application/json"}
-            >
-              <Button size="lg" variant="outline">
-                <Icon as={FaDownload} boxSize={4} />
-                Download
+            {/* Right: Buttons */}
+            <HStack>
+              {/* Start/Stop button */}
+              <Button
+                variant="solid"
+                colorPalette={device.running ? "red" : "green"}
+                size="lg"
+                loading={isControlLoading}
+                onClick={device.running ? handleStop : handleStart}
+              >
+                <Icon as={device.running ? FaStop : FaPlay} boxSize={4} />
+                {device.running ? "Stop" : "Start"}
               </Button>
-            </DownloadTrigger>
-            <Button
-              size="lg"
-              colorPalette="red"
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Icon as={FaTrash} boxSize={4} />
-              <Text>Delete</Text>
-            </Button>
+
+              {/* Delete button */}
+              <Button
+                size="lg"
+                colorPalette="red"
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Icon as={FaTrash} boxSize={4} />
+                <Text>Delete</Text>
+              </Button>
+
+              {/* Download button */}
+              <DownloadTrigger
+                data={() => fetchDeviceData(device)}
+                fileName={device.filename}
+                asChild
+                mimeType={"application/json"}
+              >
+                <Button size="lg" variant="outline">
+                  <Icon as={FaDownload} boxSize={4} />
+                </Button>
+              </DownloadTrigger>
+            </HStack>
           </HStack>
-        </HStack>
-      </Card.Body>
-    </Card.Root>
+        </Card.Body>
+      </Card.Root>
+    </>
   );
 };
 

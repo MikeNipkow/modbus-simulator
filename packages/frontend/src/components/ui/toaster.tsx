@@ -1,5 +1,3 @@
-"use client"
-
 import {
   Toaster as ChakraToaster,
   Portal,
@@ -7,12 +5,25 @@ import {
   Stack,
   Toast,
   createToaster,
-} from "@chakra-ui/react"
+} from "@chakra-ui/react";
+import type { Options } from "@zag-js/toast";
 
 export const toaster = createToaster({
   placement: "bottom-end",
   pauseOnPageIdle: true,
-})
+});
+
+export const createToast = (data: Options<any>) => {
+  toaster.create({ closable: true, ...data });
+};
+
+export const createSuccessToast = (data: Options<any>) => {
+  createToast({ type: "success", ...data });
+};
+
+export const createErrorToast = (data: Options<any>) => {
+  toaster.create({ type: "error", ...data });
+};
 
 export const Toaster = () => {
   return (
@@ -39,5 +50,5 @@ export const Toaster = () => {
         )}
       </ChakraToaster>
     </Portal>
-  )
-}
+  );
+};

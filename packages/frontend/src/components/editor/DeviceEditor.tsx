@@ -4,7 +4,7 @@ import DeviceOverviewCard from "./DeviceOverviewCard";
 import DeviceConfigurationCard from "./DeviceConfigurationCard";
 import { useState, useEffect } from "react";
 import useUpdateDevice from "@/hooks/useUpdateDevice";
-import { toaster } from "../ui/toaster";
+import { toaster } from "../ui/Toaster";
 
 interface Props {
   device: ModbusDevice;
@@ -58,7 +58,7 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
   };
 
   return (
-    <VStack width="100%" alignItems="center" padding="16px">
+    <VStack width="100%" alignItems="center" padding="16px" gap={"24px"}>
       <DeviceOverviewCard
         device={device}
         onUpdate={() => onUpdate?.(editDevice)}

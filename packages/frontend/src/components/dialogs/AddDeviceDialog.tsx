@@ -11,7 +11,7 @@ import { useState } from "react";
 import { useCreateDevice } from "@/hooks/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
-import { toaster } from "../ui/toaster";
+import { toaster } from "../ui/Toaster";
 
 interface Props {
   template: boolean;

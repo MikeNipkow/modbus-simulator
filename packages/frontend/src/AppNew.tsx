@@ -5,7 +5,7 @@ import Navbar from "./components/Navbar";
 import DeviceEditorOld from "./components/editor/DeviceEditor_";
 import DeviceEditor from "./components/editor/DeviceEditor";
 import useDevices from "./hooks/useDevices";
-import { Toaster } from "./components/ui/toaster";
+import { Toaster } from "./components/ui/Toaster";
 
 function AppNew() {
   const [refreshTrigger, setRefreshTrigger] = useState({});
