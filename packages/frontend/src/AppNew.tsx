@@ -39,7 +39,7 @@ function AppNew() {
       <Toaster />
       <Grid
         h="100vh"
-        templateRows="60px 1fr"
+        templateRows="70px 1fr"
         templateColumns="300px 1fr"
         gap={0}
       >
@@ -51,7 +51,7 @@ function AppNew() {
           borderColor={"primary"}
         >
           <Navbar
-            title={selectedDevice === null ? "" : selectedDevice.filename}
+            title={selectedDevice === null ? "Home" : selectedDevice.filename}
             onHomeClick={() => setSelectedDevice(null)}
           />
         </GridItem>
