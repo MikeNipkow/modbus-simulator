@@ -8,9 +8,8 @@ import {
   VStack,
   Input,
   Textarea,
-  NativeSelectRoot,
-  NativeSelectField,
   Field,
+  NativeSelect,
 } from "@chakra-ui/react";
 import { FaInfoCircle } from "react-icons/fa";
 import { Endian } from "@/types/enums/Endian";
@@ -62,17 +61,18 @@ const DeviceConfigurationCard = ({ device, setField }: Props) => {
               </Field.Root>
               <Field.Root width="50%">
                 <Field.Label>Endian</Field.Label>
-                <NativeSelectRoot size="md">
-                  <NativeSelectField
+                <NativeSelect.Root size="md">
+                  <NativeSelect.Field
                     value={device.endian}
                     onChange={(e) =>
                       setField("endian", e.target.value as Endian)
                     }
+                    focusRingColor="primary"
                   >
                     <option value={Endian.BigEndian}>Big Endian</option>
                     <option value={Endian.LittleEndian}>Little Endian</option>
-                  </NativeSelectField>
-                </NativeSelectRoot>
+                  </NativeSelect.Field>
+                </NativeSelect.Root>
               </Field.Root>
             </HStack>
           </VStack>

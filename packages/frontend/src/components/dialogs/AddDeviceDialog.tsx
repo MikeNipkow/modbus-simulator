@@ -1,17 +1,19 @@
 import { isValidFilename } from "@/util/fileUtils";
-import BaseDialog from "./BaseDialog";
+import BaseDialog from "./base/BaseDialog";
 import {
   Field,
   Input,
   Text,
   NativeSelectRoot,
   NativeSelectField,
+  VStack,
+  NativeSelect,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useCreateDevice } from "@/hooks/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
-import { toaster } from "../ui/Toaster";
+import { createErrorToast, createSuccessToast } from "../ui/Toaster";
 
 interface Props {
   template: boolean;
@@ -30,7 +32,6 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
   const { createDevice, isLoading, errors } = useCreateDevice();
 
   const hasFilenameError = (): boolean => error !== "";
-  const hasApiError = (): boolean => errors !== undefined && errors.length > 0;
 
   /**
    * Validate filename and set error state
@@ -47,9 +48,13 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
   };
 
   const handleSubmit = async () => {
+    // Check if filename is valid.
     if (!validateFilename(filename)) return;
 
+    // Create device object.
     let device: ModbusDevice;
+
+    // If a template is selected, use it as a base.
     if (selectedTemplate) device = { ...selectedTemplate, filename: filename };
     else
       device = {
@@ -61,18 +66,24 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
         template: template,
       };
 
-    device.filename = filename;
-
+    // Call create device hook.
     const success = await createDevice(device, template);
-    if (success) {
-      toaster.create({
-        title: template ? "Template added" : "Device added",
-        type: "success",
-        description: `Created new ${template ? "template" : "device"}: "${device.filename}"`,
-        closable: true,
-      });
-      onClose(filename);
-    }
+
+    // Close dialog on success.
+    if (success) onClose(filename);
+
+    // Show toaster notification.
+    success
+      ? createSuccessToast({
+          title: template ? "Template created" : "Device created",
+          description: `Successfully created ${template ? "template" : "device"} "${device.filename}".`,
+        })
+      : createErrorToast({
+          title: template
+            ? "Failed to create template"
+            : "Failed to create device",
+          description: errors,
+        });
   };
 
   return (
@@ -84,63 +95,59 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
       loading={isLoading}
       loadingText="Saving..."
     >
-      {/* Filename input */}
-      <Field.Root invalid={hasFilenameError()}>
-        <Field.Label>
-          Filename
-          <Text color="red">*</Text>
-        </Field.Label>
-        <Input
-          value={filename}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            setFilename(e.target.value);
-            if (e.target.value.length > 0) validateFilename(e.target.value);
-            else setError("");
-          }}
-          onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              handleSubmit();
-            }
-          }}
-          placeholder="e.g. my_device.json"
-        />
-        {hasFilenameError() && (
-          <Field.ErrorText color="red.600">{error}</Field.ErrorText>
-        )}
-      </Field.Root>
-
-      {/* Template selection (optional) */}
-      {true && (
-        <Field.Root>
-          <Field.Label>Template (Optional)</Field.Label>
-          <NativeSelectRoot>
-            <NativeSelectField
-              value={selectedTemplate?.filename || ""}
-              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                const templateFilename = e.target.value;
-                const template = templates?.find(
-                  (t) => t.filename === templateFilename,
-                );
-                setSelectedTemplate(template || null);
-              }}
-            >
-              <option value="">-- Select a template --</option>
-              {templates?.map((template) => (
-                <option key={template.filename} value={template.filename}>
-                  {template.filename}
-                </option>
-              ))}
-            </NativeSelectField>
-          </NativeSelectRoot>
+      <VStack gap={4}>
+        {/* Filename input */}
+        <Field.Root invalid={hasFilenameError()}>
+          <Field.Label>
+            Filename
+            <Text color="red">*</Text>
+          </Field.Label>
+          <Input
+            value={filename}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setFilename(e.target.value);
+              if (e.target.value.length > 0) validateFilename(e.target.value);
+              else setError("");
+            }}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                handleSubmit();
+              }
+            }}
+            placeholder="e.g. my_device.json"
+          />
+          {hasFilenameError() && (
+            <Field.ErrorText color="red.600">{error}</Field.ErrorText>
+          )}
         </Field.Root>
-      )}
-
-      {hasApiError() && (
-        <Text color="red.600" fontSize="sm" mt={2}>
-          {errors.join(", ")}
-        </Text>
-      )}
+        {/* Template selection (optional) */}
+        {true && (
+          <Field.Root>
+            <Field.Label>Template (Optional)</Field.Label>
+            <NativeSelect.Root>
+              <NativeSelect.Field
+                value={selectedTemplate?.filename || ""}
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                  const templateFilename = e.target.value;
+                  const template = templates?.find(
+                    (t) => t.filename === templateFilename,
+                  );
+                  setSelectedTemplate(template || null);
+                }}
+                focusRingColor="primary"
+              >
+                <option value="">-- Select a template --</option>
+                {templates?.map((template) => (
+                  <option key={template.filename} value={template.filename}>
+                    {template.filename}
+                  </option>
+                ))}
+              </NativeSelect.Field>
+            </NativeSelect.Root>
+          </Field.Root>
+        )}
+      </VStack>
     </BaseDialog>
   );
 };

@@ -7,7 +7,7 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import BaseDialog from "../dialogs/BaseDialog";
+import BaseDialog from "../dialogs/base/BaseDialog";
 import { fetchDeviceData } from "@/services/downloadService";
 import { FaServer, FaPlay, FaStop, FaDownload, FaTrash } from "react-icons/fa";
 import { useDeleteDevice } from "@/hooks/useDeleteDevice";

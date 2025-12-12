@@ -1,5 +1,12 @@
 import { createSystem, defaultConfig, defineConfig } from "@chakra-ui/react";
-import { buttonRecipe } from "./recipes";
+import {
+  buttonRecipe,
+  inputRecipe,
+  textareaRecipe,
+  checkboxRecipe,
+  radioRecipe,
+  switchRecipe,
+} from "./recipes";
 import { colors, semanticColors } from "./colors";
 
 const config = defineConfig({
@@ -14,6 +21,11 @@ const config = defineConfig({
   theme: {
     recipes: {
       button: buttonRecipe,
+      input: inputRecipe,
+      textarea: textareaRecipe,
+      checkbox: checkboxRecipe,
+      radio: radioRecipe,
+      switch: switchRecipe,
     },
 
     tokens: {

@@ -9,6 +9,7 @@ const SidebarButton = (props: Props) => {
       width="100%"
       borderRadius="0"
       justifyContent="flex-start"
+      focusRing="none"
       {...props}
     />
   );

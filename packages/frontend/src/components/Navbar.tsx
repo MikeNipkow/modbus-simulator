@@ -28,7 +28,7 @@ const Navbar = ({ title, onHomeClick }: Props) => {
       <HStack
         onClick={onHomeClick}
         cursor="pointer"
-        _hover={{ opacity: 0.8 }}
+        _hover={{ opacity: 0.9 }}
         transition="opacity 0.2s"
       >
         <HStack gap="12px">

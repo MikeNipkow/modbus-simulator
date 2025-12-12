@@ -12,6 +12,9 @@ export const buttonRecipe = defineRecipe({
         _active: {
           fontWeight: "bold",
         },
+        _focus: {
+          focusRingColor: "primary",
+        },
       },
       secondary: {
         bg: "transparent",

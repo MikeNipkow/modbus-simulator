@@ -8,8 +8,6 @@ interface Props {
   onClose?: () => void;
   onSubmit?: () => void;
   placement?: "center" | "top" | "bottom";
-  headerColor?: string;
-  headerBackground?: string;
   loading?: boolean;
   loadingText?: string;
   cancelBtnLabel?: string;
@@ -33,8 +31,6 @@ const BaseDialog = ({
   onClose,
   onSubmit,
   placement,
-  headerColor,
-  headerBackground,
   loading,
   loadingText,
   cancelBtnLabel,
@@ -47,24 +43,33 @@ const BaseDialog = ({
     <Dialog.Root
       open={open}
       onOpenChange={(e) => (e.open ? undefined : onClose?.())}
-      placement={placement || "center"}
+      placement={placement || "top"}
     >
       {/* Darken background */}
-      <Dialog.Backdrop />
+      <Dialog.Backdrop bg="blackAlpha.600" />
 
       {/* Required to position dialog in center */}
       <Dialog.Positioner>
-        <Dialog.Content>
+        <Dialog.Content
+          borderRadius="xl"
+          boxShadow={"2xl"}
+          overflow={"hidden"}
+          border="3px"
+          borderStyle="solid"
+          borderColor="primary"
+          background="primary"
+        >
           {/* Header */}
-          <DialogHeader
-            title={title || ""}
-            onClose={() => onClose?.()}
-            color={headerColor}
-            background={headerBackground}
-          />
+          <DialogHeader title={title || ""} onClose={() => onClose?.()} />
 
           {/* Body */}
-          <Dialog.Body padding="24px">{children}</Dialog.Body>
+          <Dialog.Body
+            borderTopRadius={"lg"}
+            background={"bg.light"}
+            padding="24px"
+          >
+            {children}
+          </Dialog.Body>
 
           {/* Footer */}
           <DialogFooter
