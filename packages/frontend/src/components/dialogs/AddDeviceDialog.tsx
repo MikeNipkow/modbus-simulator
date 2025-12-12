@@ -7,6 +7,7 @@ import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
 import { createErrorToast, createSuccessToast } from "../ui/Toaster";
 
+
 interface Props {
   template: boolean;
   open: boolean;

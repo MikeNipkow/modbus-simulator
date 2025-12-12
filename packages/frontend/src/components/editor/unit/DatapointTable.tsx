@@ -108,22 +108,9 @@ const DatapointTable = ({ device, unit, onUpdate, setField }: Props) => {
               <Select.Root
                 collection={dataTypes}
                 value={[dp.type]}
-                onChange={(values: any) => {
-                  const newType = Array.isArray(values) ? values[0] : values;
-                  const newUnits = device.modbusUnits?.map((u) =>
-                    u.unitId === unit.unitId
-                      ? {
-                          ...u,
-                          dataPoints: u.dataPoints?.map((d) =>
-                            d.id === dp.id
-                              ? { ...d, type: newType as DataType }
-                              : d,
-                          ),
-                        }
-                      : u,
-                  );
-                  setField("modbusUnits", newUnits);
-                }}
+                onSelect={(newType) =>
+                  handleFieldChange(dp, "type", newType.value)
+                }
               >
                 <Select.HiddenSelect />
                 <Select.Control>
@@ -151,24 +138,15 @@ const DatapointTable = ({ device, unit, onUpdate, setField }: Props) => {
 
             <Table.Cell>
               <Select.Root
+                multiple
                 collection={dataAreas}
                 value={dp.areas}
-                multiple
-                onChange={(values: any) => {
-                  const newAreas = Array.isArray(values) ? values : [values];
-                  const newUnits = device.modbusUnits?.map((u) =>
-                    u.unitId === unit.unitId
-                      ? {
-                          ...u,
-                          dataPoints: u.dataPoints?.map((d) =>
-                            d.id === dp.id
-                              ? { ...d, areas: newAreas as DataArea[] }
-                              : d,
-                          ),
-                        }
-                      : u,
-                  );
-                  setField("modbusUnits", newUnits);
+                onSelect={(area) => {
+                  const included = dp.areas.includes(area.value as DataArea);
+                  const newAreas = included
+                    ? dp.areas.filter((a) => a !== area.value)
+                    : [...dp.areas, area.value as DataArea];
+                  handleFieldChange(dp, "areas", newAreas);
                 }}
               >
                 <Select.HiddenSelect />
