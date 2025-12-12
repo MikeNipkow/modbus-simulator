@@ -1,14 +1,6 @@
 import { isValidFilename } from "@/util/fileUtils";
 import BaseDialog from "./base/BaseDialog";
-import {
-  Field,
-  Input,
-  Text,
-  NativeSelectRoot,
-  NativeSelectField,
-  VStack,
-  NativeSelect,
-} from "@chakra-ui/react";
+import { Field, Input, Text, VStack, NativeSelect } from "@chakra-ui/react";
 import { useState } from "react";
 import { useCreateDevice } from "@/hooks/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";

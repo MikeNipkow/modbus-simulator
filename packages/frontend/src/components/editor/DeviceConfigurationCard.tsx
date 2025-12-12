@@ -21,11 +21,16 @@ interface Props {
 
 const DeviceConfigurationCard = ({ device, setField }: Props) => {
   return (
-    <Card.Root width="80%">
+    <Card.Root
+      width="80%"
+      borderRadius={"2xl"}
+      boxShadow={"xl"}
+      overflow="hidden"
+    >
       <Card.Header padding="24px" background="bg.medium">
         <Card.Title>
-          <HStack>
-            <Icon as={FaInfoCircle} color="blue.500" />
+          <HStack gap={4}>
+            <Icon as={FaInfoCircle} boxSize={6} color="blue.500" />
             <Text>Device Configuration</Text>
           </HStack>
         </Card.Title>
@@ -34,7 +39,7 @@ const DeviceConfigurationCard = ({ device, setField }: Props) => {
 
       <Card.Body>
         <HStack gap={4} width="100%" alignItems="stretch">
-          <VStack width="100%" flex={1} alignItems="stretch">
+          <VStack width="100%" flex={1} alignItems="stretch" gap={4}>
             {/* Name, Vendor, Port, Endian */}
             <Field.Root>
               <Field.Label>Name</Field.Label>

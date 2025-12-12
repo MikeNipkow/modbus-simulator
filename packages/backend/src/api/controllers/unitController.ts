@@ -222,7 +222,9 @@ export const updateUnitRoute = (req: Request, res: Response) => {
 
     res
       .status(500)
-      .json({ errors: [`Failed to add new unit with id ${newUnit.getId()}`] });
+      .json({
+        errors: [`Unit with Unit-ID ${newUnit.getId()} already exists`],
+      });
     return;
   }
 

@@ -13,6 +13,7 @@ export const colors = {
     light: { value: "{colors.white}" },
     medium: { value: "{colors.gray.50}" },
     dark: { value: "{colors.gray.100}" },
+    darker: { value: "{colors.gray.200}" },
   },
 };
 

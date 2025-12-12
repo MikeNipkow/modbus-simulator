@@ -5,10 +5,11 @@ import DeviceConfigurationCard from "./DeviceConfigurationCard";
 import { useState, useEffect } from "react";
 import useUpdateDevice from "@/hooks/useUpdateDevice";
 import { toaster } from "../ui/Toaster";
+import UnitOverviewCard from "./unit/UnitOverviewCard";
 
 interface Props {
   device: ModbusDevice;
-  onUpdate?: (device: ModbusDevice) => void;
+  onUpdate?: () => void;
   onDelete?: () => void;
 }
 
@@ -41,7 +42,7 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
 
   const handleSave = async () => {
     if (await updateDevice(editDevice)) {
-      onUpdate?.(editDevice);
+      onUpdate?.();
       toaster.create({
         title: "Changes saved",
         type: "success",
@@ -61,10 +62,15 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
     <VStack width="100%" alignItems="center" padding="16px" gap={"24px"}>
       <DeviceOverviewCard
         device={device}
-        onUpdate={() => onUpdate?.(editDevice)}
+        onUpdate={() => onUpdate?.()}
         onDelete={onDelete}
       />
       <DeviceConfigurationCard device={editDevice} setField={setField} />
+      <UnitOverviewCard
+        device={editDevice}
+        onUpdate={onUpdate}
+        setField={setField}
+      />
       <HStack gap={4} marginTop={4}>
         <Button variant="primary" onClick={handleSave}>
           Save
