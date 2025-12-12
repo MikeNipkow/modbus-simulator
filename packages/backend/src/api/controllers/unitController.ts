@@ -10,6 +10,7 @@ import {
 } from "../mapper/ModbusUnitDTOMapper.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { ModbusUnit } from "../../ModbusUnit.js";
+import { ParseResult } from "../../types/enums/ParseResult.js";
 
 /**
  * Helper function to get a ModbusUnit by ID from request parameters.
@@ -106,45 +107,30 @@ export const createUnitRoute = (req: Request, res: Response) => {
   const device = getDeviceFromRequest(req, res);
   if (!device) return;
 
-  // Parse unit id from request body.
-  const unitId = req.body.id;
-  if (unitId === undefined || unitId === null) {
-    res.status(400).json({ errors: ["Unit id is required"] });
+  // Parse unit DTO from request body.
+  const result: ParseResult<ModbusUnitDTO> = unitDTOFromObject(req.body);
+  if (!result.success) {
+    res.status(400).json({ errors: result.errors });
     return;
   }
-
-  // Validate unit id.
-  if (
-    typeof unitId !== "number" ||
-    isNaN(unitId) ||
-    unitId < 1 ||
-    unitId > 254
-  ) {
-    res
-      .status(400)
-      .json({ errors: ["Unit id must be a valid number between 1 and 254"] });
-    return;
-  }
+  const unitDTO = result.value;
 
   // Check if unit already exists.
-  if (device.hasUnit(unitId)) {
+  if (device.hasUnit(unitDTO.unitId)) {
     res.status(409).json({
       errors: [
-        `Unit with id ${unitId} already exists in device ${device.getFilename()}`,
+        `Unit with id ${unitDTO.unitId} already exists in device ${device.getFilename()}`,
       ],
     });
     return;
   }
 
   // Create and add new unit.
-  const unit = new ModbusUnit({ unitId });
+  const unit = new ModbusUnit(unitDTO);
   device.addUnit(unit);
 
   // Save device in json file.
   deviceManager.saveDevice(device.getFilename());
-
-  // Convert to DTO.
-  const unitDTO = unitToUnitDTO(unit);
 
   res.status(201).json(unitDTO);
 };
