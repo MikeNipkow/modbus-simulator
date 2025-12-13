@@ -23,6 +23,7 @@ import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
 import ChangeUnitIdDialog from "../../dialogs/ChangeUnitIdDialog";
 import useUpdateUnit from "@/hooks/useUpdateUnit";
 import DatapointTable from "./DatapointTable";
+import DatapointEditDialog from "@/components/dialogs/DatapointEditDialog";
 
 interface Props {
   device: ModbusDevice;
@@ -34,6 +35,8 @@ interface Props {
 const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
   const [isOpen, setOpen] = useState(device.modbusUnits?.length === 1);
   const [idEditDialogOpen, setIdEditDialogOpen] = useState(false);
+  const [isAddDatapointDialogOpen, setIsAddDatapointDialogOpen] =
+    useState(false);
   const {
     updateUnit,
     isLoading: isUpdating,
@@ -88,13 +91,22 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
 
   return (
     <>
+      <DatapointEditDialog
+        open={isAddDatapointDialogOpen}
+        device={device}
+        unit={unit}
+        onClose={(update) => {
+          setIsAddDatapointDialogOpen(false);
+          if (update) onUpdate?.();
+        }}
+      />
       <ChangeUnitIdDialog
         open={idEditDialogOpen}
         unitId={unit.unitId}
         onClose={() => setIdEditDialogOpen(false)}
         onSubmit={handleUnitIdChange}
         loading={isUpdating}
-      ></ChangeUnitIdDialog>
+      />
       <Card.Root
         width="100%"
         borderRadius={"2xl"}
@@ -124,7 +136,11 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
                 </Badge>
               </HStack>
               <HStack>
-                <Button variant={"outline"} width="160px">
+                <Button
+                  variant={"outline"}
+                  width="160px"
+                  onClick={() => setIsAddDatapointDialogOpen(true)}
+                >
                   <Icon as={FaPlus} boxSize={4} />
                   <Text fontSize={"md"}>Add Datapoint</Text>
                 </Button>

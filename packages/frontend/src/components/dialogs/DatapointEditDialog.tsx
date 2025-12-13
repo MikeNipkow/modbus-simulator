@@ -21,11 +21,13 @@ import {
   getMinValueForType,
 } from "@/util/modbusUtils";
 import { deserializeValue, serializeValue } from "@/util/jsonUtils";
+import type { ModbusUnit } from "@/types/ModbusUnit";
+import useCreateDatapoint from "@/hooks/useCreateDatapoint";
 
 interface Props {
   device: ModbusDevice;
-  unitId: number;
-  datapoint: DataPoint;
+  unit: ModbusUnit;
+  datapoint?: DataPoint;
   open: boolean;
   onClose?: (update: boolean) => void;
 }
@@ -58,14 +60,36 @@ const accessModes = createListCollection({
 
 const DatapointEditDialog = ({
   device,
-  unitId,
+  unit,
   datapoint,
   open,
   onClose,
 }: Props) => {
-  const [editDatapoint, setEditDatapoint] = useState<DataPoint>(datapoint);
+  const [editDatapoint, setEditDatapoint] = useState<DataPoint>(
+    datapoint || {
+      id: "",
+      name: "",
+      type: DataType.UInt16,
+      areas: [DataArea.HoldingRegister],
+      address: 0,
+      accessMode: AccessMode.ReadWrite,
+      defaultValue: 0,
+      value: 0,
+      unit: "",
+      simulation: { enabled: false, minValue: 0, maxValue: 1 },
+    },
+  );
 
-  const { updateDatapoint, isLoading, errors } = useUpdateDatapoint();
+  const {
+    updateDatapoint,
+    isLoading: updatingDatapoint,
+    errors: updateErrors,
+  } = useUpdateDatapoint();
+  const {
+    createDatapoint,
+    isLoading: creatingDatapoint,
+    errors: createErrors,
+  } = useCreateDatapoint();
 
   const setField = (field: keyof DataPoint, value: any) => {
     setEditDatapoint({ ...editDatapoint, [field]: value });
@@ -90,9 +114,13 @@ const DatapointEditDialog = ({
     });
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
+    datapoint !== undefined ? handleUpdate() : handleCreate();
+  };
+
+  const handleUpdate = async () => {
     // Call the update function from the hook.
-    const success = await updateDatapoint(device, unitId, editDatapoint);
+    const success = await updateDatapoint(device, unit.unitId, editDatapoint);
 
     // If successful, close the dialog and indicate an update occurred.
     if (success) onClose?.(true);
@@ -102,15 +130,44 @@ const DatapointEditDialog = ({
       ? createSuccessToast({ title: "Datapoint updated" })
       : createErrorToast({
           title: "Failed to update datapoint",
-          description: errors,
+          description: updateErrors,
+        });
+  };
+
+  const handleCreate = async () => {
+    // Set the id to a new unique value if creating a new datapoint.
+    if (editDatapoint.id === "")
+      editDatapoint.id = editDatapoint.areas[0] + "_" + editDatapoint.address;
+
+    // Check if a datapoint with the same id already exists. If so, append a number to make it unique.
+    for (
+      let i = 1;
+      i < 100 && unit.dataPoints?.some((dp) => dp.id === editDatapoint.id);
+      i++
+    )
+      editDatapoint.id =
+        editDatapoint.areas[0] + "_" + editDatapoint.address + "_" + i;
+
+    // Call the update function from the hook.
+    const success = await createDatapoint(device, unit.unitId, editDatapoint);
+
+    // If successful, close the dialog and indicate an update occurred.
+    if (success) onClose?.(true);
+
+    // Show appropriate toast notification.
+    success
+      ? createSuccessToast({ title: "Datapoint created" })
+      : createErrorToast({
+          title: "Failed to create datapoint",
+          description: createErrors,
         });
   };
 
   return (
     <BaseDialog
       open={open}
-      title={"Edit: " + datapoint?.id}
-      loading={isLoading}
+      title={datapoint ? "Edit Datapoint" : "Create Datapoint"}
+      loading={device !== undefined ? updatingDatapoint : creatingDatapoint}
       onSubmit={handleSubmit}
       onClose={() => onClose?.(false)}
     >
