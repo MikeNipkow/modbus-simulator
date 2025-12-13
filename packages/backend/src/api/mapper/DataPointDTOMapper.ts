@@ -6,7 +6,7 @@ import {
   dataPointFromObject,
   dataPointToDataPointProps,
 } from "../../mapper/DataPointMapper.js";
-import { serializeValue } from "../../util/jsonUtils.js";
+import { deserializeValue, serializeValue } from "../../util/jsonUtils.js";
 
 /**
  * Converts a DataPoint to a DataPointDTO.
@@ -62,10 +62,11 @@ export function dataPointDTOFromObject(obj: any): ParseResult<DataPointDTO> {
   };
 
   // Check if value is defined.
-  const value = obj.value;
+  const value = deserializeValue(obj.value);
   if (value !== undefined) {
     // Validate value type.
     if (typeof value !== getJSTypeFromDataType(dp.getType())) {
+      console.log(typeof value, getJSTypeFromDataType(dp.getType()));
       errors.push(
         `DataPointDTO value type ${typeof value} does not match DataType for data point '${dp.getId()}'`,
       );
@@ -104,7 +105,8 @@ export function dataPointFromDTO(dto: DataPointDTO): ParseResult<DataPoint> {
   const dataPoint = propsResult.value;
 
   // Check if value is defined.
-  const value = dto.value;
+  const value =
+    dto.value !== undefined ? deserializeValue(dto.value) : undefined;
   if (value !== undefined) {
     // Validate value type.
     if (typeof value !== getJSTypeFromDataType(dataPoint.getType())) {
