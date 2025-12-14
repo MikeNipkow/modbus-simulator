@@ -1,6 +1,6 @@
 import { useState } from "react";
-import BaseDialog from "./base/BaseDialog";
 import { Field, Input } from "@chakra-ui/react";
+import BaseDialog from "@/components/dialogs/base/BaseDialog";
 
 interface Props {
   open: boolean;

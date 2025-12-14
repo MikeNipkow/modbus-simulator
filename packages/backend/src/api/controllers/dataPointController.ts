@@ -11,6 +11,7 @@ import {
   getDeviceManagerByEndpoint,
   isTemplateEndpoint,
 } from "./deviceController.js";
+import { serializeValue } from "../../util/jsonUtils.js";
 
 /**
  * Helper function to get a DataPoint by ID from request parameters.
@@ -79,6 +80,19 @@ export const getDataPointRoute = (req: Request, res: Response) => {
   const dataPointDTO = dataPointToDataPointDTO(dataPoint);
 
   res.json(dataPointDTO);
+};
+
+/**
+ * Retrieves a DataPoint value by ID.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getDataPointValueRoute = (req: Request, res: Response) => {
+  // Retrieve data point.
+  const dataPoint = getDataPointFromRequest(req, res);
+  if (!dataPoint) return;
+
+  res.json({ value: serializeValue(dataPoint.getValue()) });
 };
 
 /**

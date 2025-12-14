@@ -65,6 +65,10 @@ export function initializeApiServer() {
     "/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId",
     getDataPointRoute,
   );
+  app.get(
+    "/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId/value",
+    getDataPointRoute,
+  );
   app.post(
     "/api/v1/devices/:id/units/:unitId/dataPoints",
     createDataPointRoute,

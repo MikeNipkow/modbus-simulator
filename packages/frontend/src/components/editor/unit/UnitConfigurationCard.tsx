@@ -8,7 +8,6 @@ import {
   HStack,
   Icon,
   IconButton,
-  Table,
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -20,34 +19,43 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import ChangeUnitIdDialog from "../../dialogs/ChangeUnitIdDialog";
 import useUpdateUnit from "@/hooks/useUpdateUnit";
 import DatapointTable from "./DatapointTable";
-import DatapointEditDialog from "@/components/dialogs/DatapointEditDialog";
+import DatapointEditDialog from "@/components/editor/datapoint/DatapointEditDialog";
+import ChangeUnitIdDialog from "./ChangeUnitIdDialog";
 
 interface Props {
   device: ModbusDevice;
   unit: ModbusUnit;
   onUpdate?: () => void;
-  setField: (field: keyof ModbusDevice, value: any) => void;
 }
 
-const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
+const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
+  // State to manage collapsible card.
   const [isOpen, setOpen] = useState(device.modbusUnits?.length === 1);
+  // State to manage dialog visibility for editing unit ID.
   const [idEditDialogOpen, setIdEditDialogOpen] = useState(false);
+  // State to manage dialog visibility for adding datapoint.
   const [isAddDatapointDialogOpen, setIsAddDatapointDialogOpen] =
     useState(false);
+
+  // Hook for updating unit.
   const {
     updateUnit,
     isLoading: isUpdating,
     errors: updateErrors,
   } = useUpdateUnit();
+  // Hook for deleting unit.
   const {
     deleteUnit,
     isLoading: isDeleting,
     errors: deleteErrors,
   } = useDeleteUnit();
 
+  /**
+   * Handle changing the unit ID.
+   * @param newUnitId The new unit ID to set.
+   */
   const handleUnitIdChange = async (newUnitId: number) => {
     // Call update unit hook.
     const success = await updateUnit(unit.unitId, device, {
@@ -70,6 +78,9 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
         });
   };
 
+  /**
+   * Handle deleting the unit.
+   */
   const handleDelete = async () => {
     // Call delete unit hook.
     const success = await deleteUnit(device, unit.unitId);
@@ -91,6 +102,7 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
 
   return (
     <>
+      {/* Dialog to add a Datapoint */}
       <DatapointEditDialog
         open={isAddDatapointDialogOpen}
         device={device}
@@ -100,6 +112,8 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
           if (update) onUpdate?.();
         }}
       />
+
+      {/* Dialog to edit the unit id */}
       <ChangeUnitIdDialog
         open={idEditDialogOpen}
         unitId={unit.unitId}
@@ -107,6 +121,8 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
         onSubmit={handleUnitIdChange}
         loading={isUpdating}
       />
+
+      {/* Unit Card */}
       <Card.Root
         width="100%"
         borderRadius={"2xl"}
@@ -159,12 +175,7 @@ const UnitConfigurationCard = ({ device, unit, onUpdate, setField }: Props) => {
         </Card.Header>
         {isOpen && (
           <Card.Body>
-            <DatapointTable
-              device={device}
-              unit={unit}
-              onUpdate={onUpdate}
-              setField={setField}
-            />
+            <DatapointTable device={device} unit={unit} onUpdate={onUpdate} />
           </Card.Body>
         )}
       </Card.Root>

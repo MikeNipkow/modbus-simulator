@@ -5,7 +5,7 @@
  */
 export function serializeValue(
   value: boolean | number | bigint | string,
-): boolean | number | bigint | string {
+): boolean | number | string {
   if (typeof value === "bigint") return value.toString();
 
   return value;
