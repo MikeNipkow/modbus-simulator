@@ -7,14 +7,14 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import BaseDialog from "../dialogs/base/BaseDialog";
+import BaseDialog from "../../ui/dialogs/base/BaseDialog";
 import { fetchDeviceData } from "@/services/downloadService";
 import { FaServer, FaPlay, FaStop, FaDownload, FaTrash } from "react-icons/fa";
-import { useDeleteDevice } from "@/hooks/useDeleteDevice";
+import { useDeleteDevice } from "@/hooks/device/useDeleteDevice";
 import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { createErrorToast, createSuccessToast } from "@/components/ui/Toaster";
-import { useControlDevice } from "@/hooks/useControlDevice";
+import { useControlDevice } from "@/hooks/device/useControlDevice";
 
 interface Props {
   device: ModbusDevice;
@@ -130,11 +130,12 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
       </BaseDialog>
 
       {/* Card */}
-      <Card.Root width="80%" borderRadius={"2xl"} boxShadow={"xl"}>
+      <Card.Root width="90%" borderRadius={"2xl"} boxShadow={"xl"}>
         <Card.Body>
           <HStack justifyContent="space-between">
             {/* Left: Info */}
             <HStack gap={4}>
+              {/* Icon */}
               <Icon
                 as={FaServer}
                 boxSize={14}
@@ -143,6 +144,8 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
                 padding={"12px"}
                 borderRadius={"2xl"}
               />
+
+              {/* Device Info */}
               <VStack alignItems="flex-start" gap={0}>
                 <Text fontWeight={"semibold"} fontSize={"2xl"}>
                   {device.filename}
@@ -155,11 +158,13 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
             <HStack>
               {/* Start/Stop button */}
               <Button
+                width="120px"
                 variant="solid"
                 colorPalette={device.running ? "red" : "green"}
                 size="lg"
                 loading={isControlLoading}
                 onClick={device.running ? handleStop : handleStart}
+                hidden={device.template || undefined}
               >
                 <Icon as={device.running ? FaStop : FaPlay} boxSize={4} />
                 {device.running ? "Stop" : "Start"}

@@ -1,4 +1,4 @@
-import { useDeleteUnit } from "@/hooks/useDeleteUnit";
+import { useDeleteUnit } from "@/hooks/unit/useDeleteUnit";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import type { ModbusUnit } from "@/types/ModbusUnit";
 import {
@@ -19,7 +19,6 @@ import {
   FaTrash,
 } from "react-icons/fa";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import useUpdateUnit from "@/hooks/useUpdateUnit";
 import DatapointTable from "./DatapointTable";
 import DatapointEditDialog from "@/components/editor/datapoint/DatapointEditDialog";
 import ChangeUnitIdDialog from "./ChangeUnitIdDialog";
@@ -39,44 +38,12 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
   const [isAddDatapointDialogOpen, setIsAddDatapointDialogOpen] =
     useState(false);
 
-  // Hook for updating unit.
-  const {
-    updateUnit,
-    isLoading: isUpdating,
-    errors: updateErrors,
-  } = useUpdateUnit();
   // Hook for deleting unit.
   const {
     deleteUnit,
     isLoading: isDeleting,
     errors: deleteErrors,
   } = useDeleteUnit();
-
-  /**
-   * Handle changing the unit ID.
-   * @param newUnitId The new unit ID to set.
-   */
-  const handleUnitIdChange = async (newUnitId: number) => {
-    // Call update unit hook.
-    const success = await updateUnit(unit.unitId, device, {
-      ...unit,
-      unitId: newUnitId,
-    });
-
-    // Notify parent component to refresh data.
-    if (success) onUpdate?.();
-
-    // Show toast notification.
-    success
-      ? createSuccessToast({
-          title: "Unit ID changed",
-          description: `Modbus unit ID has been changed to ${newUnitId}.`,
-        })
-      : createErrorToast({
-          title: "Failed to change Unit ID",
-          description: updateErrors,
-        });
-  };
 
   /**
    * Handle deleting the unit.
@@ -116,30 +83,37 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
       {/* Dialog to edit the unit id */}
       <ChangeUnitIdDialog
         open={idEditDialogOpen}
-        unitId={unit.unitId}
+        device={device}
+        unit={unit}
         onClose={() => setIdEditDialogOpen(false)}
-        onSubmit={handleUnitIdChange}
-        loading={isUpdating}
+        onChange={onUpdate}
       />
 
       {/* Unit Card */}
       <Card.Root
         width="100%"
         borderRadius={"2xl"}
-        boxShadow={"xl"}
+        boxShadow={"lg"}
         overflow="hidden"
       >
+        {/* Header */}
         <Card.Header padding="24px">
           <Card.Title>
             <HStack justifyContent={"space-between"}>
+              {/* Left side */}
               <HStack gap={4}>
+                {/* Collapsible trigger */}
                 <IconButton
                   as={isOpen ? FaChevronDown : FaChevronRight}
                   padding="8px"
                   variant={"secondary"}
                   onClick={() => setOpen(!isOpen)}
                 />
+
+                {/* Unit id */}
                 <Text>Unit {unit.unitId}</Text>
+
+                {/* Edit unit id button */}
                 <Button
                   size="lg"
                   variant="ghost"
@@ -147,11 +121,16 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
                 >
                   <Icon as={FaEdit} boxSize={4} />
                 </Button>
+
+                {/* Show amount of datapoints in this unit */}
                 <Badge size={"lg"} colorPalette={"blue"}>
                   {unit.dataPoints?.length} Datapoints
                 </Badge>
               </HStack>
+
+              {/* Right side */}
               <HStack>
+                {/* Add button */}
                 <Button
                   variant={"outline"}
                   width="160px"
@@ -160,8 +139,9 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
                   <Icon as={FaPlus} boxSize={4} />
                   <Text fontSize={"md"}>Add Datapoint</Text>
                 </Button>
+
+                {/* Delete button */}
                 <Button
-                  size="lg"
                   colorPalette="red"
                   variant="outline"
                   onClick={handleDelete}
@@ -173,6 +153,8 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
             </HStack>
           </Card.Title>
         </Card.Header>
+
+        {/* Body */}
         {isOpen && (
           <Card.Body>
             <DatapointTable device={device} unit={unit} onUpdate={onUpdate} />

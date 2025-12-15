@@ -1,5 +1,5 @@
 import { createErrorToast, createSuccessToast } from "@/components/ui/Toaster";
-import { useDeleteDatapoint } from "@/hooks/useDeleteDatapoint";
+import { useDeleteDatapoint } from "@/hooks/datapoint/useDeleteDatapoint";
 import type { DataPoint } from "@/types/DataPoint";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import type { ModbusUnit } from "@/types/ModbusUnit";

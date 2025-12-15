@@ -1,6 +1,6 @@
 import type { DataPoint } from "@/types/DataPoint";
-import BaseDialog from "../../dialogs/base/BaseDialog";
-import useUpdateDatapoint from "@/hooks/useUpdateDatapoint";
+import BaseDialog from "../../ui/dialogs/base/BaseDialog";
+import useUpdateDatapoint from "@/hooks/datapoint/useUpdateDatapoint";
 import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
@@ -9,7 +9,7 @@ import { DataType } from "@/types/enums/DataType";
 import { DataArea } from "@/types/enums/DataArea";
 import { AccessMode } from "@/types/enums/AccessMode";
 import type { ModbusUnit } from "@/types/ModbusUnit";
-import useCreateDatapoint from "@/hooks/useCreateDatapoint";
+import useCreateDatapoint from "@/hooks/datapoint/useCreateDatapoint";
 import LabeledSeparator from "../../ui/LabeledSeparator";
 import DataTypeSelector from "./fields/DataTypeSelector";
 import DatapointLengthInput from "./fields/DatapointLengthInput";

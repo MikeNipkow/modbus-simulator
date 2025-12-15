@@ -1,12 +1,11 @@
 import { isValidFilename } from "@/util/fileUtils";
-import BaseDialog from "./base/BaseDialog";
 import { Field, Input, Text, VStack, NativeSelect } from "@chakra-ui/react";
 import { useState } from "react";
-import { useCreateDevice } from "@/hooks/useCreateDevice";
+import { useCreateDevice } from "@/hooks/device/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
-import { createErrorToast, createSuccessToast } from "../ui/Toaster";
-
+import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
+import BaseDialog from "../../ui/dialogs/base/BaseDialog";
 
 interface Props {
   template: boolean;

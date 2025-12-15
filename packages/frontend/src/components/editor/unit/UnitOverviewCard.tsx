@@ -1,28 +1,48 @@
-import { Button, Card, HStack, Icon, Separator, Text } from "@chakra-ui/react";
+import {
+  Button,
+  Card,
+  HStack,
+  Icon,
+  Separator,
+  Text,
+  VStack,
+} from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
 import UnitConfigurationCard from "./UnitConfigurationCard";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import { useCreateUnit } from "@/hooks/useCreateUnit";
+import { useCreateUnit } from "@/hooks/unit/useCreateUnit";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 
 interface Props {
   device: ModbusDevice;
   onUpdate?: () => void;
-  setField: (field: keyof ModbusDevice, value: any) => void;
 }
 
-const UnitOverviewCard = ({ device, onUpdate, setField }: Props) => {
-  const { createUnit, unit, isLoading, errors } = useCreateUnit();
+const UnitOverviewCard = ({ device, onUpdate }: Props) => {
+  // Hook for creating a new unit.
+  const { createUnit, isLoading, errors } = useCreateUnit();
 
+  /**
+   * Check if a unit ID is already taken in the device.
+   * @param unitId The unit ID to check.
+   * @returns True if the unit ID is taken, false otherwise.
+   */
   const hasUnit = (unitId: number) => {
     return device.modbusUnits?.some((unit) => unit.unitId === unitId);
   };
+  /**
+   * Get the next free unit ID between 1 and 254.
+   * @returns The next free unit ID, or null if all are taken.
+   */
   const getNextFreeUnitId = () => {
     for (let i = 1; i <= 254; i++) if (!hasUnit(i)) return i;
     return null;
   };
 
+  /**
+   * Handle adding a new Modbus unit.
+   */
   const handleAddUnit = async () => {
     const nextUnitId = getNextFreeUnitId();
     if (nextUnitId === null) {
@@ -39,6 +59,7 @@ const UnitOverviewCard = ({ device, onUpdate, setField }: Props) => {
     // Notify parent component to refresh data.
     if (success) onUpdate?.();
 
+    // Show toast notification.
     success
       ? createSuccessToast({
           title: "Unit added",
@@ -52,18 +73,22 @@ const UnitOverviewCard = ({ device, onUpdate, setField }: Props) => {
 
   return (
     <Card.Root
-      width="80%"
+      width="90%"
       borderRadius={"2xl"}
       boxShadow={"xl"}
       overflow="hidden"
     >
+      {/* Header */}
       <Card.Header padding="24px" background="bg.medium">
         <Card.Title>
           <HStack justifyContent={"space-between"}>
+            {/* Icon */}
             <HStack gap={4}>
               <Icon as={FaGears} boxSize={6} />
               <Text>Modbus Units ({device.modbusUnits?.length})</Text>
             </HStack>
+
+            {/* Add Unit Button */}
             <Button
               variant={"primary"}
               width="120px"
@@ -76,17 +101,22 @@ const UnitOverviewCard = ({ device, onUpdate, setField }: Props) => {
           </HStack>
         </Card.Title>
       </Card.Header>
+
       <Separator />
+
+      {/* Body */}
       <Card.Body alignItems={"center"}>
-        {device.modbusUnits?.map((unit) => (
-          <UnitConfigurationCard
-            key={unit.unitId}
-            device={device}
-            unit={unit}
-            onUpdate={onUpdate}
-            setField={setField}
-          />
-        ))}
+        <VStack width="100%" gap={4}>
+          {/* Map all modbus units */}
+          {device.modbusUnits?.map((unit) => (
+            <UnitConfigurationCard
+              key={unit.unitId}
+              device={device}
+              unit={unit}
+              onUpdate={onUpdate}
+            />
+          ))}
+        </VStack>
       </Card.Body>
     </Card.Root>
   );
