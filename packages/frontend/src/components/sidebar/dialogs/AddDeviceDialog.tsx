@@ -11,11 +11,11 @@ import { useCreateDevice } from "@/hooks/device/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import { uploadTemplateFile } from "@/services/uploadService";
 import BaseDialog from "../../ui/dialogs/base/BaseDialog";
 import { HiUpload } from "react-icons/hi";
 import LabeledSeparator from "@/components/ui/LabeledSeparator";
 import FilenameInput from "@/components/ui/FilenameInput";
+import { useUploadTemplate } from "@/services/uploadService";
 
 interface Props {
   template: boolean;
@@ -37,7 +37,7 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
   // Hook for creating device.
   const { createDevice, isLoading, errors } = useCreateDevice();
 
-  const { uploadFile, errors: uploadErrors } = uploadTemplateFile();
+  const { uploadTemplateFile, errors: uploadErrors } = useUploadTemplate();
 
   const handleSubmit = async () => {
     // Check if filename is valid.
@@ -84,7 +84,7 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
 
   const handleFileUpload = async (details: FileUploadFileAcceptDetails) => {
     // Handle file upload.
-    const device = await uploadFile(details.files[0]);
+    const device = await uploadTemplateFile(details.files[0]);
 
     // Close dialog on success.
     if (device !== null) onClose(device.filename);

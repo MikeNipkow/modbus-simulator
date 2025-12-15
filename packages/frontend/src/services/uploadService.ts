@@ -2,12 +2,14 @@ import apiClient from "@/services/apiClient";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useState } from "react";
 
-export const uploadTemplateFile = () => {
+export const useUploadTemplate = () => {
   const [device, setDevice] = useState<ModbusDevice | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const uploadFile = async (file: File): Promise<ModbusDevice | null> => {
+  const uploadTemplateFile = async (
+    file: File,
+  ): Promise<ModbusDevice | null> => {
     setIsLoading(true);
     setErrors([]);
     setDevice(null);
@@ -32,7 +34,7 @@ export const uploadTemplateFile = () => {
     }
   };
 
-  return { uploadFile, device, isLoading, errors };
+  return { uploadTemplateFile, device, isLoading, errors };
 };
 
-export default { uploadTemplateFile };
+export default { useUploadTemplate };
