@@ -9,12 +9,21 @@ import {
 } from "@chakra-ui/react";
 import BaseDialog from "../../ui/dialogs/base/BaseDialog";
 import { fetchDeviceData } from "@/services/downloadService";
-import { FaServer, FaPlay, FaStop, FaDownload, FaTrash } from "react-icons/fa";
+import {
+  FaServer,
+  FaPlay,
+  FaStop,
+  FaDownload,
+  FaTrash,
+  FaSave,
+} from "react-icons/fa";
 import { useDeleteDevice } from "@/hooks/device/useDeleteDevice";
 import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { createErrorToast, createSuccessToast } from "@/components/ui/Toaster";
 import { useControlDevice } from "@/hooks/device/useControlDevice";
+import { useCreateDevice } from "@/hooks/device/useCreateDevice";
+import FilenameInput from "@/components/ui/FilenameInput";
 
 interface Props {
   device: ModbusDevice;
@@ -23,8 +32,17 @@ interface Props {
 }
 
 const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
+  // State to manage filename input.
+  const [filename, setFilename] = useState("");
+  // State to manage filename validity.
+  const [filenameValid, setFilenameValid] = useState(false);
+
   // Delete dialog to prevent accidental deletions
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // Delete dialog to save device as template
+  const [saveAsTemplateDialogOpen, setSaveAsTemplateDialogOpen] =
+    useState(false);
 
   // Hook to delete device
   const {
@@ -40,6 +58,13 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
     isLoading: isControlLoading,
     errors: controlErrors,
   } = useControlDevice();
+
+  // Hook to save device as template
+  const {
+    createDevice,
+    isLoading: isSaving,
+    errors: saveErrors,
+  } = useCreateDevice();
 
   // ~~~~~ Function Handlers ~~~~~
 
@@ -87,6 +112,36 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
         });
   };
 
+  // Handle saving device as template.
+  const handleSaveAsTemplate = async () => {
+    // Create a new device object based on the current device but marked as a template
+    const templateDevice: ModbusDevice = {
+      ...device,
+      template: true,
+      filename: filename + ".json",
+    };
+
+    // Save device as template via hook.
+    const success = await createDevice(templateDevice, true);
+
+    // Update UI based on result.
+    if (success) {
+      onUpdate?.();
+      setSaveAsTemplateDialogOpen(false);
+    }
+
+    // Show toaster notification.
+    success
+      ? createSuccessToast({
+          title: "Template saved",
+          description: `Device "${device.filename}" has been saved as a template.`,
+        })
+      : createErrorToast({
+          title: "Failed to save device as template",
+          description: saveErrors,
+        });
+  };
+
   // Handle stopping the device
   const handleStop = async () => {
     // Stop device via hook
@@ -129,6 +184,27 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
         )}
       </BaseDialog>
 
+      {/* Dialog for saving as template */}
+      <BaseDialog
+        open={saveAsTemplateDialogOpen}
+        title="Save device as Template?"
+        placement="top"
+        loading={isSaving}
+        submitDisabled={!filenameValid}
+        onClose={() => setSaveAsTemplateDialogOpen(false)}
+        onSubmit={handleSaveAsTemplate}
+      >
+        {/* Filename input */}
+        <FilenameInput
+          filename={filename}
+          onChange={({ filename, valid }) => {
+            setFilename(filename);
+            setFilenameValid(valid);
+          }}
+          onSubmit={handleSaveAsTemplate}
+        />
+      </BaseDialog>
+
       {/* Card */}
       <Card.Root width="90%" borderRadius={"2xl"} boxShadow={"xl"}>
         <Card.Body>
@@ -168,6 +244,19 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
               >
                 <Icon as={device.running ? FaStop : FaPlay} boxSize={4} />
                 {device.running ? "Stop" : "Start"}
+              </Button>
+
+              {/* Save as template button */}
+              <Button
+                size="lg"
+                colorPalette="blue"
+                variant="outline"
+                onClick={() => setSaveAsTemplateDialogOpen(true)}
+                hidden={device.template || undefined}
+                loading={isSaving}
+              >
+                <Icon as={FaSave} boxSize={4} />
+                <Text>Save as Template</Text>
               </Button>
 
               {/* Delete button */}

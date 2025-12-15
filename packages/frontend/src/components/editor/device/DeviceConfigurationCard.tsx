@@ -27,6 +27,9 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
   // State to manage editable device fields.
   const [editDevice, setEditDevice] = useState<ModbusDevice>({ ...device });
 
+  // State to manage if data has changed.
+  const [dataChanged, setDataChanged] = useState(false);
+
   // Hook for updating device.
   const { updateDevice, isLoading, errors } = useUpdateDevice();
 
@@ -36,7 +39,9 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
    * @param value New value.
    */
   const setField = (field: keyof ModbusDevice, value: any) => {
+    if (editDevice[field] === value) return;
     setEditDevice((prev) => ({ ...prev, [field]: value }));
+    setDataChanged(true);
   };
 
   /**
@@ -47,7 +52,10 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
     const success = await updateDevice(editDevice);
 
     // Update UI based on result.
-    if (success) onUpdate?.();
+    if (success) {
+      onUpdate?.();
+      setDataChanged(false);
+    }
 
     // Show toast notification.
     success
@@ -163,14 +171,23 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
       <Card.Footer padding="24px" background="bg.medium">
         <HStack width="100%" justify={"flex-end"}>
           {/* Save button */}
-          <Button variant="primary" loading={isLoading} onClick={handleUpdate}>
+          <Button
+            variant="primary"
+            loading={isLoading}
+            onClick={handleUpdate}
+            disabled={!dataChanged}
+          >
             Save
           </Button>
 
           {/* Reset button */}
           <Button
             variant="outline"
-            onClick={() => setEditDevice({ ...device })}
+            onClick={() => {
+              setEditDevice({ ...device });
+              setDataChanged(false);
+            }}
+            disabled={!dataChanged}
           >
             Reset
           </Button>

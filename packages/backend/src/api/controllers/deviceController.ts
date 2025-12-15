@@ -10,6 +10,8 @@ import {
 } from "../mapper/ModbusDeviceDTOMapper.js";
 import { DeviceManager } from "../../DeviceManager.js";
 import fs from "fs";
+import { ModbusDeviceProps } from "../../types/ModbusDeviceProps.js";
+import { deviceFromObject } from "../../mapper/ModbusDeviceMapper.js";
 
 /**
  * Helper function to determine if the request is for a template.
@@ -369,4 +371,68 @@ export const downloadDeviceRoute = (req: Request, res: Response) => {
   res.download(filePath, filename, (err) => {
     if (err) res.status(500).json({ errors: ["Failed to download file"] });
   });
+};
+
+/**
+ * Uploads a device template file.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const uploadTemplateRoute = (req: Request, res: Response) => {
+  // Check if file is provided.
+  if (!req.file) {
+    res.status(400).json({ errors: ["No file uploaded"] });
+    return;
+  }
+
+  // Get content.
+  const fileBuffer = req.file.buffer.toString("utf-8");
+
+  // Parse JSON content.
+  let json: any;
+  try {
+    json = JSON.parse(fileBuffer);
+  } catch (error) {
+    res.status(400).json({ errors: ["Invalid JSON file"] });
+    return;
+  }
+
+  // Check if filename already exists.
+  let filename = req.file.originalname;
+  for (let i = 1; templateManager.hasDevice(filename) && i < 10; i++)
+    filename = filename.replace(".json", `_${i}.json`);
+
+  // Check if filename exists.
+  if (templateManager.hasDevice(filename)) {
+    res
+      .status(409)
+      .json({ errors: ["Template with this filename already exists"] });
+    return;
+  }
+
+  // Try to parse device from JSON object.
+  const deviceResult = deviceFromObject(json, filename);
+
+  // Check for parsing errors.
+  if (!deviceResult.success) {
+    res.status(400).json({ errors: deviceResult.errors });
+    return;
+  }
+
+  // Add device to template manager.
+  const device = deviceResult.value;
+  const addResult = templateManager.addDevice(filename, device);
+
+  // Check if adding was successful.
+  if (!addResult) {
+    res
+      .status(500)
+      .json({ errors: ["Failed to add the template to the template manager"] });
+    return;
+  }
+
+  // Save device in json file.
+  templateManager.saveDevice(device.getFilename());
+
+  res.status(201).json(deviceToDeviceDTO(device, true));
 };

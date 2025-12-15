@@ -1,8 +1,7 @@
 {
-  "filename": "wago_879_4pu_4ps_2puct_modbus.json",
   "enabled": true,
   "port": 503,
-  "endian": "BigEndian",
+  "endian": "LittleEndian",
   "name": "WAGO Energy Meters 4PU/4PS/2PU CT (MID)",
   "vendor": "WAGO",
   "description": "Modbus RTU mapping for WAGO MID energy meters 4PU, 4PS and 2PU CT based on operating instructions 082022V1.6.",
@@ -18,8 +17,9 @@
           "type": "UInt32",
           "address": 16384,
           "accessMode": "RO",
-          "name": "Serial number",
           "defaultValue": 0,
+          "name": "Serial number",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -34,8 +34,9 @@
           "type": "UInt16",
           "address": 16386,
           "accessMode": "RO",
-          "name": "Meter code (4PU:1111, 4PS:1112, 2PU CT:1113)",
           "defaultValue": 1111,
+          "name": "Meter code (4PU:1111, 4PS:1112, 2PU CT:1113)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -50,8 +51,9 @@
           "type": "Int16",
           "address": 16387,
           "accessMode": "RW",
-          "name": "Modbus ID",
           "defaultValue": 1,
+          "name": "Modbus ID",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -66,8 +68,9 @@
           "type": "Int16",
           "address": 16388,
           "accessMode": "RW",
-          "name": "Modbus baud rate (code)",
           "defaultValue": 6,
+          "name": "Modbus baud rate (code)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -82,8 +85,9 @@
           "type": "Float32",
           "address": 16389,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "Protocol version",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -98,8 +102,9 @@
           "type": "Float32",
           "address": 16391,
           "accessMode": "RO",
-          "name": "Software version",
           "defaultValue": 1.34,
+          "name": "Software version",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -114,8 +119,9 @@
           "type": "Float32",
           "address": 16393,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "Hardware version",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -130,9 +136,9 @@
           "type": "Int16",
           "address": 16395,
           "accessMode": "RO",
+          "defaultValue": 5,
           "name": "Meter base current (Ib)",
           "unit": "A",
-          "defaultValue": 5,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -147,9 +153,9 @@
           "type": "UInt16",
           "address": 16396,
           "accessMode": "RO",
+          "defaultValue": 5,
           "name": "CT ratio code",
           "unit": "A",
-          "defaultValue": 5,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -164,9 +170,9 @@
           "type": "Float32",
           "address": 16397,
           "accessMode": "RW",
+          "defaultValue": 1000,
           "name": "S0 pulse rate (pulses/kWh)",
           "unit": "pulse/kWh",
-          "defaultValue": 1000.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -181,8 +187,9 @@
           "type": "Int16",
           "address": 16399,
           "accessMode": "RW",
-          "name": "Combination code (import/export)",
           "defaultValue": 3,
+          "name": "Combination code (import/export)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -197,9 +204,9 @@
           "type": "UInt16",
           "address": 16400,
           "accessMode": "RW",
+          "defaultValue": 10,
           "name": "LCD rolling time",
           "unit": "s",
-          "defaultValue": 10,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -214,8 +221,9 @@
           "type": "Int16",
           "address": 16401,
           "accessMode": "RW",
-          "name": "Modbus parity (1=even,2=none,3=odd)",
           "defaultValue": 1,
+          "name": "Modbus parity (1=even,2=none,3=odd)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -230,9 +238,15 @@
           "type": "ASCII",
           "address": 16402,
           "accessMode": "RO",
+          "defaultValue": "F",
           "name": "L1 current direction (F=import,R=export)",
-          "length": 1,
-          "defaultValue": "F"
+          "unit": "",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "length": 1
         },
         {
           "id": "wago_4013_l2CurrentDirection",
@@ -242,9 +256,15 @@
           "type": "ASCII",
           "address": 16403,
           "accessMode": "RO",
+          "defaultValue": "F",
           "name": "L2 current direction (F=import,R=export)",
-          "length": 1,
-          "defaultValue": "F"
+          "unit": "",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "length": 1
         },
         {
           "id": "wago_4014_l3CurrentDirection",
@@ -254,9 +274,15 @@
           "type": "ASCII",
           "address": 16404,
           "accessMode": "RO",
+          "defaultValue": "F",
           "name": "L3 current direction (F=import,R=export)",
-          "length": 1,
-          "defaultValue": "F"
+          "unit": "",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "length": 1
         },
         {
           "id": "wago_4016_powerDownCounter",
@@ -266,8 +292,9 @@
           "type": "Int16",
           "address": 16406,
           "accessMode": "RW",
-          "name": "Power-down counter",
           "defaultValue": 0,
+          "name": "Power-down counter",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -282,8 +309,9 @@
           "type": "Int16",
           "address": 16407,
           "accessMode": "RO",
-          "name": "Current total quadrant",
           "defaultValue": 0,
+          "name": "Current total quadrant",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -298,8 +326,9 @@
           "type": "Int16",
           "address": 16408,
           "accessMode": "RO",
-          "name": "L1 quadrant",
           "defaultValue": 0,
+          "name": "L1 quadrant",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -314,8 +343,9 @@
           "type": "Int16",
           "address": 16409,
           "accessMode": "RO",
-          "name": "L2 quadrant",
           "defaultValue": 0,
+          "name": "L2 quadrant",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -330,8 +360,9 @@
           "type": "Int16",
           "address": 16410,
           "accessMode": "RO",
-          "name": "L3 quadrant",
           "defaultValue": 0,
+          "name": "L3 quadrant",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -346,8 +377,9 @@
           "type": "UInt32",
           "address": 16411,
           "accessMode": "RO",
-          "name": "Checksum 1",
           "defaultValue": 0,
+          "name": "Checksum 1",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -362,8 +394,9 @@
           "type": "UInt32",
           "address": 16413,
           "accessMode": "RO",
-          "name": "Active status word",
           "defaultValue": 0,
+          "name": "Active status word",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -378,9 +411,9 @@
           "type": "Int32",
           "address": 16415,
           "accessMode": "RW",
+          "defaultValue": 5,
           "name": "CT ratio primary/secondary (e.g., 9995/5 A)",
           "unit": "A",
-          "defaultValue": 5,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -395,9 +428,9 @@
           "type": "Int16",
           "address": 16417,
           "accessMode": "RW",
+          "defaultValue": 30,
           "name": "S0 pulse width",
           "unit": "ms",
-          "defaultValue": 30,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -412,8 +445,9 @@
           "type": "UInt16",
           "address": 16418,
           "accessMode": "RW",
-          "name": "S0 pulse type (1=energy,2=forward/reverse)",
           "defaultValue": 1,
+          "name": "S0 pulse type (1=energy,2=forward/reverse)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -428,8 +462,9 @@
           "type": "UInt32",
           "address": 16419,
           "accessMode": "RO",
-          "name": "Checksum 2 (not relevant)",
           "defaultValue": 0,
+          "name": "Checksum 2 (not relevant)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -444,8 +479,9 @@
           "type": "UInt16",
           "address": 16421,
           "accessMode": "RO",
-          "name": "Reserved (block 0x4025\u20130x4025)",
           "defaultValue": 0,
+          "name": "Reserved (block 0x4025–0x4025)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -460,8 +496,9 @@
           "type": "Int16",
           "address": 16422,
           "accessMode": "RW",
-          "name": "Data type (1=standard,2=integer)",
           "defaultValue": 1,
+          "name": "Data type (1=standard,2=integer)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -476,8 +513,9 @@
           "type": "UInt16",
           "address": 16423,
           "accessMode": "RO",
-          "name": "Reserved (block 0x4027\u20130x402A)",
           "defaultValue": 0,
+          "name": "Reserved (block 0x4027–0x402A)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -492,8 +530,9 @@
           "type": "UInt16",
           "address": 16424,
           "accessMode": "RO",
-          "name": "Reserved (block 0x4027\u20130x402A)",
           "defaultValue": 0,
+          "name": "Reserved (block 0x4027–0x402A)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -508,8 +547,9 @@
           "type": "UInt16",
           "address": 16425,
           "accessMode": "RO",
-          "name": "Reserved (block 0x4027\u20130x402A)",
           "defaultValue": 0,
+          "name": "Reserved (block 0x4027–0x402A)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -524,8 +564,9 @@
           "type": "UInt16",
           "address": 16426,
           "accessMode": "RO",
-          "name": "Reserved (block 0x4027\u20130x402A)",
           "defaultValue": 0,
+          "name": "Reserved (block 0x4027–0x402A)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -540,8 +581,9 @@
           "type": "Int16",
           "address": 16434,
           "accessMode": "RW",
-          "name": "Screen direction (0=normal,1=rotated 180\u00b0)",
           "defaultValue": 0,
+          "name": "Screen direction (0=normal,1=rotated 180°)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -556,8 +598,9 @@
           "type": "Int16",
           "address": 16435,
           "accessMode": "RW",
-          "name": "OBIS code display ON/OFF (0=OFF,1=ON)",
           "defaultValue": 1,
+          "name": "OBIS code display ON/OFF (0=OFF,1=ON)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -572,13 +615,13 @@
           "type": "Float32",
           "address": 20480,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total voltage (average)",
           "unit": "V",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 215.0,
-            "maxValue": 245.0
+            "minValue": 215,
+            "maxValue": 245
           }
         },
         {
@@ -589,13 +632,13 @@
           "type": "Float32",
           "address": 20482,
           "accessMode": "RO",
+          "defaultValue": 230,
           "name": "L1 voltage",
           "unit": "V",
-          "defaultValue": 230.0,
           "simulation": {
             "enabled": true,
-            "minValue": 215.0,
-            "maxValue": 245.0
+            "minValue": 215,
+            "maxValue": 245
           }
         },
         {
@@ -606,13 +649,13 @@
           "type": "Float32",
           "address": 20484,
           "accessMode": "RO",
+          "defaultValue": 230,
           "name": "L2 voltage",
           "unit": "V",
-          "defaultValue": 230.0,
           "simulation": {
             "enabled": true,
-            "minValue": 215.0,
-            "maxValue": 245.0
+            "minValue": 215,
+            "maxValue": 245
           }
         },
         {
@@ -623,13 +666,13 @@
           "type": "Float32",
           "address": 20486,
           "accessMode": "RO",
+          "defaultValue": 230,
           "name": "L3 voltage",
           "unit": "V",
-          "defaultValue": 230.0,
           "simulation": {
             "enabled": true,
-            "minValue": 215.0,
-            "maxValue": 245.0
+            "minValue": 215,
+            "maxValue": 245
           }
         },
         {
@@ -640,9 +683,9 @@
           "type": "Float32",
           "address": 20488,
           "accessMode": "RO",
+          "defaultValue": 50,
           "name": "Line frequency",
           "unit": "Hz",
-          "defaultValue": 50.0,
           "simulation": {
             "enabled": true,
             "minValue": 49.9,
@@ -657,13 +700,13 @@
           "type": "Float32",
           "address": 20490,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total current",
           "unit": "A",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 40.0
+            "minValue": 0,
+            "maxValue": 40
           }
         },
         {
@@ -674,13 +717,13 @@
           "type": "Float32",
           "address": 20492,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 current",
           "unit": "A",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 40.0
+            "minValue": 0,
+            "maxValue": 40
           }
         },
         {
@@ -691,13 +734,13 @@
           "type": "Float32",
           "address": 20494,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 current",
           "unit": "A",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 40.0
+            "minValue": 0,
+            "maxValue": 40
           }
         },
         {
@@ -708,13 +751,13 @@
           "type": "Float32",
           "address": 20496,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 current",
           "unit": "A",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 40.0
+            "minValue": 0,
+            "maxValue": 40
           }
         },
         {
@@ -725,13 +768,13 @@
           "type": "Float32",
           "address": 20498,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total active power",
           "unit": "kW",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 15.0
+            "minValue": 0,
+            "maxValue": 15
           }
         },
         {
@@ -742,13 +785,13 @@
           "type": "Float32",
           "address": 20500,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 active power",
           "unit": "kW",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 15.0
+            "minValue": 0,
+            "maxValue": 15
           }
         },
         {
@@ -759,13 +802,13 @@
           "type": "Float32",
           "address": 20502,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 active power",
           "unit": "kW",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 15.0
+            "minValue": 0,
+            "maxValue": 15
           }
         },
         {
@@ -776,13 +819,13 @@
           "type": "Float32",
           "address": 20504,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 active power",
           "unit": "kW",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 15.0
+            "minValue": 0,
+            "maxValue": 15
           }
         },
         {
@@ -793,13 +836,13 @@
           "type": "Float32",
           "address": 20506,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total reactive power",
           "unit": "kvar",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": -15.0,
-            "maxValue": 15.0
+            "minValue": -15,
+            "maxValue": 15
           }
         },
         {
@@ -810,13 +853,13 @@
           "type": "Float32",
           "address": 20508,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 reactive power",
           "unit": "kvar",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": -15.0,
-            "maxValue": 15.0
+            "minValue": -15,
+            "maxValue": 15
           }
         },
         {
@@ -827,13 +870,13 @@
           "type": "Float32",
           "address": 20510,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 reactive power",
           "unit": "kvar",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": -15.0,
-            "maxValue": 15.0
+            "minValue": -15,
+            "maxValue": 15
           }
         },
         {
@@ -844,13 +887,13 @@
           "type": "Float32",
           "address": 20512,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 reactive power",
           "unit": "kvar",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": -15.0,
-            "maxValue": 15.0
+            "minValue": -15,
+            "maxValue": 15
           }
         },
         {
@@ -861,13 +904,13 @@
           "type": "Float32",
           "address": 20514,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total apparent power",
           "unit": "kVA",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 30.0
+            "minValue": 0,
+            "maxValue": 30
           }
         },
         {
@@ -878,13 +921,13 @@
           "type": "Float32",
           "address": 20516,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 apparent power",
           "unit": "kVA",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 30.0
+            "minValue": 0,
+            "maxValue": 30
           }
         },
         {
@@ -895,13 +938,13 @@
           "type": "Float32",
           "address": 20518,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 apparent power",
           "unit": "kVA",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 30.0
+            "minValue": 0,
+            "maxValue": 30
           }
         },
         {
@@ -912,13 +955,13 @@
           "type": "Float32",
           "address": 20520,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 apparent power",
           "unit": "kVA",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 30.0
+            "minValue": 0,
+            "maxValue": 30
           }
         },
         {
@@ -929,12 +972,13 @@
           "type": "Float32",
           "address": 20522,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "Total power factor",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 1.0
+            "minValue": 0,
+            "maxValue": 1
           }
         },
         {
@@ -945,12 +989,13 @@
           "type": "Float32",
           "address": 20524,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "L1 power factor",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 1.0
+            "minValue": 0,
+            "maxValue": 1
           }
         },
         {
@@ -961,12 +1006,13 @@
           "type": "Float32",
           "address": 20526,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "L2 power factor",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 1.0
+            "minValue": 0,
+            "maxValue": 1
           }
         },
         {
@@ -977,12 +1023,13 @@
           "type": "Float32",
           "address": 20528,
           "accessMode": "RO",
+          "defaultValue": 1,
           "name": "L3 power factor",
-          "defaultValue": 1.0,
+          "unit": "",
           "simulation": {
             "enabled": true,
-            "minValue": 0.0,
-            "maxValue": 1.0
+            "minValue": 0,
+            "maxValue": 1
           }
         },
         {
@@ -993,13 +1040,13 @@
           "type": "Float32",
           "address": 20530,
           "accessMode": "RO",
+          "defaultValue": 400,
           "name": "L1-L2 voltage",
           "unit": "V",
-          "defaultValue": 400.0,
           "simulation": {
             "enabled": true,
-            "minValue": 375.0,
-            "maxValue": 425.0
+            "minValue": 375,
+            "maxValue": 425
           }
         },
         {
@@ -1010,13 +1057,13 @@
           "type": "Float32",
           "address": 20532,
           "accessMode": "RO",
+          "defaultValue": 400,
           "name": "L1-L3 voltage",
           "unit": "V",
-          "defaultValue": 400.0,
           "simulation": {
             "enabled": true,
-            "minValue": 375.0,
-            "maxValue": 425.0
+            "minValue": 375,
+            "maxValue": 425
           }
         },
         {
@@ -1027,13 +1074,13 @@
           "type": "Float32",
           "address": 20534,
           "accessMode": "RO",
+          "defaultValue": 400,
           "name": "L2-L3 voltage",
           "unit": "V",
-          "defaultValue": 400.0,
           "simulation": {
             "enabled": true,
-            "minValue": 375.0,
-            "maxValue": 425.0
+            "minValue": 375,
+            "maxValue": 425
           }
         },
         {
@@ -1044,9 +1091,9 @@
           "type": "Float32",
           "address": 24576,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1061,9 +1108,9 @@
           "type": "Float32",
           "address": 24578,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1078,9 +1125,9 @@
           "type": "Float32",
           "address": 24580,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1095,9 +1142,9 @@
           "type": "Float32",
           "address": 24582,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1112,9 +1159,9 @@
           "type": "Float32",
           "address": 24584,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1129,9 +1176,9 @@
           "type": "Float32",
           "address": 24586,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1146,9 +1193,9 @@
           "type": "Float32",
           "address": 24588,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1163,9 +1210,9 @@
           "type": "Float32",
           "address": 24590,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1180,9 +1227,9 @@
           "type": "Float32",
           "address": 24592,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1197,9 +1244,9 @@
           "type": "Float32",
           "address": 24594,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1214,9 +1261,9 @@
           "type": "Float32",
           "address": 24596,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1231,9 +1278,9 @@
           "type": "Float32",
           "address": 24598,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 active energy import",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1248,9 +1295,9 @@
           "type": "Float32",
           "address": 24600,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1265,9 +1312,9 @@
           "type": "Float32",
           "address": 24602,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1282,9 +1329,9 @@
           "type": "Float32",
           "address": 24604,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1299,9 +1346,9 @@
           "type": "Float32",
           "address": 24606,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1316,9 +1363,9 @@
           "type": "Float32",
           "address": 24608,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1333,9 +1380,9 @@
           "type": "Float32",
           "address": 24610,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 active energy export",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1350,9 +1397,9 @@
           "type": "Float32",
           "address": 24612,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1367,9 +1414,9 @@
           "type": "Float32",
           "address": 24614,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1384,9 +1431,9 @@
           "type": "Float32",
           "address": 24616,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1401,9 +1448,9 @@
           "type": "Float32",
           "address": 24618,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1418,9 +1465,9 @@
           "type": "Float32",
           "address": 24620,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1435,9 +1482,9 @@
           "type": "Float32",
           "address": 24622,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1452,9 +1499,9 @@
           "type": "Float32",
           "address": 24624,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1469,9 +1516,9 @@
           "type": "Float32",
           "address": 24626,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1486,9 +1533,9 @@
           "type": "Float32",
           "address": 24628,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1503,9 +1550,9 @@
           "type": "Float32",
           "address": 24630,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1520,9 +1567,9 @@
           "type": "Float32",
           "address": 24632,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1537,9 +1584,9 @@
           "type": "Float32",
           "address": 24634,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 reactive energy import",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1554,9 +1601,9 @@
           "type": "Float32",
           "address": 24636,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1571,9 +1618,9 @@
           "type": "Float32",
           "address": 24638,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T1 reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1588,9 +1635,9 @@
           "type": "Float32",
           "address": 24640,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T2 reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1605,9 +1652,9 @@
           "type": "Float32",
           "address": 24642,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L1 reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1622,9 +1669,9 @@
           "type": "Float32",
           "address": 24644,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L2 reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1639,9 +1686,9 @@
           "type": "Float32",
           "address": 24646,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "L3 reactive energy export",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1656,8 +1703,9 @@
           "type": "Int16",
           "address": 24648,
           "accessMode": "RW",
-          "name": "Active tariff (1=T1,2=T2,3=T3,4=T4)",
           "defaultValue": 1,
+          "name": "Active tariff (1=T1,2=T2,3=T3,4=T4)",
+          "unit": "",
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1672,9 +1720,9 @@
           "type": "Float32",
           "address": 24649,
           "accessMode": "RW",
+          "defaultValue": 0,
           "name": "Resettable day register",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1689,9 +1737,9 @@
           "type": "Float32",
           "address": 24651,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1706,9 +1754,9 @@
           "type": "Float32",
           "address": 24653,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 total active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1723,9 +1771,9 @@
           "type": "Float32",
           "address": 24655,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 import active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1740,9 +1788,9 @@
           "type": "Float32",
           "address": 24657,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 import active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1757,9 +1805,9 @@
           "type": "Float32",
           "address": 24659,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 export active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1774,9 +1822,9 @@
           "type": "Float32",
           "address": 24661,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 export active energy",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1791,9 +1839,9 @@
           "type": "Float32",
           "address": 24663,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1808,9 +1856,9 @@
           "type": "Float32",
           "address": 24665,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 total reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1825,9 +1873,9 @@
           "type": "Float32",
           "address": 24667,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 import reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1842,9 +1890,9 @@
           "type": "Float32",
           "address": 24669,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 import reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1859,9 +1907,9 @@
           "type": "Float32",
           "address": 24671,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T3 export reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1876,9 +1924,9 @@
           "type": "Float32",
           "address": 24673,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "T4 export reactive energy",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1893,9 +1941,9 @@
           "type": "Float32",
           "address": 24675,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import inductive reactive energy in Q1 (total)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1910,9 +1958,9 @@
           "type": "Float32",
           "address": 24677,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import inductive reactive energy in Q1 (T1)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1927,9 +1975,9 @@
           "type": "Float32",
           "address": 24679,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import inductive reactive energy in Q1 (T2)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1944,9 +1992,9 @@
           "type": "Float32",
           "address": 24681,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import inductive reactive energy in Q1 (T3)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1961,9 +2009,9 @@
           "type": "Float32",
           "address": 24683,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import inductive reactive energy in Q1 (T4)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1978,9 +2026,9 @@
           "type": "Float32",
           "address": 24685,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import capacitive reactive energy in Q2 (total)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -1995,9 +2043,9 @@
           "type": "Float32",
           "address": 24687,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import capacitive reactive energy in Q2 (T1)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2012,9 +2060,9 @@
           "type": "Float32",
           "address": 24689,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import capacitive reactive energy in Q2 (T2)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2029,9 +2077,9 @@
           "type": "Float32",
           "address": 24691,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import capacitive reactive energy in Q2 (T3)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2046,9 +2094,9 @@
           "type": "Float32",
           "address": 24693,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Import capacitive reactive energy in Q2 (T4)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2063,9 +2111,9 @@
           "type": "Float32",
           "address": 24695,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export inductive reactive energy in Q3 (total)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2080,9 +2128,9 @@
           "type": "Float32",
           "address": 24697,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export inductive reactive energy in Q3 (T1)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2097,9 +2145,9 @@
           "type": "Float32",
           "address": 24699,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export inductive reactive energy in Q3 (T2)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2114,9 +2162,9 @@
           "type": "Float32",
           "address": 24701,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export inductive reactive energy in Q3 (T3)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2131,9 +2179,9 @@
           "type": "Float32",
           "address": 24703,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export inductive reactive energy in Q3 (T4)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2148,9 +2196,9 @@
           "type": "Float32",
           "address": 24705,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export capacitive reactive energy in Q4 (total)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2165,9 +2213,9 @@
           "type": "Float32",
           "address": 24707,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export capacitive reactive energy in Q4 (T1)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2182,9 +2230,9 @@
           "type": "Float32",
           "address": 24709,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export capacitive reactive energy in Q4 (T2)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2199,9 +2247,9 @@
           "type": "Float32",
           "address": 24711,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export capacitive reactive energy in Q4 (T3)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2216,9 +2264,9 @@
           "type": "Float32",
           "address": 24713,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Export capacitive reactive energy in Q4 (T4)",
           "unit": "kvarh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2233,9 +2281,9 @@
           "type": "Float32",
           "address": 24715,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Resettable day register L1",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2250,9 +2298,9 @@
           "type": "Float32",
           "address": 24717,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Resettable day register L2",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,
@@ -2267,9 +2315,9 @@
           "type": "Float32",
           "address": 24719,
           "accessMode": "RO",
+          "defaultValue": 0,
           "name": "Resettable day register L3",
           "unit": "kWh",
-          "defaultValue": 0.0,
           "simulation": {
             "enabled": false,
             "minValue": 0,

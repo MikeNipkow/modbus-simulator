@@ -5,14 +5,16 @@ import type { ModbusUnit } from "@/types/ModbusUnit";
 import { Badge, Button, HStack, Table } from "@chakra-ui/react";
 import { useState } from "react";
 import DatapointRow from "./DatapointRow";
+import type { DataArea } from "@/types/enums/DataArea";
 
 interface Props {
   device: ModbusDevice;
   unit: ModbusUnit;
+  area?: DataArea;
   onUpdate?: () => void;
 }
 
-const DatapointTable = ({ device, unit, onUpdate }: Props) => {
+const DatapointTable = ({ device, unit, area, onUpdate }: Props) => {
   // State to manage the datapoint being edited.
   const [dpToEdit, setDpToEdit] = useState<DataPoint | null>(null);
 
@@ -48,7 +50,7 @@ const DatapointTable = ({ device, unit, onUpdate }: Props) => {
           <Table.Row>
             <Table.ColumnHeader fontWeight={"bold"}>Name</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Type</Table.ColumnHeader>
-            <Table.ColumnHeader fontWeight={"bold"}>Area</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight={"bold"}>Areas</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>
               <HStack gap={0}>
                 Address
@@ -72,16 +74,18 @@ const DatapointTable = ({ device, unit, onUpdate }: Props) => {
 
         {/* Map rows */}
         <Table.Body>
-          {unit.dataPoints?.map((datapoint) => (
-            <DatapointRow
-              device={device}
-              unit={unit}
-              datapoint={datapoint}
-              onDelete={onUpdate}
-              onEdit={() => setDpToEdit(datapoint)}
-              useHexFormat={useHexFormat}
-            />
-          ))}
+          {unit.dataPoints
+            ?.filter((dp) => !area || dp.areas.includes(area))
+            .map((datapoint) => (
+              <DatapointRow
+                device={device}
+                unit={unit}
+                datapoint={datapoint}
+                onDelete={onUpdate}
+                onEdit={() => setDpToEdit(datapoint)}
+                useHexFormat={useHexFormat}
+              />
+            ))}
         </Table.Body>
       </Table.Root>
     </>

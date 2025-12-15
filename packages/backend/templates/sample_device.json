@@ -1,5 +1,4 @@
 {
-  "filename": "sample_device.json",
   "enabled": true,
   "port": 502,
   "endian": "BigEndian",
@@ -226,6 +225,11 @@
           "defaultValue": "Sample String",
           "name": "Sample Holding Register 10",
           "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
           "length": 7
         },
         {

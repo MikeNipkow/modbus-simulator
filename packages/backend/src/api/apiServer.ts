@@ -9,6 +9,7 @@ import {
   startDeviceRoute,
   stopDeviceRoute,
   updateDeviceRoute,
+  uploadTemplateRoute,
 } from "./controllers/deviceController.js";
 import {
   createUnitRoute,
@@ -25,6 +26,7 @@ import {
   updateDataPointRoute,
 } from "./controllers/dataPointController.js";
 import { getVersionRoute } from "./controllers/serverController.js";
+import multer from "multer";
 
 export function initializeApiServer() {
   const app = express();
@@ -41,6 +43,9 @@ export function initializeApiServer() {
     res.set("Expires", "0");
     next();
   });
+
+  // Multer setup for file uploads to RAM.
+  const upload = multer({ storage: multer.memoryStorage() });
 
   // Routes
   app.get("/api/v1/version", getVersionRoute);
@@ -83,6 +88,11 @@ export function initializeApiServer() {
   );
 
   app.get("/api/v1/templates", getDevicesRoute);
+  app.post(
+    "/api/v1/templates/upload",
+    upload.single("file"),
+    uploadTemplateRoute,
+  );
   app.get("/api/v1/templates/:id", getDeviceRoute);
   app.get("/api/v1/templates/:id/download", downloadDeviceRoute);
   app.post("/api/v1/templates", createDeviceRoute);

@@ -1,18 +1,21 @@
-import { isValidFilename } from "@/util/fileUtils";
 import {
   Field,
-  Input,
-  Text,
   VStack,
   NativeSelect,
-  InputGroup,
+  FileUpload,
+  Button,
+  type FileUploadFileAcceptDetails,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import { useCreateDevice } from "@/hooks/device/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Endian } from "@/types/enums/Endian";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
+import { uploadTemplateFile } from "@/services/uploadService";
 import BaseDialog from "../../ui/dialogs/base/BaseDialog";
+import { HiUpload } from "react-icons/hi";
+import LabeledSeparator from "@/components/ui/LabeledSeparator";
+import FilenameInput from "@/components/ui/FilenameInput";
 
 interface Props {
   template: boolean;
@@ -22,37 +25,26 @@ interface Props {
 }
 
 const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
+  // State to manage filename input.
   const [filename, setFilename] = useState("");
+  // State to manage filename validity.
+  const [filenameValid, setFilenameValid] = useState(false);
+  // State to manage selected template.
   const [selectedTemplate, setSelectedTemplate] = useState<ModbusDevice | null>(
     null,
   );
-  const [error, setError] = useState("");
 
+  // Hook for creating device.
   const { createDevice, isLoading, errors } = useCreateDevice();
 
-  const hasFilenameError = (): boolean => error !== "";
-
-  /**
-   * Validate filename and set error state
-   * @param value Filename to validate
-   * @return Boolean indicating if filename is valid
-   */
-  const validateFilename = (value: string): boolean => {
-    let error = "";
-    if (value.trim() == ".json") error = "Filename cannot be empty";
-    else if (!isValidFilename(value)) error = "Invalid filename";
-    else if (!value.endsWith(".json")) error = 'Filename must end with ".json"';
-
-    setError(error);
-    return error !== "" ? false : true;
-  };
+  const { uploadFile, errors: uploadErrors } = uploadTemplateFile();
 
   const handleSubmit = async () => {
+    // Check if filename is valid.
+    if (!filenameValid) return;
+
     // Append .json extension to filename.
     const filenameWithExtension = filename + ".json";
-
-    // Check if filename is valid.
-    if (!validateFilename(filenameWithExtension)) return;
 
     // Create device object.
     let device: ModbusDevice;
@@ -90,6 +82,25 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
         });
   };
 
+  const handleFileUpload = async (details: FileUploadFileAcceptDetails) => {
+    // Handle file upload.
+    const device = await uploadFile(details.files[0]);
+
+    // Close dialog on success.
+    if (device !== null) onClose(device.filename);
+
+    // Show toaster notification.
+    device !== null
+      ? createSuccessToast({
+          title: "Template uploaded",
+          description: `Successfully uploaded template "${device.filename}".`,
+        })
+      : createErrorToast({
+          title: "Failed to upload template",
+          description: uploadErrors,
+        });
+  };
+
   return (
     <BaseDialog
       title={"Add " + (template ? "Template" : "Device")}
@@ -98,67 +109,63 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
       onSubmit={handleSubmit}
       loading={isLoading}
       loadingText="Saving..."
-      submitDisabled={hasFilenameError()}
+      submitDisabled={!filenameValid}
     >
       <VStack gap={4}>
         {/* Filename input */}
-        <Field.Root invalid={hasFilenameError()}>
-          <Field.Label>
-            Filename
-            <Text color="red">*</Text>
-          </Field.Label>
-          <InputGroup endAddon=".json">
-            <Input
-              value={filename}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                const value = e.target.value;
-                if (value.length > 0 && value.trim().length === 0) return;
-
-                setFilename(value);
-                if (e.target.value.length > 0)
-                  validateFilename(e.target.value + ".json");
-              }}
-              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-                if (e.key === " ") e.key = "_";
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleSubmit();
-                }
-              }}
-              placeholder="e.g. my_device.json"
-            />
-          </InputGroup>
-          {hasFilenameError() && (
-            <Field.ErrorText color="red.600">{error}</Field.ErrorText>
-          )}
-        </Field.Root>
+        <FilenameInput
+          filename={filename}
+          onChange={({ filename, valid }) => {
+            setFilename(filename);
+            setFilenameValid(valid);
+          }}
+          onSubmit={handleSubmit}
+        />
         {/* Template selection (optional) */}
-        {true && (
-          <Field.Root>
-            <Field.Label>Template (Optional)</Field.Label>
-            <NativeSelect.Root>
-              <NativeSelect.Field
-                value={selectedTemplate?.filename || ""}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                  const templateFilename = e.target.value;
-                  const template = templates?.find(
-                    (t) => t.filename === templateFilename,
-                  );
-                  setSelectedTemplate(template || null);
-                }}
-                focusRingColor="primary"
-              >
-                <option value="">-- Select a template --</option>
-                {templates?.map((template) => (
-                  <option key={template.filename} value={template.filename}>
-                    {template.filename}
-                  </option>
-                ))}
-              </NativeSelect.Field>
-            </NativeSelect.Root>
-          </Field.Root>
-        )}
+        <Field.Root>
+          <Field.Label>Template (Optional)</Field.Label>
+          <NativeSelect.Root>
+            <NativeSelect.Field
+              value={selectedTemplate?.filename || ""}
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                const templateFilename = e.target.value;
+                const template = templates?.find(
+                  (t) => t.filename === templateFilename,
+                );
+                setSelectedTemplate(template || null);
+              }}
+              focusRingColor="primary"
+            >
+              <option value="">-- Select a template --</option>
+              {templates?.map((template) => (
+                <option key={template.filename} value={template.filename}>
+                  {template.filename}
+                </option>
+              ))}
+            </NativeSelect.Field>
+          </NativeSelect.Root>
+        </Field.Root>
       </VStack>
+
+      {/* Upload button */}
+      {template && (
+        <>
+          <LabeledSeparator label="OR" />
+          <VStack width="100%" align="center">
+            <FileUpload.Root
+              accept={["application/json"]}
+              onFileAccept={handleFileUpload}
+            >
+              <FileUpload.HiddenInput />
+              <FileUpload.Trigger asChild>
+                <Button variant="outline" size="sm" mx="auto">
+                  <HiUpload /> Upload file
+                </Button>
+              </FileUpload.Trigger>
+            </FileUpload.Root>
+          </VStack>
+        </>
+      )}
     </BaseDialog>
   );
 };
