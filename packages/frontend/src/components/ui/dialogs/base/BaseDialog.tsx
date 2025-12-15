@@ -5,6 +5,7 @@ import DialogFooter from "./DialogFooter";
 interface Props {
   open: boolean;
   title?: string;
+  submitDisabled?: boolean;
   onClose?: () => void;
   onSubmit?: () => void;
   placement?: "center" | "top" | "bottom";
@@ -28,6 +29,7 @@ interface Props {
 const BaseDialog = ({
   open,
   title,
+  submitDisabled,
   onClose,
   onSubmit,
   placement,
@@ -77,6 +79,7 @@ const BaseDialog = ({
             confirmBtnLabel={confirmBtnLabel}
             confirmBtnVariant={confirmBtnVariant}
             confirmBtnColorPalette={confirmBtnColorPalette}
+            submitDisabled={submitDisabled}
             onClose={() => onClose?.()}
             onSubmit={() => onSubmit?.()}
             loading={loading}

@@ -2,7 +2,7 @@ import DatapointEditDialog from "@/components/editor/datapoint/DatapointEditDial
 import type { DataPoint } from "@/types/DataPoint";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import type { ModbusUnit } from "@/types/ModbusUnit";
-import { Table } from "@chakra-ui/react";
+import { Badge, Button, HStack, Table } from "@chakra-ui/react";
 import { useState } from "react";
 import DatapointRow from "./DatapointRow";
 
@@ -15,6 +15,9 @@ interface Props {
 const DatapointTable = ({ device, unit, onUpdate }: Props) => {
   // State to manage the datapoint being edited.
   const [dpToEdit, setDpToEdit] = useState<DataPoint | null>(null);
+
+  // State to manage hex format usage.
+  const [useHexFormat, setUseHexFormat] = useState(false);
 
   return (
     <>
@@ -43,10 +46,23 @@ const DatapointTable = ({ device, unit, onUpdate }: Props) => {
         <Table.Header background={"bg.darker"} height={"50px"}>
           {/* Row Headers */}
           <Table.Row>
-            <Table.ColumnHeader>Name</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight={"bold"}>Name</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Type</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Area</Table.ColumnHeader>
-            <Table.ColumnHeader fontWeight={"bold"}>Address</Table.ColumnHeader>
+            <Table.ColumnHeader fontWeight={"bold"}>
+              <HStack gap={0}>
+                Address
+                <Button
+                  padding={1}
+                  variant={"ghost"}
+                  onClick={() => setUseHexFormat(!useHexFormat)}
+                >
+                  <Badge colorPalette={useHexFormat ? "yellow" : "green"}>
+                    {useHexFormat ? "HEX" : "DEC"}
+                  </Badge>
+                </Button>
+              </HStack>
+            </Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Value</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Unit</Table.ColumnHeader>
             <Table.ColumnHeader fontWeight={"bold"}>Access</Table.ColumnHeader>
@@ -63,6 +79,7 @@ const DatapointTable = ({ device, unit, onUpdate }: Props) => {
               datapoint={datapoint}
               onDelete={onUpdate}
               onEdit={() => setDpToEdit(datapoint)}
+              useHexFormat={useHexFormat}
             />
           ))}
         </Table.Body>

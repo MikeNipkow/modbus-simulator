@@ -9,9 +9,6 @@ export const buttonRecipe = defineRecipe({
         _hover: {
           bg: "primary.hover",
         },
-        _active: {
-          fontWeight: "bold",
-        },
         _focus: {
           focusRingColor: "primary",
         },
@@ -23,7 +20,6 @@ export const buttonRecipe = defineRecipe({
           bg: "blackAlpha.50",
         },
         _active: {
-          fontWeight: "bold",
           color: "primary",
         },
       },

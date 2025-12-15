@@ -1,5 +1,12 @@
 import { isValidFilename } from "@/util/fileUtils";
-import { Field, Input, Text, VStack, NativeSelect } from "@chakra-ui/react";
+import {
+  Field,
+  Input,
+  Text,
+  VStack,
+  NativeSelect,
+  InputGroup,
+} from "@chakra-ui/react";
 import { useState } from "react";
 import { useCreateDevice } from "@/hooks/device/useCreateDevice";
 import type { ModbusDevice } from "@/types/ModbusDevice";
@@ -32,7 +39,8 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
    */
   const validateFilename = (value: string): boolean => {
     let error = "";
-    if (!isValidFilename(value)) error = "Invalid filename";
+    if (value.trim() == ".json") error = "Filename cannot be empty";
+    else if (!isValidFilename(value)) error = "Invalid filename";
     else if (!value.endsWith(".json")) error = 'Filename must end with ".json"';
 
     setError(error);
@@ -40,17 +48,21 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
   };
 
   const handleSubmit = async () => {
+    // Append .json extension to filename.
+    const filenameWithExtension = filename + ".json";
+
     // Check if filename is valid.
-    if (!validateFilename(filename)) return;
+    if (!validateFilename(filenameWithExtension)) return;
 
     // Create device object.
     let device: ModbusDevice;
 
     // If a template is selected, use it as a base.
-    if (selectedTemplate) device = { ...selectedTemplate, filename: filename };
+    if (selectedTemplate)
+      device = { ...selectedTemplate, filename: filenameWithExtension };
     else
       device = {
-        filename: filename,
+        filename: filenameWithExtension,
         port: 502,
         enabled: false,
         running: false,
@@ -86,6 +98,7 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
       onSubmit={handleSubmit}
       loading={isLoading}
       loadingText="Saving..."
+      submitDisabled={hasFilenameError()}
     >
       <VStack gap={4}>
         {/* Filename input */}
@@ -94,21 +107,27 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
             Filename
             <Text color="red">*</Text>
           </Field.Label>
-          <Input
-            value={filename}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-              setFilename(e.target.value);
-              if (e.target.value.length > 0) validateFilename(e.target.value);
-              else setError("");
-            }}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleSubmit();
-              }
-            }}
-            placeholder="e.g. my_device.json"
-          />
+          <InputGroup endAddon=".json">
+            <Input
+              value={filename}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const value = e.target.value;
+                if (value.length > 0 && value.trim().length === 0) return;
+
+                setFilename(value);
+                if (e.target.value.length > 0)
+                  validateFilename(e.target.value + ".json");
+              }}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === " ") e.key = "_";
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleSubmit();
+                }
+              }}
+              placeholder="e.g. my_device.json"
+            />
+          </InputGroup>
           {hasFilenameError() && (
             <Field.ErrorText color="red.600">{error}</Field.ErrorText>
           )}

@@ -87,6 +87,12 @@ const Sidebar = ({
           {devices.map((device) => (
             <SidebarButton
               variant="secondary"
+              fontWeight={
+                isDeviceSelected() &&
+                selectedDevice?.filename === device.filename
+                  ? "bold"
+                  : undefined
+              }
               onClick={() => onDeviceSelect(device)}
               data-active={
                 isDeviceSelected() &&
@@ -121,6 +127,12 @@ const Sidebar = ({
             <SidebarButton
               variant="secondary"
               onClick={() => onDeviceSelect(template)}
+              fontWeight={
+                isTemplateSelected() &&
+                selectedDevice?.filename === template.filename
+                  ? "bold"
+                  : undefined
+              }
               data-active={
                 isTemplateSelected() &&
                 selectedDevice?.filename === template.filename

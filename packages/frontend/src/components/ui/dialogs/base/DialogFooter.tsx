@@ -13,6 +13,7 @@ interface Props {
     | "primary"
     | "secondary";
   confirmBtnColorPalette?: string;
+  submitDisabled?: boolean;
   onClose?: () => void;
   onSubmit?: () => void;
   loading?: boolean;
@@ -24,6 +25,7 @@ const DialogFooter = ({
   confirmBtnLabel,
   confirmBtnVariant,
   confirmBtnColorPalette,
+  submitDisabled,
   onClose,
   onSubmit,
   loading,
@@ -48,6 +50,7 @@ const DialogFooter = ({
           colorPalette={confirmBtnColorPalette || undefined}
           size="xl"
           onClick={() => onSubmit?.()}
+          disabled={submitDisabled}
         >
           {confirmBtnLabel || "Confirm"}
         </Button>

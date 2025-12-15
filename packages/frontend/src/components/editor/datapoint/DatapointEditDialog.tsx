@@ -4,7 +4,7 @@ import useUpdateDatapoint from "@/hooks/datapoint/useUpdateDatapoint";
 import { useState } from "react";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import { Box, Checkbox, Field, HStack, Input } from "@chakra-ui/react";
+import { Box, Checkbox, Field, HStack, Input, VStack } from "@chakra-ui/react";
 import { DataType } from "@/types/enums/DataType";
 import { DataArea } from "@/types/enums/DataArea";
 import { AccessMode } from "@/types/enums/AccessMode";
@@ -213,42 +213,48 @@ const DatapointEditDialog = ({
           {editDatapoint.type !== DataType.ASCII && (
             <>
               <LabeledSeparator label="Simulation" />
-              {/* Simulation active */}
-              <Field.Root>
-                <Checkbox.Root
-                  checked={editDatapoint.simulation?.enabled}
-                  onCheckedChange={({ checked }) =>
-                    setField("simulation", {
-                      ...editDatapoint.simulation,
-                      enabled: checked,
-                    })
-                  }
-                >
-                  <Checkbox.HiddenInput />
-                  <Checkbox.Control />
-                  <Checkbox.Label>Active</Checkbox.Label>
-                </Checkbox.Root>
-              </Field.Root>
+              <VStack gap={4}>
+                {/* Simulation active */}
+                <Field.Root>
+                  <Checkbox.Root
+                    checked={editDatapoint.simulation?.enabled}
+                    onCheckedChange={({ checked }) =>
+                      setField("simulation", {
+                        ...editDatapoint.simulation,
+                        enabled: checked,
+                      })
+                    }
+                  >
+                    <Checkbox.HiddenInput />
+                    <Checkbox.Control />
+                    <Checkbox.Label>Active</Checkbox.Label>
+                  </Checkbox.Root>
+                </Field.Root>
+
+                {/* Edit simulation range for number types */}
+                {editDatapoint.type !== DataType.Bool &&
+                  editDatapoint.simulation?.enabled && (
+                    <HStack width="100%">
+                      {/* Min Value */}
+                      <MinValueInput
+                        datapoint={editDatapoint}
+                        onChange={(newDatapoint) =>
+                          setEditDatapoint(newDatapoint)
+                        }
+                      />
+
+                      {/* Max Value */}
+                      <MaxValueInput
+                        datapoint={editDatapoint}
+                        onChange={(newDatapoint) =>
+                          setEditDatapoint(newDatapoint)
+                        }
+                      />
+                    </HStack>
+                  )}
+              </VStack>
             </>
           )}
-
-          {/* Edit simulation range for number types */}
-          {editDatapoint.type !== DataType.Bool &&
-            editDatapoint.simulation?.enabled && (
-              <HStack>
-                {/* Min Value */}
-                <MinValueInput
-                  datapoint={editDatapoint}
-                  onChange={(newDatapoint) => setEditDatapoint(newDatapoint)}
-                />
-
-                {/* Max Value */}
-                <MaxValueInput
-                  datapoint={editDatapoint}
-                  onChange={(newDatapoint) => setEditDatapoint(newDatapoint)}
-                />
-              </HStack>
-            )}
 
           {/* Feedback Datapoint */}
           {editDatapoint.accessMode !== AccessMode.ReadOnly && (
