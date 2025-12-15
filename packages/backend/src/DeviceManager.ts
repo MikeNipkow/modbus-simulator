@@ -56,12 +56,23 @@ export class DeviceManager {
    * @param device The ModbusDevice instance to add.
    * @returns True if the device was added successfully, false if a device with the same filename already exists.
    */
-  public addDevice(filename: string, device: ModbusDevice): boolean {
+  public addDevice(
+    filename: string,
+    device: ModbusDevice,
+    startServer?: boolean,
+  ): boolean {
     // Check if device with the same filename already exists.
     if (this.hasDevice(filename)) return false;
 
     // Add device to map.
     this.devices.set(filename, device);
+
+    // Enable simulation if configured.
+    if (startServer) device.startAllEnabledSimulations();
+
+    // Start the Modbus server if requested.
+    if (startServer && device.isEnabled()) device.startServer();
+
     return true;
   }
 
@@ -189,7 +200,7 @@ export class DeviceManager {
         messages.push("");
 
         // Enable simulation if configured.
-        device.startAllEnabledSimulations();
+        if (startServer) device.startAllEnabledSimulations();
 
         // Start the Modbus server if requested.
         if (startServer && device.isEnabled()) {

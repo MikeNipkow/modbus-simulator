@@ -26,10 +26,16 @@ import ChangeUnitIdDialog from "./ChangeUnitIdDialog";
 interface Props {
   device: ModbusDevice;
   unit: ModbusUnit;
+  allowPolling?: boolean;
   onUpdate?: () => void;
 }
 
-const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
+const UnitConfigurationCard = ({
+  device,
+  unit,
+  allowPolling,
+  onUpdate,
+}: Props) => {
   // State to manage collapsible card.
   const [isOpen, setOpen] = useState(device.modbusUnits?.length === 1);
   // State to manage dialog visibility for editing unit ID.
@@ -39,31 +45,27 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
     useState(false);
 
   // Hook for deleting unit.
-  const {
-    deleteUnit,
-    isLoading: isDeleting,
-    errors: deleteErrors,
-  } = useDeleteUnit();
+  const { deleteUnit, isLoading: isDeleting } = useDeleteUnit();
 
   /**
    * Handle deleting the unit.
    */
   const handleDelete = async () => {
     // Call delete unit hook.
-    const success = await deleteUnit(device, unit.unitId);
+    const result = await deleteUnit(device, unit.unitId);
 
     // Update UI based on result.
-    if (success) onUpdate?.();
+    if (result.success) onUpdate?.();
 
     // Show toast notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Unit deleted",
           description: `Modbus unit with ID ${unit.unitId} has been deleted.`,
         })
       : createErrorToast({
           title: "Failed to delete unit",
-          description: deleteErrors,
+          description: result.errors,
         });
   };
 
@@ -117,16 +119,17 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
                 <Button
                   size="lg"
                   variant="ghost"
+                  color={"blackAlpha.700"}
                   onClick={() => setIdEditDialogOpen(true)}
                 >
                   <Icon as={FaEdit} boxSize={4} />
                 </Button>
-
-                {/* Show amount of datapoints in this unit */}
-                <Badge size={"lg"} colorPalette={"blue"}>
-                  {unit.dataPoints?.length} Datapoints
-                </Badge>
               </HStack>
+
+              {/* Show amount of datapoints in this unit */}
+              <Badge size={"lg"} colorPalette={"blue"}>
+                {unit.dataPoints?.length} Datapoints
+              </Badge>
 
               {/* Right side */}
               <HStack>
@@ -157,7 +160,12 @@ const UnitConfigurationCard = ({ device, unit, onUpdate }: Props) => {
         {/* Body */}
         {isOpen && (
           <Card.Body>
-            <DatapointTable device={device} unit={unit} onUpdate={onUpdate} />
+            <DatapointTable
+              device={device}
+              unit={unit}
+              allowPolling={allowPolling}
+              onUpdate={onUpdate}
+            />
           </Card.Body>
         )}
       </Card.Root>

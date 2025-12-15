@@ -26,7 +26,7 @@ const ChangeUnitIdDialog = ({
   const [newUnitId, setNewUnitId] = useState<number>(unit.unitId);
 
   // Hook for updating unit.
-  const { updateUnit, isLoading, errors } = useUpdateUnit();
+  const { updateUnit, isLoading } = useUpdateUnit();
 
   /**
    * Handle changing the unit ID.
@@ -39,23 +39,23 @@ const ChangeUnitIdDialog = ({
     }
 
     // Call update unit hook.
-    const success = await updateUnit(unit.unitId, device, {
+    const result = await updateUnit(unit.unitId, device, {
       ...unit,
       unitId: newUnitId,
     });
 
     // Notify parent component to refresh data.
-    if (success) onChange?.();
+    if (result.success) onChange?.();
 
     // Show toast notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Unit ID changed",
           description: `Modbus unit ID has been changed to ${newUnitId}.`,
         })
       : createErrorToast({
           title: "Failed to change Unit ID",
-          description: errors,
+          description: result.errors,
         });
   };
 

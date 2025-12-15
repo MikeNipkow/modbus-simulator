@@ -132,13 +132,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
    * @returns A promise that resolves with the result of the enable attempt and a message.
    */
   public enableServer(): Promise<{ success: boolean; message: string }> {
-    // Check if server is already enabled.
-    if (this.enabled)
-      return Promise.resolve({
-        success: false,
-        message: `Modbus server on device '${this.name}' is already enabled`,
-      });
-
     this.enabled = true;
 
     // Start server.
@@ -150,13 +143,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
    * @returns A promise that resolves with the result of the disable attempt and a message.
    */
   public disableServer(): Promise<{ success: boolean; message: string }> {
-    // Check if server is already disabled.
-    if (!this.enabled)
-      return Promise.resolve({
-        success: false,
-        message: `Modbus server on device '${this.name}' is already disabled`,
-      });
-
     this.enabled = false;
 
     // Stop server.

@@ -1,4 +1,4 @@
-import { VStack, Separator } from "@chakra-ui/react";
+import { VStack, Separator, HStack, Badge, Text } from "@chakra-ui/react";
 import { FaBook, FaHome, FaNetworkWired, FaPlus } from "react-icons/fa";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { useState } from "react";
@@ -102,7 +102,12 @@ const Sidebar = ({
               }
               key={device.filename}
             >
-              {device.filename}
+              <HStack width="100%" justify={"space-between"}>
+                <Text overflow={"hidden"}>{device.filename}</Text>
+                <Badge hidden={!device.running} colorPalette={"green"}>
+                  {"Running"}
+                </Badge>
+              </HStack>
             </SidebarButton>
           ))}
         </SidebarDropdownButton>

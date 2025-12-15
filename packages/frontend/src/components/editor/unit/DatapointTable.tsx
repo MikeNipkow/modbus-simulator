@@ -5,16 +5,15 @@ import type { ModbusUnit } from "@/types/ModbusUnit";
 import { Badge, Button, HStack, Table } from "@chakra-ui/react";
 import { useState } from "react";
 import DatapointRow from "./DatapointRow";
-import type { DataArea } from "@/types/enums/DataArea";
 
 interface Props {
   device: ModbusDevice;
   unit: ModbusUnit;
-  area?: DataArea;
+  allowPolling?: boolean;
   onUpdate?: () => void;
 }
 
-const DatapointTable = ({ device, unit, area, onUpdate }: Props) => {
+const DatapointTable = ({ device, unit, allowPolling, onUpdate }: Props) => {
   // State to manage the datapoint being edited.
   const [dpToEdit, setDpToEdit] = useState<DataPoint | null>(null);
 
@@ -75,7 +74,7 @@ const DatapointTable = ({ device, unit, area, onUpdate }: Props) => {
         {/* Map rows */}
         <Table.Body>
           {unit.dataPoints
-            ?.filter((dp) => !area || dp.areas.includes(area))
+            ?.sort((dpA, dpB) => dpA.address - dpB.address)
             .map((datapoint) => (
               <DatapointRow
                 device={device}
@@ -84,6 +83,7 @@ const DatapointTable = ({ device, unit, area, onUpdate }: Props) => {
                 onDelete={onUpdate}
                 onEdit={() => setDpToEdit(datapoint)}
                 useHexFormat={useHexFormat}
+                allowPolling={allowPolling}
               />
             ))}
         </Table.Body>

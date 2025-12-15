@@ -9,7 +9,10 @@ export const useUploadTemplate = () => {
 
   const uploadTemplateFile = async (
     file: File,
-  ): Promise<ModbusDevice | null> => {
+  ): Promise<
+    | { success: true; device: ModbusDevice }
+    | { success: false; errors: string[] }
+  > => {
     setIsLoading(true);
     setErrors([]);
     setDevice(null);
@@ -22,13 +25,13 @@ export const useUploadTemplate = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
       setDevice(response.data);
-      return response.data; // Success
+      return { success: true, device: response.data }; // Success
     } catch (err: any) {
       const errorMessage = err.response?.data?.errors || [
         err.message || "Unknown error",
       ];
       setErrors(errorMessage);
-      return null; // Failure
+      return { success: false, errors: errorMessage }; // Failure
     } finally {
       setIsLoading(false);
     }

@@ -10,7 +10,6 @@ import {
 } from "../mapper/ModbusDeviceDTOMapper.js";
 import { DeviceManager } from "../../DeviceManager.js";
 import fs from "fs";
-import { ModbusDeviceProps } from "../../types/ModbusDeviceProps.js";
 import { deviceFromObject } from "../../mapper/ModbusDeviceMapper.js";
 
 /**
@@ -176,7 +175,11 @@ export const createDeviceRoute = (req: Request, res: Response) => {
 
   // Create new device.
   const device = new ModbusDevice(deviceDTO);
-  const addResult = deviceManager.addDevice(filename, device);
+  const addResult = deviceManager.addDevice(
+    filename,
+    device,
+    isDeviceEndpoint(req),
+  );
   if (!addResult) {
     res
       .status(500)
@@ -269,10 +272,18 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
   }
 
   // Try to add new device.
-  const addResult = deviceManager.addDevice(newDevice.getFilename(), newDevice);
+  const addResult = deviceManager.addDevice(
+    newDevice.getFilename(),
+    newDevice,
+    isDeviceEndpoint(req),
+  );
   if (!addResult) {
     // Try to add the old device back.
-    deviceManager.addDevice(device.getFilename(), device);
+    deviceManager.addDevice(
+      device.getFilename(),
+      device,
+      isDeviceEndpoint(req),
+    );
     if (wasRunning) await device.startServer();
 
     // Save old device.

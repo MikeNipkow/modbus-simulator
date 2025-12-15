@@ -15,7 +15,7 @@ import BaseDialog from "../../ui/dialogs/base/BaseDialog";
 import { HiUpload } from "react-icons/hi";
 import LabeledSeparator from "@/components/ui/LabeledSeparator";
 import FilenameInput from "@/components/ui/FilenameInput";
-import { useUploadTemplate } from "@/services/uploadService";
+import { useUploadTemplate } from "@/hooks/device/useUploadTemplate";
 
 interface Props {
   template: boolean;
@@ -35,9 +35,9 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
   );
 
   // Hook for creating device.
-  const { createDevice, isLoading, errors } = useCreateDevice();
+  const { createDevice, isLoading } = useCreateDevice();
 
-  const { uploadTemplateFile, errors: uploadErrors } = useUploadTemplate();
+  const { uploadTemplateFile } = useUploadTemplate();
 
   const handleSubmit = async () => {
     // Check if filename is valid.
@@ -63,13 +63,13 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
       };
 
     // Call create device hook.
-    const success = await createDevice(device, template);
+    const result = await createDevice(device, template);
 
     // Close dialog on success.
-    if (success) onClose(filename);
+    if (result.success) onClose(filenameWithExtension);
 
     // Show toaster notification.
-    success
+    result.success
       ? createSuccessToast({
           title: template ? "Template created" : "Device created",
           description: `Successfully created ${template ? "template" : "device"} "${device.filename}".`,
@@ -78,26 +78,26 @@ const AddDeviceDialog = ({ template, open, onClose, templates }: Props) => {
           title: template
             ? "Failed to create template"
             : "Failed to create device",
-          description: errors,
+          description: result.errors,
         });
   };
 
   const handleFileUpload = async (details: FileUploadFileAcceptDetails) => {
     // Handle file upload.
-    const device = await uploadTemplateFile(details.files[0]);
+    const result = await uploadTemplateFile(details.files[0]);
 
     // Close dialog on success.
-    if (device !== null) onClose(device.filename);
+    if (result.success) onClose(result.device.filename);
 
     // Show toaster notification.
-    device !== null
+    result.success
       ? createSuccessToast({
           title: "Template uploaded",
-          description: `Successfully uploaded template "${device.filename}".`,
+          description: `Successfully uploaded template "${result.device.filename}".`,
         })
       : createErrorToast({
           title: "Failed to upload template",
-          description: uploadErrors,
+          description: result.errors,
         });
   };
 

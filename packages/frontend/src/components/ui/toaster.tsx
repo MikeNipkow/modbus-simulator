@@ -14,7 +14,7 @@ export const toaster = createToaster({
 });
 
 export const createToast = (data: Options<any>) => {
-  toaster.create({ closable: true, ...data });
+  toaster.create({ ...data, closable: true });
 };
 
 export const createSuccessToast = (data: Options<any>) => {
@@ -22,7 +22,7 @@ export const createSuccessToast = (data: Options<any>) => {
 };
 
 export const createErrorToast = (data: Options<any>) => {
-  toaster.create({ type: "error", ...data });
+  createToast({ type: "error", ...data });
 };
 
 export const Toaster = () => {

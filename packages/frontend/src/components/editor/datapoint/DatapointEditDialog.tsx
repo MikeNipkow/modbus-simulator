@@ -54,16 +54,10 @@ const DatapointEditDialog = ({
   const [showAdvancedSettings, setShowAdvancedSettings] = useState(false);
 
   // Custom hooks for creating and updating datapoints.
-  const {
-    updateDatapoint,
-    isLoading: updatingDatapoint,
-    errors: updateErrors,
-  } = useUpdateDatapoint();
-  const {
-    createDatapoint,
-    isLoading: creatingDatapoint,
-    errors: createErrors,
-  } = useCreateDatapoint();
+  const { updateDatapoint, isLoading: updatingDatapoint } =
+    useUpdateDatapoint();
+  const { createDatapoint, isLoading: creatingDatapoint } =
+    useCreateDatapoint();
 
   // Helper function to set a field in the editDatapoint state.
   const setField = (field: keyof DataPoint, value: any) => {
@@ -78,17 +72,17 @@ const DatapointEditDialog = ({
   // Handle updating an existing datapoint.
   const handleUpdate = async () => {
     // Call the update function from the hook.
-    const success = await updateDatapoint(device, unit.unitId, editDatapoint);
+    const result = await updateDatapoint(device, unit.unitId, editDatapoint);
 
     // If successful, close the dialog and indicate an update occurred.
-    if (success) onClose?.(true);
+    if (result.success) onClose?.(true);
 
     // Show appropriate toast notification.
-    success
+    result.success
       ? createSuccessToast({ title: "Datapoint updated" })
       : createErrorToast({
           title: "Failed to update datapoint",
-          description: updateErrors,
+          description: result.errors,
         });
   };
 
@@ -108,17 +102,17 @@ const DatapointEditDialog = ({
         editDatapoint.areas[0] + "_" + editDatapoint.address + "_" + i;
 
     // Call the update function from the hook.
-    const success = await createDatapoint(device, unit.unitId, editDatapoint);
+    const result = await createDatapoint(device, unit.unitId, editDatapoint);
 
     // If successful, close the dialog and indicate an update occurred.
-    if (success) onClose?.(true);
+    if (result.success) onClose?.(true);
 
     // Show appropriate toast notification.
-    success
+    result.success
       ? createSuccessToast({ title: "Datapoint created" })
       : createErrorToast({
           title: "Failed to create datapoint",
-          description: createErrors,
+          description: result.errors,
         });
   };
 

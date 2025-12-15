@@ -1,6 +1,5 @@
 import apiClient from "@/services/apiClient";
 import type { ModbusDevice } from "@/types/ModbusDevice";
-import type { ModbusUnit } from "@/types/ModbusUnit";
 import { useState } from "react";
 
 export const useDeleteUnit = () => {
@@ -10,7 +9,7 @@ export const useDeleteUnit = () => {
   const deleteUnit = async (
     device: ModbusDevice,
     unitId: number,
-  ): Promise<boolean> => {
+  ): Promise<{ success: true } | { success: false; errors: string[] }> => {
     setIsLoading(true);
     setErrors([]);
 
@@ -18,13 +17,13 @@ export const useDeleteUnit = () => {
       const deviceTypeEndpoint = device.template ? "templates" : "devices";
       const endpoint = `/${deviceTypeEndpoint}/${device.filename}/units/${unitId}`;
       await apiClient.delete(endpoint);
-      return true; // Success
+      return { success: true }; // Success
     } catch (err: any) {
       const errorMessage = err.response?.data?.errors || [
         err.message || "Unknown error",
       ];
       setErrors(errorMessage);
-      return false; // Failure
+      return { success: false, errors: errorMessage }; // Failure
     } finally {
       setIsLoading(false);
     }

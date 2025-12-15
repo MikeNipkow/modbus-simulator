@@ -11,7 +11,9 @@ export const useCreateUnit = () => {
   const createUnit = async (
     device: ModbusDevice,
     unitId: number,
-  ): Promise<boolean> => {
+  ): Promise<
+    { success: true; unit: ModbusUnit } | { success: false; errors: string[] }
+  > => {
     setIsLoading(true);
     setErrors([]);
     setUnit(null);
@@ -23,13 +25,13 @@ export const useCreateUnit = () => {
       const endpoint = `/${deviceTypeEndpoint}/${device.filename}/units`;
       const response = await apiClient.post(endpoint, unit);
       setUnit(response.data);
-      return true; // Success
+      return { success: true, unit: response.data }; // Success
     } catch (err: any) {
       const errorMessage = err.response?.data?.errors || [
         err.message || "Unknown error",
       ];
       setErrors(errorMessage);
-      return false; // Failure
+      return { success: false, errors: errorMessage }; // Failure
     } finally {
       setIsLoading(false);
     }

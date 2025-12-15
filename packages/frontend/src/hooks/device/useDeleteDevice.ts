@@ -6,7 +6,9 @@ export const useDeleteDevice = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const deleteDevice = async (device: ModbusDevice): Promise<boolean> => {
+  const deleteDevice = async (
+    device: ModbusDevice,
+  ): Promise<{ success: true } | { success: false; errors: string[] }> => {
     setIsLoading(true);
     setErrors([]);
 
@@ -14,13 +16,13 @@ export const useDeleteDevice = () => {
       const endpoint =
         (device.template ? "/templates" : "/devices") + `/${device.filename}`;
       await apiClient.delete(endpoint);
-      return true; // Success
+      return { success: true }; // Success
     } catch (err: any) {
       const errorMessage = err.response?.data?.errors || [
         err.message || "Unknown error",
       ];
       setErrors(errorMessage);
-      return false; // Failure
+      return { success: false, errors: errorMessage }; // Failure
     } finally {
       setIsLoading(false);
     }

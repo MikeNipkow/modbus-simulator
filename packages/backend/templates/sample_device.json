@@ -27,24 +27,6 @@
           }
         },
         {
-          "id": "sample_coil_2",
-          "areas": [
-            "Coil"
-          ],
-          "type": "Bool",
-          "address": 1,
-          "accessMode": "RW",
-          "defaultValue": true,
-          "name": "Sample Coil 2",
-          "unit": "Sample Unit",
-          "simulation": {
-            "enabled": false,
-            "minValue": 0,
-            "maxValue": 1
-          },
-          "feedbackDataPoint": "sample_discreteInput_1"
-        },
-        {
           "id": "sample_discreteInput_1",
           "areas": [
             "DiscreteInput"
@@ -77,6 +59,41 @@
             "minValue": 0,
             "maxValue": 1
           }
+        },
+        {
+          "id": "sample_inputRegister_1",
+          "areas": [
+            "InputRegister"
+          ],
+          "type": "Float32",
+          "address": 0,
+          "accessMode": "RO",
+          "defaultValue": 0,
+          "name": "Sample Input Register 1: Feedback Setpoint P",
+          "unit": "%",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          }
+        },
+        {
+          "id": "sample_coil_2",
+          "areas": [
+            "Coil"
+          ],
+          "type": "Bool",
+          "address": 1,
+          "accessMode": "RW",
+          "defaultValue": true,
+          "name": "Sample Coil 2",
+          "unit": "Sample Unit",
+          "simulation": {
+            "enabled": false,
+            "minValue": 0,
+            "maxValue": 1
+          },
+          "feedbackDataPoint": "sample_discreteInput_1"
         },
         {
           "id": "sample_holdingRegister_2",
@@ -266,23 +283,6 @@
             "maxValue": 1
           },
           "feedbackDataPoint": "sample_inputRegister_1"
-        },
-        {
-          "id": "sample_inputRegister_1",
-          "areas": [
-            "InputRegister"
-          ],
-          "type": "Float32",
-          "address": 0,
-          "accessMode": "RO",
-          "defaultValue": 0,
-          "name": "Sample Input Register 1: Feedback Setpoint P",
-          "unit": "%",
-          "simulation": {
-            "enabled": false,
-            "minValue": 0,
-            "maxValue": 1
-          }
         },
         {
           "id": "sample_inputRegister_2",

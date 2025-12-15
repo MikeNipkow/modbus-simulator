@@ -12,7 +12,10 @@ const useUpdateDatapoint = () => {
     device: ModbusDevice,
     unitId: number,
     datapoint: DataPoint,
-  ): Promise<boolean> => {
+  ): Promise<
+    | { success: true; datapoint: DataPoint }
+    | { success: false; errors: string[] }
+  > => {
     setDatapoint(null);
     setIsLoading(true);
     setErrors([]);
@@ -21,14 +24,17 @@ const useUpdateDatapoint = () => {
       const deviceTypeEndpoint = device.template ? "templates" : "devices";
       const endpoint = `${deviceTypeEndpoint}/${device.filename}/units/${unitId}/datapoints/${datapoint.id}`;
       await apiClient.put(endpoint, datapoint);
-      return true;
+      return { success: true, datapoint };
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.errors ||
         err.message ||
         "Failed to update datapoint";
       setErrors(errorMessage);
-      return false;
+      return {
+        success: false,
+        errors: errorMessage,
+      };
     } finally {
       setIsLoading(false);
     }

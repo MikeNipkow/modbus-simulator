@@ -1,10 +1,12 @@
 import { createErrorToast, createSuccessToast } from "@/components/ui/Toaster";
+import useDatapointValue from "@/hooks/datapoint/useDatapointValue";
 import { useDeleteDatapoint } from "@/hooks/datapoint/useDeleteDatapoint";
 import type { DataPoint } from "@/types/DataPoint";
 import { DataType } from "@/types/enums/DataType";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import type { ModbusUnit } from "@/types/ModbusUnit";
 import { Badge, IconButton, Table } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
 /**
@@ -17,6 +19,7 @@ interface Props {
   onEdit?: () => void;
   onDelete?: () => void;
   useHexFormat?: boolean;
+  allowPolling?: boolean;
 }
 
 const DatapointRow = ({
@@ -26,9 +29,26 @@ const DatapointRow = ({
   onEdit,
   onDelete,
   useHexFormat,
+  allowPolling,
 }: Props) => {
+  // Hook to trigger datapoint value updates.
+  const [refreshTrigger, setRefreshTrigger] = useState({});
+
+  // Hook to get datapoint value.
+  const { value } = useDatapointValue(device, unit, datapoint, [
+    refreshTrigger,
+  ]);
+
   // Hook to delete a datapoint.
-  const { deleteDatapoint, isLoading, errors } = useDeleteDatapoint();
+  const { deleteDatapoint, isLoading } = useDeleteDatapoint();
+
+  // Refresh datapoint value every second.
+  useEffect(() => {
+    if (!allowPolling) return;
+    if (!datapoint.simulation?.enabled) return;
+    const id = setInterval(() => setRefreshTrigger({}), 1000);
+    return () => clearInterval(id);
+  }, [datapoint.simulation?.enabled, allowPolling]);
 
   /**
    * Handle deletion of a datapoint.
@@ -36,20 +56,20 @@ const DatapointRow = ({
    */
   const handleDelete = async () => {
     // Call delete datapoint hook.
-    const success = await deleteDatapoint(device, unit.unitId, datapoint.id);
+    const result = await deleteDatapoint(device, unit.unitId, datapoint.id);
 
     // Notify parent component to refresh data.
-    if (success) onDelete?.();
+    if (result.success) onDelete?.();
 
     // Show toast notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Datapoint deleted",
           description: `Datapoint "${datapoint.name}" has been deleted.`,
         })
       : createErrorToast({
           title: "Failed to delete datapoint",
-          description: errors,
+          description: result.errors,
         });
   };
 
@@ -58,9 +78,9 @@ const DatapointRow = ({
     switch (datapoint.type) {
       case DataType.Float32:
       case DataType.Float64:
-        return Number(datapoint.value).toFixed(2);
+        return Number(value).toFixed(2);
       default:
-        return String(datapoint.value);
+        return String(value);
     }
   };
 

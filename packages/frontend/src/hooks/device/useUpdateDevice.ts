@@ -7,7 +7,9 @@ const useUpdateDevice = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
 
-  const updateDevice = async (device: ModbusDevice): Promise<boolean> => {
+  const updateDevice = async (
+    device: ModbusDevice,
+  ): Promise<{ success: true } | { success: false; errors: string[] }> => {
     setDevice(null);
     setIsLoading(true);
     setErrors([]);
@@ -15,12 +17,15 @@ const useUpdateDevice = () => {
     try {
       const endpoint = device.template ? "templates" : "devices";
       await apiClient.put(`/${endpoint}/${device.filename}`, device);
-      return true;
+      return { success: true };
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.errors || err.message || "Failed to update device";
       setErrors(errorMessage);
-      return false;
+      return {
+        success: false,
+        errors: errorMessage,
+      };
     } finally {
       setIsLoading(false);
     }

@@ -11,7 +11,9 @@ const useUpdateUnit = () => {
     currentUnitId: number,
     device: ModbusDevice,
     unit: ModbusUnit,
-  ): Promise<boolean> => {
+  ): Promise<
+    { success: true; unit: ModbusUnit } | { success: false; errors: string[] }
+  > => {
     setUnit(null);
     setIsLoading(true);
     setErrors([]);
@@ -20,12 +22,15 @@ const useUpdateUnit = () => {
       const deviceTypeEndpoint = device.template ? "templates" : "devices";
       const endpoint = `/${deviceTypeEndpoint}/${device.filename}/units/${currentUnitId}`;
       await apiClient.put(endpoint, unit);
-      return true;
+      return { success: true, unit };
     } catch (err: any) {
       const errorMessage =
         err.response?.data?.errors || err.message || "Failed to update unit";
       setErrors(errorMessage);
-      return false;
+      return {
+        success: false,
+        errors: errorMessage,
+      };
     } finally {
       setIsLoading(false);
     }

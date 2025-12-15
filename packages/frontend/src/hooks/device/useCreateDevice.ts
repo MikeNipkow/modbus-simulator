@@ -10,7 +10,10 @@ export const useCreateDevice = () => {
   const createDevice = async (
     device: ModbusDevice,
     isTemplate: boolean,
-  ): Promise<boolean> => {
+  ): Promise<
+    | { success: true; device: ModbusDevice }
+    | { success: false; errors: string[] }
+  > => {
     setIsLoading(true);
     setErrors([]);
     setDevice(null);
@@ -19,13 +22,13 @@ export const useCreateDevice = () => {
       const endpoint = isTemplate ? "/templates" : "/devices";
       const response = await apiClient.post(endpoint, device);
       setDevice(response.data);
-      return true; // Success
+      return { success: true, device: response.data }; // Success
     } catch (err: any) {
       const errorMessage = err.response?.data?.errors || [
         err.message || "Unknown error",
       ];
       setErrors(errorMessage);
-      return false; // Failure
+      return { success: false, errors: errorMessage }; // Failure
     } finally {
       setIsLoading(false);
     }

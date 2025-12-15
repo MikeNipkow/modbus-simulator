@@ -24,6 +24,7 @@ import {
   deleteDataPointRoute,
   createDataPointRoute,
   updateDataPointRoute,
+  getDataPointValueRoute,
 } from "./controllers/dataPointController.js";
 import { getVersionRoute } from "./controllers/serverController.js";
 import multer from "multer";
@@ -72,7 +73,7 @@ export function initializeApiServer() {
   );
   app.get(
     "/api/v1/devices/:id/units/:unitId/dataPoints/:dataPointId/value",
-    getDataPointRoute,
+    getDataPointValueRoute,
   );
   app.post(
     "/api/v1/devices/:id/units/:unitId/dataPoints",

@@ -3,16 +3,19 @@ import {
   Card,
   HStack,
   Icon,
+  IconButton,
   Separator,
   Text,
   VStack,
 } from "@chakra-ui/react";
 import { FaPlus } from "react-icons/fa";
-import { FaGears } from "react-icons/fa6";
+import { FaGears, FaRotate } from "react-icons/fa6";
 import UnitConfigurationCard from "./UnitConfigurationCard";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
 import { useCreateUnit } from "@/hooks/unit/useCreateUnit";
 import type { ModbusDevice } from "@/types/ModbusDevice";
+import { Tooltip } from "@/components/ui/Tooltip";
+import { useState } from "react";
 
 interface Props {
   device: ModbusDevice;
@@ -20,8 +23,11 @@ interface Props {
 }
 
 const UnitOverviewCard = ({ device, onUpdate }: Props) => {
+  // State for polling option.
+  const [allowPolling, setAllowPolling] = useState(false);
+
   // Hook for creating a new unit.
-  const { createUnit, isLoading, errors } = useCreateUnit();
+  const { createUnit, isLoading } = useCreateUnit();
 
   /**
    * Check if a unit ID is already taken in the device.
@@ -54,20 +60,20 @@ const UnitOverviewCard = ({ device, onUpdate }: Props) => {
     }
 
     // Send request to create unit.
-    const success = await createUnit(device, nextUnitId);
+    const result = await createUnit(device, nextUnitId);
 
     // Notify parent component to refresh data.
-    if (success) onUpdate?.();
+    if (result.success) onUpdate?.();
 
     // Show toast notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Unit added",
           description: `Modbus unit with ID ${nextUnitId} has been added.`,
         })
       : createErrorToast({
           title: "Failed to add unit",
-          description: errors,
+          description: result.errors,
         });
   };
 
@@ -88,16 +94,34 @@ const UnitOverviewCard = ({ device, onUpdate }: Props) => {
               <Text>Modbus Units ({device.modbusUnits?.length})</Text>
             </HStack>
 
-            {/* Add Unit Button */}
-            <Button
-              variant={"primary"}
-              width="120px"
-              onClick={handleAddUnit}
-              loading={isLoading}
-            >
-              <Icon as={FaPlus} boxSize={4} />
-              <Text fontSize={"md"}>Add Unit</Text>
-            </Button>
+            <HStack gap={4}>
+              {/* Button to allow value polling */}
+              {!device.template && (
+                <Tooltip
+                  content="Auto-Refresh values"
+                  contentProps={{ css: { "--tooltip-bg": "white" } }}
+                >
+                  <IconButton
+                    as={FaRotate}
+                    variant={"subtle"}
+                    colorPalette={allowPolling ? "green" : "white"}
+                    padding={"10px"}
+                    onClick={() => setAllowPolling(!allowPolling)}
+                  />
+                </Tooltip>
+              )}
+
+              {/* Add Unit Button */}
+              <Button
+                variant={"primary"}
+                width="120px"
+                onClick={handleAddUnit}
+                loading={isLoading}
+              >
+                <Icon as={FaPlus} boxSize={4} />
+                <Text fontSize={"md"}>Add Unit</Text>
+              </Button>
+            </HStack>
           </HStack>
         </Card.Title>
       </Card.Header>
@@ -113,6 +137,7 @@ const UnitOverviewCard = ({ device, onUpdate }: Props) => {
               key={unit.unitId}
               device={device}
               unit={unit}
+              allowPolling={allowPolling}
               onUpdate={onUpdate}
             />
           ))}

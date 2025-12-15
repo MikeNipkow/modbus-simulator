@@ -56,59 +56,54 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
     startDevice,
     stopDevice,
     isLoading: isControlLoading,
-    errors: controlErrors,
   } = useControlDevice();
 
   // Hook to save device as template
-  const {
-    createDevice,
-    isLoading: isSaving,
-    errors: saveErrors,
-  } = useCreateDevice();
+  const { createDevice, isLoading: isSaving } = useCreateDevice();
 
   // ~~~~~ Function Handlers ~~~~~
 
   // Handle device deletion
   const handleDelete = async () => {
     // Delete device via hook
-    const success = await deleteDevice(device);
+    const result = await deleteDevice(device);
 
     // Close delete dialog if successful and trigger onUpdate and onDelete callbacks
-    if (success) {
+    if (result.success) {
       setDeleteDialogOpen(false);
       onUpdate?.();
       onDelete?.();
     }
 
     // Show toaster notification based on success or failure
-    success
+    result.success
       ? createSuccessToast({
           title: "Device deleted",
           description: `Device "${device.filename}" has been deleted.`,
         })
       : createErrorToast({
           title: "Failed to delete device",
-          description: deleteErrors,
+          description: result.errors,
         });
   };
 
   // Handle starting the device
   const handleStart = async () => {
     // Start device via hook
-    const success = await startDevice(device);
+    const result = await startDevice(device);
 
     // Trigger onUpdate callback if successful
-    if (success) onUpdate?.();
+    if (result.success) onUpdate?.();
 
     // Show toaster notification based on success or failure
-    success
+    result.success
       ? createSuccessToast({
           title: "Modbus Server started",
           description: `Modbus Server for device "${device.filename}" has been started.`,
         })
       : createErrorToast({
           title: "Error starting Modbus Server",
-          description: controlErrors,
+          description: result.errors,
         });
   };
 
@@ -122,43 +117,43 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
     };
 
     // Save device as template via hook.
-    const success = await createDevice(templateDevice, true);
+    const result = await createDevice(templateDevice, true);
 
     // Update UI based on result.
-    if (success) {
+    if (result.success) {
       onUpdate?.();
       setSaveAsTemplateDialogOpen(false);
     }
 
     // Show toaster notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Template saved",
           description: `Device "${device.filename}" has been saved as a template.`,
         })
       : createErrorToast({
           title: "Failed to save device as template",
-          description: saveErrors,
+          description: result.errors,
         });
   };
 
   // Handle stopping the device
   const handleStop = async () => {
     // Stop device via hook
-    const success = await stopDevice(device);
+    const result = await stopDevice(device);
 
     // Trigger onUpdate callback if successful
-    if (success) onUpdate?.();
+    if (result.success) onUpdate?.();
 
     // Show toaster notification based on success or failure
-    success
+    result.success
       ? createSuccessToast({
           title: "Modbus Server stopped",
           description: `Modbus Server for device "${device.filename}" has been stopped.`,
         })
       : createErrorToast({
           title: "Error stopping Modbus Server",
-          description: controlErrors,
+          description: result.errors,
         });
   };
 

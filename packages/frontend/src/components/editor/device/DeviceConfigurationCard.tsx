@@ -16,7 +16,7 @@ import { FaInfoCircle } from "react-icons/fa";
 import { Endian } from "@/types/enums/Endian";
 import useUpdateDevice from "@/hooks/device/useUpdateDevice";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Props {
   device: ModbusDevice;
@@ -31,7 +31,13 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
   const [dataChanged, setDataChanged] = useState(false);
 
   // Hook for updating device.
-  const { updateDevice, isLoading, errors } = useUpdateDevice();
+  const { updateDevice, isLoading } = useUpdateDevice();
+
+  // Reset editable device state when the device prop changes.
+  useEffect(() => {
+    setEditDevice({ ...device });
+    setDataChanged(false);
+  }, [device]);
 
   /**
    * Set a field value in the editable device state.
@@ -49,23 +55,23 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
    */
   const handleUpdate = async () => {
     // Call update device hook.
-    const success = await updateDevice(editDevice);
+    const result = await updateDevice(editDevice);
 
     // Update UI based on result.
-    if (success) {
+    if (result.success) {
       onUpdate?.();
       setDataChanged(false);
     }
 
     // Show toast notification.
-    success
+    result.success
       ? createSuccessToast({
           title: "Device updated",
           description: `Device "${device.filename}" has been updated.`,
         })
       : createErrorToast({
           title: "Failed to update device",
-          description: errors,
+          description: result.errors,
         });
   };
 
