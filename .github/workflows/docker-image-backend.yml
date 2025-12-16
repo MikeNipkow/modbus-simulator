@@ -1,4 +1,4 @@
-name: Build and Publish backend image to Docker Hub
+name: Build and Publish backend image
 
 on:
   [workflow_dispatch]
@@ -41,6 +41,6 @@ jobs:
         context: ./packages/backend/
         file: ./Dockerfile
         tags: | 
-            ghcr.io/mikenipkow/modbus-simulator:latest
+            ghcr.io/mikenipkow/modbus-simulator-backend:latest
         push: true
         platforms: linux/amd64,linux/arm64,linux/arm/v7
