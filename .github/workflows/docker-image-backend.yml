@@ -39,6 +39,6 @@ jobs:
         context: ./packages/backend/
         file: ./Dockerfile
         tags: | 
-            ghcr.io/MikeNipkow/modbus-simulator:latest
+            ghcr.io/mikenipkow/modbus-simulator:latest
         push: true
         platforms: linux/amd64,linux/arm64,linux/arm/v7
