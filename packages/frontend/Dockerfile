@@ -1,6 +1,6 @@
 ARG NODE_VERSION=18
 
-FROM node:${NODE_VERSION}-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 
 # Install dependencies
