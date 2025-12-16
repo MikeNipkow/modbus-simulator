@@ -79,6 +79,6 @@ export class Logger {
    * @returns An array of log messages.
    */
   public getLogs() {
-    return this.logs;
+    return [...this.logs];
   }
 }

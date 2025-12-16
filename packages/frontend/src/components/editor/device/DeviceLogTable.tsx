@@ -1,5 +1,5 @@
 import useLogs from "@/hooks/device/useLogs";
-import { LogLevel, type LogMessage } from "@/types/enums/LogLevel";
+import { LogLevel } from "@/types/enums/LogLevel";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import { Card, Checkbox, For, HStack, Table } from "@chakra-ui/react";
 import { useEffect, useState, useRef } from "react";
@@ -15,7 +15,7 @@ const DeviceLogTable = ({ device }: Props) => {
     LogLevel.ERROR,
   ]);
   const [refreshTrigger, setRefreshTrigger] = useState({});
-  const { logs, errors, isLoading } = useLogs(device, [refreshTrigger]);
+  const { logs } = useLogs(device, [refreshTrigger]);
 
   // observe visibility of the table container and only poll when visible
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -91,7 +91,7 @@ const DeviceLogTable = ({ device }: Props) => {
                 key={level}
               >
                 <Checkbox.HiddenInput />
-                <Checkbox.Control />
+                <Checkbox.Control bg={"primary"} borderColor={"primary"} />
                 <Checkbox.Label>{level}</Checkbox.Label>
               </Checkbox.Root>
             )}
@@ -118,21 +118,24 @@ const DeviceLogTable = ({ device }: Props) => {
 
           {/* Map rows or show placeholder while content is prepared */}
           <Table.Body>
-            {logs &&
-              logs.map((log: LogMessage, id: number) => (
-                <Table.Row
-                  color={getColorForLogLevel(log.level)}
-                  key={id}
-                  hidden={!logLevelFilter.includes(log.level)}
-                >
-                  <Table.Cell width={"20px"}>{id + 1}</Table.Cell>
-                  <Table.Cell width={"50px"}>{log.level}</Table.Cell>
-                  <Table.Cell width={"200px"}>
-                    {new Date(log.timestamp).toLocaleString(navigator.language)}
-                  </Table.Cell>
-                  <Table.Cell>{log.message}</Table.Cell>
-                </Table.Row>
-              ))}
+            {logs && (
+              <For each={logs}>
+                {(log, id) =>
+                  logLevelFilter.includes(log.level) && (
+                    <Table.Row color={getColorForLogLevel(log.level)} key={id}>
+                      <Table.Cell width={"20px"}>{id + 1}</Table.Cell>
+                      <Table.Cell width={"50px"}>{log.level}</Table.Cell>
+                      <Table.Cell width={"200px"}>
+                        {new Date(log.timestamp).toLocaleString(
+                          navigator.language,
+                        )}
+                      </Table.Cell>
+                      <Table.Cell>{log.message}</Table.Cell>
+                    </Table.Row>
+                  )
+                }
+              </For>
+            )}
           </Table.Body>
         </Table.Root>
       </Card.Body>
