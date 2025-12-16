@@ -1,23 +1,26 @@
-ARG NODE_VERSION=20
-
-FROM node:${NODE_VERSION}-alpine AS build
+FROM node:20-alpine AS build
 WORKDIR /app
 
-# Install dependencies
 COPY package.json package-lock.json* ./
 RUN if [ -f package-lock.json ]; then npm ci --silent; else npm install --silent; fi
 
-# Copy source and build
 COPY . .
 RUN npm run typegen
 RUN npm run build
 
 FROM nginx:stable-alpine AS production
+
+# wenn du envsubst brauchst:
+RUN apk add --no-cache gettext
+
 COPY --from=build /app/dist /usr/share/nginx/html
+
 RUN rm /etc/nginx/conf.d/default.conf || true
 RUN printf 'server { listen 80; server_name _; root /usr/share/nginx/html; index index.html; location / { try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
+
+# Custom startup script (wird vom nginx-entrypoint automatisch ausgeführt)
+COPY docker-entrypoint.d/99-runtime-config.sh /docker-entrypoint.d/99-runtime-config.sh
+RUN sed -i 's/\r$//' /docker-entrypoint.d/99-runtime-config.sh && chmod +x /docker-entrypoint.d/99-runtime-config.sh
+
 EXPOSE 80
-COPY docker-entrypoint.sh /docker-entrypoint.sh
-RUN chmod +x /docker-entrypoint.sh
-ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["nginx","-g","daemon off;"]
