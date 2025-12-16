@@ -1,13 +1,11 @@
 import { ModbusUnit } from "./ModbusUnit.js";
-import { DataArea } from "./types/enums/DataArea.js";
-import { Endian } from "./types/enums/Endian.js";
 import Modbus, { FCallbackVal } from "modbus-serial";
-import { ModbusError } from "./types/enums/ModbusError.js";
-import { ModbusDeviceProps } from "./types/ModbusDeviceProps.js";
-import { isValidFilename } from "./util/fileUtils.js";
 import { Logger, LogMessage } from "./Logger.js";
-import { isArray } from "util";
-import { get } from "http";
+import { DataArea } from "../types/enums/DataArea.js";
+import { Endian } from "../types/enums/Endian.js";
+import { ModbusError } from "../types/enums/ModbusError.js";
+import { ModbusDeviceProps } from "../types/ModbusDeviceProps.js";
+import { isValidFilename } from "../util/fileUtils.js";
 
 /**
  * Class representing a Modbus device with multiple units and data points.

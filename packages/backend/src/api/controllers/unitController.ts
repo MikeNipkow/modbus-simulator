@@ -9,8 +9,8 @@ import {
   unitToUnitDTO,
 } from "../mapper/ModbusUnitDTOMapper.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
-import { ModbusUnit } from "../../ModbusUnit.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
+import { ModbusUnit } from "../../classes/ModbusUnit.js";
 
 /**
  * Helper function to get a ModbusUnit by ID from request parameters.
@@ -220,11 +220,9 @@ export const updateUnitRoute = (req: Request, res: Response) => {
     // Restore old unit.
     device.addUnit(unit);
 
-    res
-      .status(500)
-      .json({
-        errors: [`Unit with Unit-ID ${newUnit.getId()} already exists`],
-      });
+    res.status(500).json({
+      errors: [`Unit with Unit-ID ${newUnit.getId()} already exists`],
+    });
     return;
   }
 

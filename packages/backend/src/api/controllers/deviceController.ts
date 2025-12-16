@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
 import deviceManager, { templateManager } from "../../app.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";
-import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
 import {
   deviceDTOFromObject,
   deviceFromDTO,
   deviceToDeviceDTO,
 } from "../mapper/ModbusDeviceDTOMapper.js";
-import { DeviceManager } from "../../DeviceManager.js";
 import fs from "fs";
 import { deviceFromObject } from "../../mapper/ModbusDeviceMapper.js";
+import { DeviceManager } from "../../classes/DeviceManager.js";
+import { ModbusDevice } from "../../classes/ModbusDevice.js";
 
 /**
  * Helper function to determine if the request is for a template.

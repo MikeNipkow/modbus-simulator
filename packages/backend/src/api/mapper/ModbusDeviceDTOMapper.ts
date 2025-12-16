@@ -1,8 +1,8 @@
+import { ModbusDevice } from "../../classes/ModbusDevice.js";
 import {
   deviceFromObject,
   deviceToDeviceProps,
 } from "../../mapper/ModbusDeviceMapper.js";
-import { ModbusDevice } from "../../ModbusDevice.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
 import { isValidFilename } from "../../util/fileUtils.js";
 import { ModbusDeviceDTO } from "../dto/ModbusDeviceDTO.js";

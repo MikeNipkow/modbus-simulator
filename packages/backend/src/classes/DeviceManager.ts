@@ -1,11 +1,11 @@
 import path from "path";
 import { ModbusDevice } from "./ModbusDevice.js";
 import * as fs from "fs";
-import { ParseResult } from "./types/enums/ParseResult.js";
 import {
-  deviceFromObject,
   deviceToDeviceProps,
-} from "./mapper/ModbusDeviceMapper.js";
+  deviceFromObject,
+} from "../mapper/ModbusDeviceMapper.js";
+import { ParseResult } from "../types/enums/ParseResult.js";
 
 /**
  * Manages Modbus devices stored in a specified directory.

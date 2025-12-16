@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { getUnitFromRequest } from "./unitController.js";
-import { DataPoint } from "../../DataPoint.js";
 import {
   dataPointDTOFromObject,
   dataPointFromDTO,
@@ -12,6 +11,7 @@ import {
   isTemplateEndpoint,
 } from "./deviceController.js";
 import { serializeValue } from "../../util/jsonUtils.js";
+import { DataPoint } from "../../classes/DataPoint.js";
 
 /**
  * Helper function to get a DataPoint by ID from request parameters.

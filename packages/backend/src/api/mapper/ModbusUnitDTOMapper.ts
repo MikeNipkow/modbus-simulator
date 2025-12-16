@@ -1,8 +1,8 @@
+import { ModbusUnit } from "../../classes/ModbusUnit.js";
 import {
   unitFromObject,
   unitToUnitProps,
 } from "../../mapper/ModbusUnitMapper.js";
-import { ModbusUnit } from "../../ModbusUnit.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
 import { ModbusUnitDTO } from "../dto/ModbusUnitDTO.js";
 import { dataPointToDataPointDTO } from "./DataPointDTOMapper.js";

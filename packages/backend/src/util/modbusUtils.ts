@@ -1,4 +1,4 @@
-import { DataPoint } from "../DataPoint.js";
+import { DataPoint } from "../classes/DataPoint.js";
 import { DataType } from "../types/enums/DataType.js";
 
 /**

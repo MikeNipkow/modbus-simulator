@@ -1,16 +1,16 @@
-import { AccessMode } from "./types/enums/AccessMode.js";
-import { DataArea } from "./types/enums/DataArea.js";
-import { DataPointProps } from "./types/DataPointProps.js";
-import { DataType } from "./types/enums/DataType.js";
-import { Endian } from "./types/enums/Endian.js";
-import { SimulationProps } from "./types/SimulationProps.js";
+import { DataPointProps } from "../types/DataPointProps.js";
+import { AccessMode } from "../types/enums/AccessMode.js";
+import { DataArea } from "../types/enums/DataArea.js";
+import { DataType } from "../types/enums/DataType.js";
+import { Endian } from "../types/enums/Endian.js";
+import { SimulationProps } from "../types/SimulationProps.js";
 import {
-  getDataViewFromValue,
-  getDefaultValueForType,
   getRegisterLengthFromType,
+  getDefaultValueForType,
+  getDataViewFromValue,
   getValueFromDataView,
   isBigIntType,
-} from "./util/modbusUtils.js";
+} from "../util/modbusUtils.js";
 
 /**
  * Represents a Modbus DataPoint with various properties and behaviors.

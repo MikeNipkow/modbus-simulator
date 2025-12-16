@@ -1,4 +1,3 @@
-import { DataPoint } from "../../DataPoint.js";
 import { ParseResult } from "../../types/enums/ParseResult.js";
 import { getJSTypeFromDataType } from "../../util/modbusUtils.js";
 import { DataPointDTO } from "../dto/DataPointDTO.js";
@@ -7,6 +6,7 @@ import {
   dataPointToDataPointProps,
 } from "../../mapper/DataPointMapper.js";
 import { deserializeValue, serializeValue } from "../../util/jsonUtils.js";
+import { DataPoint } from "../../classes/DataPoint.js";
 
 /**
  * Converts a DataPoint to a DataPointDTO.
