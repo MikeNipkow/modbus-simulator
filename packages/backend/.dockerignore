@@ -1,0 +1,10 @@
+node_modules
+dist
+.env
+npm-debug.log
+.DS_Store
+coverage
+.vscode
+*.tgz
+package-lock.json
+/.git
