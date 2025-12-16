@@ -8,15 +8,15 @@ This repository contains a Modbus-TCP simulator. The system is split into a fron
 
 Prerequisites: Docker Engine installed.
 
-Pull and run the backend container:
+1. Pull and run the backend container:
 
 ```bash
-docker run -d -p 3000:3000 ghcr.io/mikenipkow/modbus-simulator-backend:latest
+docker run -d --net=host --name=modbus-simulator-backend ghcr.io/mikenipkow/modbus-simulator-backend:latest
 ```
 
-Pull and run the frontend container:
+2. Pull and run the frontend container:
 ```bash
-docker run -d -p 3000:3000 ghcr.io/mikenipkow/modbus-simulator-backend:latest
+docker run -d -p 8080:80 --name=modbus-simulator-frontend ghcr.io/mikenipkow/modbus-simulator-frontend:latest
 ```
 
 Notes:
