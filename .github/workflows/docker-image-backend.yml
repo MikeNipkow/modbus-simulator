@@ -1,4 +1,4 @@
-name: Build and Public backend image to Docker Hub
+name: Build and Publish backend image to Docker Hub
 
 on:
   [workflow_dispatch]
@@ -13,7 +13,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
     - name: Build the Docker image
-      run: docker buildx build --platform linux/arm/v7,linux/arm64,linux/amd64 ./packages/backend/ -t nipkowmike/modbus-simulator-backend:latest
+      run: docker build ./packages/backend/ -t nipkowmike/modbus-simulator-backend:latest
     - name: Push image to Docker Hub
       run: |
         docker login -u nipkowmike -p ${{ secrets.DOCKER_HUB_TOKEN }}
