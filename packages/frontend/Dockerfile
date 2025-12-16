@@ -9,6 +9,7 @@ RUN if [ -f package-lock.json ]; then npm ci --silent; else npm install --silent
 
 # Copy source and build
 COPY . .
+RUN npm run typegen
 RUN npm run build
 
 FROM nginx:stable-alpine AS production
