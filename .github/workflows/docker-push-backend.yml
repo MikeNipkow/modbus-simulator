@@ -42,4 +42,4 @@ jobs:
             ghcr.io/mikenipkow/modbus-simulator-backend:latest
         push: true
         platforms: linux/amd64
-
+        no-cache: true
