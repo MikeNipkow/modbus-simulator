@@ -26,4 +26,4 @@ COPY --from=builder /app/package*.json ./
 RUN if [ -f package-lock.json ]; then npm ci --production --silent; else npm install --production --silent; fi
 
 EXPOSE 3000
-CMD ["node","dist/src/app.js"]
+CMD ["node","dist/app.js"]
