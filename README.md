@@ -70,22 +70,22 @@ Example `docker-compose.yml`:
 ```yaml
 version: "3.8"
 services:
-	backend:
-        container_name: modbus-simulator-backend
-		image: ghcr.io/mikenipkow/modbus-simulator-backend:latest
-        network_mode: host
-		environment:
-			- NODE_ENV=production
+  backend:
+    container_name: modbus-simulator-backend
+      image: ghcr.io/mikenipkow/modbus-simulator-backend:latest
+      network_mode: host
+      environment:
+        - NODE_ENV=production
 
-	frontend:
-        container_name: modbus-simulator-frontend
-		image: ghcr.io/mikenipkow/modbus-simulator-frontend:latest
-		ports:
-			- "8080:80"
-		environment:
-			- API_URL=http://127.0.0.1:3000/api/v1
-		depends_on:
-			- backend
+  frontend:
+    container_name: modbus-simulator-frontend
+    image: ghcr.io/mikenipkow/modbus-simulator-frontend:latest
+    ports:
+      - "8080:80"
+    environment:
+      - API_URL=http://127.0.0.1:3000/api/v1
+    depends_on:
+      - backend
 ```
 
 Run the whole stack:
