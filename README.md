@@ -23,6 +23,8 @@ Notes:
 
 - Use the `API_URL` environment variable to point the frontend to your backend API. If not provided, the frontend will default to `http(s)://<current-host>:3000/api/v1`.
 
+___
+
 ### Docker Compose (recommended for development/local stacks)
 
 Create a `docker-compose.yml` at the repository root (example below) to run frontend and backend together.
