@@ -1,5 +1,6 @@
 import { AbsoluteCenter, HStack, Image, Spacer, Text } from "@chakra-ui/react";
 import VersionPopover from "./VersionPopover";
+import logo from "../../assets/logo.svg";
 
 interface Props {
   onHomeClick?: () => void;
@@ -17,7 +18,7 @@ const Navbar = ({ title, onHomeClick }: Props) => {
         transition="opacity 0.2s"
       >
         <HStack gap="12px">
-          <Image src="/src/assets/logo.svg" alt="Logo" height="50px" />
+          <Image src={logo} alt="Logo" height="50px" />
           <Text fontWeight="bold" fontSize="2xl">
             Modbus Simulator
           </Text>
