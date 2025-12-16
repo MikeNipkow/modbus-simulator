@@ -92,4 +92,4 @@ Run the whole stack:
 
 ```bash
 docker compose up
-```.
+```
