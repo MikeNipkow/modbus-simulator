@@ -39,7 +39,7 @@ jobs:
       uses: docker/build-push-action@v6
       with:
         context: ./packages/backend/
-        file: ./Dockerfile
+        file: ./packages/backend/Dockerfile
         tags: | 
             ghcr.io/mikenipkow/modbus-simulator-backend:latest
         push: true
