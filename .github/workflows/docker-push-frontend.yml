@@ -1,4 +1,4 @@
-name: Build and Publish backend image to GitHub
+name: Build and Publish frontend image to GitHub
 
 on:
   [workflow_dispatch]
@@ -38,9 +38,9 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v6
       with:
-        context: ./packages/backend/
-        file: ./packages/backend/Dockerfile
+        context: ./packages/frontend/
+        file: ./packages/frontend/Dockerfile
         tags: | 
-            ghcr.io/mikenipkow/modbus-simulator-backend:latest
+            ghcr.io/mikenipkow/modbus-simulator-frontend:latest
         push: true
         platforms: linux/amd64,linux/arm64,linux/arm/v7
