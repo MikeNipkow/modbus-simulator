@@ -10,7 +10,6 @@ RUN npm run build
 
 FROM nginx:stable-alpine AS production
 
-# wenn du envsubst brauchst:
 RUN apk add --no-cache gettext
 
 COPY --from=build /app/dist /usr/share/nginx/html
@@ -18,7 +17,6 @@ COPY --from=build /app/dist /usr/share/nginx/html
 RUN rm /etc/nginx/conf.d/default.conf || true
 RUN printf 'server { listen 80; server_name _; root /usr/share/nginx/html; index index.html; location / { try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
 
-# Custom startup script (wird vom nginx-entrypoint automatisch ausgeführt)
 COPY docker-entrypoint.d/99-runtime-config.sh /docker-entrypoint.d/99-runtime-config.sh
 RUN sed -i 's/\r$//' /docker-entrypoint.d/99-runtime-config.sh && chmod +x /docker-entrypoint.d/99-runtime-config.sh
 
