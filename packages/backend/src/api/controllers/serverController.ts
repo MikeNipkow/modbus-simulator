@@ -6,6 +6,6 @@ import { Request, Response } from "express";
  * @param res Express response object.
  */
 export const getVersionRoute = (req: Request, res: Response) => {
-  const version = "1.0.0";
+  const version = process.env.REACT_APP_VERSION || "1.0.0";
   return res.json(version);
 };
