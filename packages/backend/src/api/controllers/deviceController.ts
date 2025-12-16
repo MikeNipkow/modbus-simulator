@@ -350,6 +350,23 @@ export const stopDeviceRoute = async (req: Request, res: Response) => {
 };
 
 /**
+ * Retrieves the logs of a device.
+ * @param req Express request object.
+ * @param res Express response object.
+ */
+export const getDeviceLogsRoute = (req: Request, res: Response) => {
+  // Retrieve device.
+  const device = getDeviceFromRequest(req, res);
+  if (!device) return;
+
+  // Get logs.
+  const logs = device
+    .getLogs()
+    .sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+  res.status(200).json(logs);
+};
+
+/**
  * Downloads the original JSON file of a device.
  * @param req Express request object.
  * @param res Express response object.

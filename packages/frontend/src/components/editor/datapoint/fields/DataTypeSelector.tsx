@@ -27,6 +27,7 @@ const DataTypeSelector = ({ datapoint, onSelect }: Props) => {
       type: newType,
       defaultValue: defaultValue,
       value: defaultValue,
+      length: newType === DataType.ASCII ? 1 : undefined,
       simulation: {
         enabled: false,
         minValue: 0,

@@ -1,8 +1,14 @@
 import type { DataPoint } from "@/types/DataPoint";
 import type { SimulationProps } from "@/types/SimulationProps";
-import { deserializeValue } from "@/util/jsonUtils";
-import { getMaxValueForType, getMinValueForType } from "@/util/modbusUtils";
+import { serializeValue } from "@/util/jsonUtils";
+import {
+  deserializeValueForType,
+  getMaxValueForType,
+  getMinValueForType,
+  isBigIntType,
+} from "@/util/modbusUtils";
 import { Field, Input } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 interface Props {
   datapoint: DataPoint;
@@ -10,31 +16,57 @@ interface Props {
 }
 
 const MaxValueInput = ({ datapoint, onChange }: Props) => {
-  const handleChange = (inputValue: any) => {
+  // Local state for input value.
+  const [value, setValue] = useState<string | number>(
+    datapoint.simulation?.maxValue as string | number,
+  );
+  const [invalid, setInvalid] = useState(false);
+
+  // Update local value when datapoint default value changes.
+  useEffect(() => {
+    setValue(datapoint.simulation?.maxValue as string | number);
+    setInvalid(false);
+  }, [datapoint.simulation?.maxValue]);
+
+  const handleChange = (inputVal: any) => {
     // Deserialize input value based on datapoint type.
-    let value = deserializeValue(inputValue);
+    let value = deserializeValueForType(inputVal, datapoint.type);
 
-    // Check if value is valid for the current data type.
-    if (typeof value !== "number" && typeof value !== "bigint") return;
-
-    const isBigIntType = typeof value === "bigint";
-
-    // Check if new value is larger than minValue.
+    // Check if value is within allowed range.
     const minAllowedValue = getMinValueForType(datapoint.type);
     const maxAllowedValue = getMaxValueForType(datapoint.type);
-    if (value <= datapoint.simulation!.minValue) {
-      value = isBigIntType
-        ? (datapoint.simulation!.minValue as bigint) + 1n
-        : (datapoint.simulation!.minValue as number) + 1;
 
-      // Check if value is within allowed range.
-      if (value < minAllowedValue || value > maxAllowedValue) return;
-    } else if (value < minAllowedValue) value = minAllowedValue;
-    else if (value > maxAllowedValue) value = maxAllowedValue;
+    // Get highest possible minValue.
+    const minValue: number | bigint = deserializeValueForType(
+      datapoint.simulation?.minValue as string,
+      datapoint.type,
+    ) as number | bigint;
+    const lowestPossibleMaxValue =
+      minValue < minAllowedValue
+        ? minAllowedValue
+        : isBigIntType(datapoint.type)
+          ? BigInt(minValue) + 1n
+          : (minValue as number) + 1;
 
-    // Create new datapoint with updated min value.
+    // Check if value is valid for the current data type.
+    if (typeof value === "number" || typeof value === "bigint") {
+      if (value > maxAllowedValue) value = maxAllowedValue;
+      else if (value < lowestPossibleMaxValue) value = lowestPossibleMaxValue;
+
+      setInvalid(false);
+    } else {
+      value = lowestPossibleMaxValue;
+      setInvalid(true);
+    }
+
+    // Create new datapoint with updated default value and value.
+    const serializedVal = serializeValue(value) as string | number;
+    setValue(serializedVal);
     const simulationProps: SimulationProps | undefined = datapoint.simulation
-      ? { ...datapoint.simulation, maxValue: value }
+      ? {
+          ...datapoint.simulation,
+          maxValue: serializedVal,
+        }
       : undefined;
     const newDatapoint: DataPoint = {
       ...datapoint,
@@ -50,8 +82,10 @@ const MaxValueInput = ({ datapoint, onChange }: Props) => {
       <Field.Label>Max Value</Field.Label>
       <Input
         type="number"
-        value={datapoint.simulation?.maxValue as number}
-        onChange={(e) => handleChange(Number(e.target.value))}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={(e) => handleChange(e.target.value)}
+        aria-invalid={invalid}
       ></Input>
     </Field.Root>
   );

@@ -5,6 +5,9 @@ import Modbus, { FCallbackVal } from "modbus-serial";
 import { ModbusError } from "./types/enums/ModbusError.js";
 import { ModbusDeviceProps } from "./types/ModbusDeviceProps.js";
 import { isValidFilename } from "./util/fileUtils.js";
+import { Logger, LogMessage } from "./Logger.js";
+import { isArray } from "util";
+import { get } from "http";
 
 /**
  * Class representing a Modbus device with multiple units and data points.
@@ -25,6 +28,9 @@ export class ModbusDevice implements Modbus.IServiceVector {
   // Modbus server instance.
   private server: Modbus.ServerTCP | undefined;
   private running: boolean = false;
+
+  // Logger.
+  private logger: Logger = new Logger(100);
 
   /**
    * Creates a new ModbusDevice instance.
@@ -166,17 +172,20 @@ export class ModbusDevice implements Modbus.IServiceVector {
     timeoutMs: number = 3000,
   ): Promise<{ success: boolean; message: string }> {
     // Check if server is already running.
-    if (this.isRunning())
+    if (this.isRunning()) {
+      this.logger.warn(`Failed to start server: Server is already running`);
       return Promise.resolve({
         success: false,
         message: `Modbus server on device '${this.name}' is already running`,
       });
+    }
 
     return new Promise((resolve) => {
       // Try to open the Modbus server socket.
       this.server = new Modbus.ServerTCP(this, {
         host: "0.0.0.0",
         port: this.port,
+        debug: true,
       });
 
       // Check if server was started successfully.
@@ -185,6 +194,8 @@ export class ModbusDevice implements Modbus.IServiceVector {
         clearTimeout(timeout);
 
         this.running = true;
+
+        this.logger.info(`Server started on port ${this.port}`);
         return resolve({
           success: true,
           message: `Modbus server started on device '${this.name}' using port ${this.port}`,
@@ -198,21 +209,28 @@ export class ModbusDevice implements Modbus.IServiceVector {
 
         this.running = false;
 
-        if (err?.message?.match(/EADDRINUSE/))
+        if (err?.message?.match(/EADDRINUSE/)) {
+          this.logger.warn(
+            `Failed to start server: Port ${this.port} is already in use`,
+          );
           return resolve({
             success: false,
             message: `Failed to start Modbus server on device '${this.name}': Port ${this.port} is already in use`,
           });
-        else
+        } else {
+          this.logger.error(`Failed to start server`);
           return resolve({
             success: false,
             message: `Modbus server error on device '${this.name}': ${err.message}`,
           });
+        }
       });
 
       // Timeout if no response within the specified timeoutMs.
       const timeout = setTimeout(() => {
         this.running = false;
+
+        this.logger.warn(`Failed to start server: Timeout`);
         return resolve({
           success: false,
           message: `Failed to start Modbus server on device '${this.name}': Timeout`,
@@ -229,30 +247,37 @@ export class ModbusDevice implements Modbus.IServiceVector {
     saveState: boolean = true,
   ): Promise<{ success: boolean; message: string }> {
     // Check if server is already stopped.
-    if (!this.isRunning())
+    if (!this.isRunning()) {
+      this.logger.warn(`Failed to stop server: Server is already stopped`);
       return Promise.resolve({
         success: false,
         message: `Modbus server on device '${this.name}' is already stopped`,
       });
+    }
 
     return new Promise<{ success: boolean; message: string }>((resolve) => {
       // Check if server is running.
-      if (!this.isRunning())
+      if (!this.isRunning()) {
+        this.logger.warn(`Failed to stop server: Server is not running`);
         return resolve({
           success: false,
           message: `Modbus server on device '${this.name}' is not running`,
         });
+      }
 
       // Close server.
       this.server?.close((err: any) => {
         // Check for errors.
-        if (err)
+        if (err) {
+          this.logger.error(`Failed to stop server`);
           return resolve({
             success: false,
             message: `Failed to stopped Modbus server on device '${this.name}': ${err}`,
           });
+        }
 
         this.running = false;
+        this.logger.info(`Modbus Server stopped`);
         return resolve({
           success: true,
           message: `Modbus server on device '${this.name}' stopped successfully`,
@@ -262,6 +287,74 @@ export class ModbusDevice implements Modbus.IServiceVector {
   }
 
   // ~~~~~ Modbus communication ~~~~~
+
+  /**
+   * Gets the log prefix for a Modbus request.
+   * @param unitId Unit ID.
+   * @param functionCode Function code.
+   * @param address Address.
+   * @param length Optional length.
+   */
+  private getLogPrefix(
+    unitId: number,
+    functionCode: number,
+    address: number,
+    length?: number,
+  ): string {
+    const prefix =
+      `[Unit-ID: ${unitId}] [FC ${functionCode}] [Address ${address}` +
+      (length ? `-${address + length - 1}` : "") +
+      `]: `;
+
+    return prefix;
+  }
+
+  /**
+   * Logs a Modbus request.
+   * @param unitId Unit ID.
+   * @param functionCode Function code.
+   * @param address Address.
+   * @param value Value.
+   * @param length Optional length.
+   */
+  private logModbusResponse(
+    unitId: number,
+    functionCode: number,
+    address: number,
+    value: number | number[] | boolean | boolean[],
+    length?: number,
+  ): void {
+    const prefix = this.getLogPrefix(unitId, functionCode, address, length);
+    const suffix = `Values: [${value.toString()}]`;
+
+    this.logger.debug(prefix + suffix);
+  }
+
+  /**
+   * Logs a Modbus error.
+   * @param unitId Unit ID.
+   * @param functionCode  Function code.
+   * @param address Address.
+   * @param error Modbus error.
+   * @param length Optional length.
+   * @param value Optional value.
+   */
+  private logModbusError(
+    unitId: number,
+    functionCode: number,
+    address: number,
+    error: ModbusError,
+    length?: number,
+    value?: number | number[] | boolean | boolean[],
+  ): void {
+    const prefix = this.getLogPrefix(unitId, functionCode, address, length);
+
+    const errorName = ModbusError[error];
+    const suffix =
+      `Error ${error} (${errorName})` +
+      (value !== undefined ? `, Values: [${value.toString()}]` : "");
+    this.logger.warn(prefix + suffix);
+  }
 
   /**
    * Modbus request handler for discrete inputs.
@@ -274,7 +367,30 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<boolean>,
   ): void {
-    this.handleReadRequest(DataArea.DiscreteInput, addr, unitID, cb);
+    const result = this.handleReadRequest(DataArea.DiscreteInput, unitID, addr);
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for reading multiple discrete inputs.
+   * @param addr Address.
+   * @param length Number of inputs to read.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public getMultipleDiscreteInputs(
+    addr: number,
+    length: number,
+    unitID: number,
+    cb: FCallbackVal<boolean[]>,
+  ): void {
+    const result = this.handleReadRequest(
+      DataArea.DiscreteInput,
+      unitID,
+      addr,
+      length,
+    );
+    cb(result[0] as any, result[1]);
   }
 
   /**
@@ -288,7 +404,25 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<boolean>,
   ): void {
-    this.handleReadRequest(DataArea.Coil, addr, unitID, cb);
+    const result = this.handleReadRequest(DataArea.Coil, unitID, addr);
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for reading multiple coils.
+   * @param addr Address.
+   * @param length Number of coils to read.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public getMultipleCoils(
+    addr: number,
+    length: number,
+    unitID: number,
+    cb: FCallbackVal<boolean[]>,
+  ): void {
+    const result = this.handleReadRequest(DataArea.Coil, unitID, addr, length);
+    cb(result[0] as any, result[1]);
   }
 
   /**
@@ -302,7 +436,34 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<number>,
   ): void {
-    this.handleReadRequest(DataArea.HoldingRegister, addr, unitID, cb);
+    const result = this.handleReadRequest(
+      DataArea.HoldingRegister,
+      unitID,
+      addr,
+    );
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for reading multiple holding registers.
+   * @param addr Address.
+   * @param length Number of registers to read.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public getMultipleHoldingRegisters(
+    addr: number,
+    length: number,
+    unitID: number,
+    cb: FCallbackVal<number[]>,
+  ): void {
+    const result = this.handleReadRequest(
+      DataArea.HoldingRegister,
+      unitID,
+      addr,
+      length,
+    );
+    cb(result[0] as any, result[1]);
   }
 
   /**
@@ -316,7 +477,30 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<number>,
   ): void {
-    this.handleReadRequest(DataArea.InputRegister, addr, unitID, cb);
+    const result = this.handleReadRequest(DataArea.InputRegister, unitID, addr);
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for reading multiple input registers.
+   * @param addr Address.
+   * @param length Number of registers to read.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public getMultipleInputRegisters(
+    addr: number,
+    length: number,
+    unitID: number,
+    cb: FCallbackVal<number[]>,
+  ): void {
+    const result = this.handleReadRequest(
+      DataArea.InputRegister,
+      unitID,
+      addr,
+      length,
+    );
+    cb(result[0] as any, result[1]);
   }
 
   /**
@@ -332,7 +516,31 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<any>,
   ): void {
-    this.handleWriteRequest(DataArea.Coil, addr, unitID, value, cb);
+    const result = this.handleWriteRequest(DataArea.Coil, unitID, addr, value);
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for setting multiple coils.
+   * @param addr Address.
+   * @param values Values to set.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public setMultipleCoils(
+    addr: number,
+    values: boolean[],
+    unitID: number,
+    cb: FCallbackVal<any>,
+  ): void {
+    const result = this.handleWriteRequest(
+      DataArea.Coil,
+      unitID,
+      addr,
+      values,
+      values.length,
+    );
+    cb(result[0] as any, result[1]);
   }
 
   /**
@@ -348,111 +556,239 @@ export class ModbusDevice implements Modbus.IServiceVector {
     unitID: number,
     cb: FCallbackVal<any>,
   ): void {
-    this.handleWriteRequest(DataArea.HoldingRegister, addr, unitID, value, cb);
+    const result = this.handleWriteRequest(
+      DataArea.HoldingRegister,
+      unitID,
+      addr,
+      value,
+    );
+    cb(result[0] as any, result[1]);
   }
 
   /**
-   * Handles a read request for a specific data point.
+   * Modbus request handler for setting multiple holding registers.
+   * @param addr Address.
+   * @param values Values to set.
+   * @param unitID Unit ID.
+   * @param cb Callback function.
+   */
+  public setMultipleRegisters(
+    addr: number,
+    values: number[],
+    unitID: number,
+    cb: FCallbackVal<any>,
+  ): void {
+    const result = this.handleWriteRequest(
+      DataArea.HoldingRegister,
+      unitID,
+      addr,
+      values,
+      values.length,
+    );
+    cb(result[0] as any, result[1]);
+  }
+
+  /**
+   * Modbus request handler for reading multiple data points.
    * @param area The data area to read from.
-   * @param addr The address of the data point.
    * @param unitID The ID of the unit to read from.
-   * @param cb The callback function to call with the result.
+   * @param addr The address of the data point.
+   * @param length Optional length of data points to read.
+   * @returns A tuple containing an optional Modbus error and the read value(s).
    */
   private handleReadRequest(
     area: DataArea,
-    addr: number,
     unitID: number,
-    cb: FCallbackVal<any>,
-  ): void {
+    addr: number,
+    length: number = 1,
+  ): [{ modbusErrorCode: ModbusError } | null, value: any] {
+    // Array to hold the read data.
+    const data: any[] = [];
+
+    let functionCode;
+    switch (area) {
+      case DataArea.Coil:
+        functionCode = 1;
+        break;
+      case DataArea.DiscreteInput:
+        functionCode = 2;
+        break;
+      case DataArea.HoldingRegister:
+        functionCode = 3;
+        break;
+      case DataArea.InputRegister:
+        functionCode = 4;
+        break;
+    }
+
     // Check if unit exists.
     const unit = this.getUnit(unitID);
     if (unit === undefined) {
-      cb(
+      this.logModbusError(
+        unitID,
+        functionCode,
+        addr,
+        ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
+      );
+      return [
         {
           modbusErrorCode: ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
-        } as any,
+        },
         null,
-      );
-      return;
+      ];
     }
 
-    // Check if data point exists at the given address.
-    let dp = unit.getDataPointAt(area, addr);
-    if (dp === undefined) {
-      cb({ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS } as any, null);
-      return;
+    for (let i = addr; i <= addr + (length - 1); i++) {
+      // Check if data point exists at the given address.
+      let dp = unit.getDataPointAt(area, i);
+      if (dp === undefined) {
+        this.logModbusError(
+          unitID,
+          functionCode,
+          addr,
+          ModbusError.ILLEGAL_DATA_ADDRESS,
+          length > 1 ? length : undefined,
+        );
+        return [
+          {
+            modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS,
+          },
+          null,
+        ];
+      }
+
+      // Check if datapoint is write-only.
+      if (!dp.hasReadAccess()) {
+        this.logModbusError(
+          unitID,
+          functionCode,
+          addr,
+          ModbusError.ILLEGAL_DATA_ADDRESS,
+          length > 1 ? length : undefined,
+        );
+        return [
+          {
+            modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS,
+          },
+          null,
+        ];
+      }
+
+      // Calculate offset to base address for multi-register data points.
+      const offset = i - dp.getAddress();
+
+      const val = dp.getRegisterValue(offset, this.endian);
+
+      // Push the value to the data array.
+      if (length === 1) {
+        this.logModbusResponse(
+          unitID,
+          functionCode,
+          addr,
+          val,
+          length > 1 ? length : undefined,
+        );
+        return [null, val];
+      }
+
+      data.push(val);
     }
 
-    // Check if datapoint is write-only.
-    if (!dp.hasReadAccess()) {
-      cb({ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS } as any, null);
-      return;
-    }
-
-    // Calculate offset to base address for multi-register data points.
-    const offset = addr - dp.getAddress();
-
-    const val = dp.getRegisterValue(offset, this.endian);
-    // Return the value.
-    cb(null, dp.getRegisterValue(offset, this.endian));
+    this.logModbusResponse(unitID, functionCode, addr, data, length);
+    return [null, data];
   }
 
-  /**
-   * Modbus request handler for setting holding registers.
-   * @param area The data area to write to.
-   * @param addr The address of the data point.
-   * @param unitID The ID of the unit to write to.
-   * @param value The value to set.
-   * @param cb The callback function to call with the result.
-   */
   private handleWriteRequest(
     area: DataArea,
-    addr: number,
     unitID: number,
-    value: any,
-    cb: FCallbackVal<any>,
-  ): void {
+    addr: number,
+    value: number | boolean | number[] | boolean[],
+    length: number = 1,
+  ): [{ modbusErrorCode: ModbusError } | null, value: any] {
+    let functionCode: number = 0;
+    switch (area) {
+      case DataArea.Coil:
+        functionCode = Array.isArray(value) ? 15 : 5;
+        break;
+      case DataArea.HoldingRegister:
+        functionCode = Array.isArray(value) ? 16 : 6;
+        break;
+    }
+
     // Check if unit exists.
     const unit = this.getUnit(unitID);
     if (unit === undefined) {
-      cb(
+      this.logModbusError(
+        unitID,
+        functionCode,
+        addr,
+        ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
+        length > 1 ? length : undefined,
+        value,
+      );
+      return [
         {
           modbusErrorCode: ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
-        } as any,
+        },
         null,
-      );
-      return;
+      ];
     }
 
-    // Check if data point exists at the given address.
-    const dp = unit.getDataPointAt(area, addr);
-    if (dp === undefined) {
-      cb({ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS } as any, null);
-      return;
+    // Check if data points exist and have write access.
+    for (let i = addr; i <= addr + (length - 1); i++) {
+      // Check if data point exists at the given address.
+      const dp = unit.getDataPointAt(area, i);
+      if (dp === undefined) {
+        this.logModbusError(
+          unitID,
+          functionCode,
+          addr,
+          ModbusError.ILLEGAL_DATA_ADDRESS,
+          length > 1 ? length : undefined,
+          value,
+        );
+        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS }, null];
+      }
+
+      // Check if datapoint is read-only.
+      if (!dp.hasWriteAccess()) {
+        this.logModbusError(
+          unitID,
+          functionCode,
+          addr,
+          ModbusError.ILLEGAL_DATA_VALUE,
+          length > 1 ? length : undefined,
+          value,
+        );
+        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_VALUE }, null];
+      }
     }
 
-    // Check if datapoint is read-only.
-    if (!dp.hasWriteAccess()) {
-      cb({ modbusErrorCode: ModbusError.ILLEGAL_DATA_VALUE } as any, null);
-      return;
-    }
+    // Write the value(s).
+    for (let i = addr; i <= addr + (length - 1); i++) {
+      const dp = unit.getDataPointAt(area, i);
+      if (dp === undefined) continue; // Should not happen due to previous checks.
 
-    // Calculate offset to base address for multi-register data points.
-    const offset = addr - dp.getAddress();
+      // Calculate offset to base address for multi-register data points.
+      const offset = i - dp.getAddress();
 
-    // Set the value.
-    dp.setRegisterValue(value, false, offset, this.endian);
+      // Set the value.
+      const val = Array.isArray(value)
+        ? (value[i - addr] as number | boolean)
+        : value;
+      dp.setRegisterValue(val, false, offset, this.endian);
 
-    // Check if the value should be mapped to another data point.
-    const feedbackDpId = dp.getFeedbackDataPoint();
-    if (feedbackDpId !== undefined && unit.hasDataPoint(feedbackDpId)) {
-      // Get the feedback datapoint.
-      const feedbackDp = unit.getDataPoint(feedbackDpId);
-      feedbackDp?.setRegisterValue(value, true, offset, this.endian);
+      // Check if the value should be mapped to another data point.
+      const feedbackDpId = dp.getFeedbackDataPoint();
+      if (feedbackDpId !== undefined && unit.hasDataPoint(feedbackDpId)) {
+        // Get the feedback datapoint.
+        const feedbackDp = unit.getDataPoint(feedbackDpId);
+        feedbackDp?.setRegisterValue(val, true, offset, this.endian);
+      }
     }
 
     // Return success.
-    cb(null, value);
+    return [null, value];
   }
 
   // ~~~~~ Getter & Setter ~~~~~
@@ -519,5 +855,13 @@ export class ModbusDevice implements Modbus.IServiceVector {
    */
   public getAllUnits(): ModbusUnit[] {
     return Array.from(this.units.values());
+  }
+
+  /**
+   * Gets the loggers log messages.
+   * @returns Array of log messages.
+   */
+  public getLogs(): LogMessage[] {
+    return this.logger.getLogs();
   }
 }

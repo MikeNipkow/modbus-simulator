@@ -1,8 +1,13 @@
 import type { DataPoint } from "@/types/DataPoint";
 import { DataType } from "@/types/enums/DataType";
-import { deserializeValue, serializeValue } from "@/util/jsonUtils";
-import { getMaxValueForType, getMinValueForType } from "@/util/modbusUtils";
+import { serializeValue } from "@/util/jsonUtils";
+import {
+  deserializeValueForType,
+  getMaxValueForType,
+  getMinValueForType,
+} from "@/util/modbusUtils";
 import { Field, Input, NativeSelect } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 interface Props {
   datapoint: DataPoint;
@@ -10,21 +15,42 @@ interface Props {
 }
 
 const DefaultValueInput = ({ datapoint, onChange }: Props) => {
+  // Local state for input value.
+  const [value, setValue] = useState<string | number>(
+    datapoint.defaultValue as string | number,
+  );
+  const [invalid, setInvalid] = useState(false);
+
+  // Update local value when datapoint default value changes.
+  useEffect(() => {
+    setValue(datapoint.defaultValue as string | number);
+    setInvalid(false);
+  }, [datapoint.defaultValue]);
+
   // Handle change of default value for number data types.
   const handleNumberChange = (inputVal: string) => {
     // Deserialize input value based on datapoint type.
-    let value = deserializeValue(inputVal);
+    let value = deserializeValueForType(inputVal, datapoint.type);
 
     // Check if value is valid for the current data type.
-    if (typeof value !== "number" && typeof value !== "bigint") return;
+    if (typeof value === "number" || typeof value === "bigint") {
+      // Check if value is within allowed range.
+      const minAllowedValue = getMinValueForType(datapoint.type);
+      const maxAllowedValue = getMaxValueForType(datapoint.type);
+      if (value < minAllowedValue) value = minAllowedValue;
+      else if (value > maxAllowedValue) value = maxAllowedValue;
 
-    // Check if value is within allowed range.
-    const minAllowedValue = getMinValueForType(datapoint.type);
-    const maxAllowedValue = getMaxValueForType(datapoint.type);
-    if (value < minAllowedValue) value = minAllowedValue;
-    else if (value > maxAllowedValue) value = maxAllowedValue;
+      setInvalid(false);
+    } else {
+      value =
+        datapoint.type === DataType.Int64 || datapoint.type === DataType.UInt64
+          ? 0n
+          : 0;
+      setInvalid(true);
+    }
 
     // Create new datapoint with updated default value and value.
+    setValue(serializeValue(value) as string | number);
     const newDatapoint: DataPoint = {
       ...datapoint,
       defaultValue: serializeValue(value),
@@ -72,9 +98,11 @@ const DefaultValueInput = ({ datapoint, onChange }: Props) => {
       {datapoint.type !== DataType.ASCII &&
         datapoint.type !== DataType.Bool && (
           <Input
-            type="number"
-            value={datapoint.defaultValue as number}
-            onChange={(e) => handleNumberChange(e.target.value)}
+            type={"number"}
+            value={value}
+            onChange={(e) => setValue(e.target.value)}
+            onBlur={(e) => handleNumberChange(e.target.value)}
+            aria-invalid={invalid}
           />
         )}
 

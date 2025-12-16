@@ -4,6 +4,7 @@ import {
   createDeviceRoute,
   deleteDeviceRoute,
   downloadDeviceRoute,
+  getDeviceLogsRoute,
   getDeviceRoute,
   getDevicesRoute,
   startDeviceRoute,
@@ -53,6 +54,7 @@ export function initializeApiServer() {
 
   app.get("/api/v1/devices", getDevicesRoute);
   app.get("/api/v1/devices/:id", getDeviceRoute);
+  app.get("/api/v1/devices/:id/logs", getDeviceLogsRoute);
   app.get("/api/v1/devices/:id/download", downloadDeviceRoute);
   app.post("/api/v1/devices", createDeviceRoute);
   app.post("/api/v1/devices/:id/start", startDeviceRoute);
@@ -95,6 +97,7 @@ export function initializeApiServer() {
     uploadTemplateRoute,
   );
   app.get("/api/v1/templates/:id", getDeviceRoute);
+  app.get("/api/v1/templates/:id/logs", getDeviceLogsRoute);
   app.get("/api/v1/templates/:id/download", downloadDeviceRoute);
   app.post("/api/v1/templates", createDeviceRoute);
   app.delete("/api/v1/templates/:id", deleteDeviceRoute);

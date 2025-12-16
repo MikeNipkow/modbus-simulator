@@ -11,13 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import {
-  FaChevronDown,
-  FaChevronRight,
-  FaEdit,
-  FaPlus,
-  FaTrash,
-} from "react-icons/fa";
+import { FaChevronRight, FaEdit, FaPlus, FaTrash } from "react-icons/fa";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
 import DatapointTable from "./DatapointTable";
 import DatapointEditDialog from "@/components/editor/datapoint/DatapointEditDialog";
@@ -106,9 +100,11 @@ const UnitConfigurationCard = ({
               <HStack gap={4}>
                 {/* Collapsible trigger */}
                 <IconButton
-                  as={isOpen ? FaChevronDown : FaChevronRight}
+                  as={FaChevronRight}
                   padding="8px"
                   variant={"secondary"}
+                  transform={isOpen ? "rotate(90deg)" : "rotate(0deg)"}
+                  transition="transform 500ms ease"
                   onClick={() => setOpen(!isOpen)}
                 />
 

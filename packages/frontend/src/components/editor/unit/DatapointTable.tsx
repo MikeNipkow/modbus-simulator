@@ -2,8 +2,15 @@ import DatapointEditDialog from "@/components/editor/datapoint/DatapointEditDial
 import type { DataPoint } from "@/types/DataPoint";
 import type { ModbusDevice } from "@/types/ModbusDevice";
 import type { ModbusUnit } from "@/types/ModbusUnit";
-import { Badge, Button, HStack, Table } from "@chakra-ui/react";
-import { useState } from "react";
+import {
+  Badge,
+  Button,
+  HStack,
+  Table,
+  Skeleton,
+  VStack,
+} from "@chakra-ui/react";
+import { useState, useEffect } from "react";
 import DatapointRow from "./DatapointRow";
 
 interface Props {
@@ -19,6 +26,16 @@ const DatapointTable = ({ device, unit, allowPolling, onUpdate }: Props) => {
 
   // State to manage hex format usage.
   const [useHexFormat, setUseHexFormat] = useState(false);
+
+  // Show a lightweight placeholder while the heavy table rows are rendered.
+  const [showContent, setShowContent] = useState(false);
+
+  useEffect(() => {
+    // reset placeholder then allow content to render on next tick so browser can paint skeleton
+    setShowContent(false);
+    const id = setTimeout(() => setShowContent(true), 0);
+    return () => clearTimeout(id);
+  }, [unit.dataPoints?.length, useHexFormat]);
 
   return (
     <>
@@ -71,21 +88,34 @@ const DatapointTable = ({ device, unit, allowPolling, onUpdate }: Props) => {
           </Table.Row>
         </Table.Header>
 
-        {/* Map rows */}
+        {/* Map rows or show placeholder while content is prepared */}
         <Table.Body>
-          {unit.dataPoints
-            ?.sort((dpA, dpB) => dpA.address - dpB.address)
-            .map((datapoint) => (
-              <DatapointRow
-                device={device}
-                unit={unit}
-                datapoint={datapoint}
-                onDelete={onUpdate}
-                onEdit={() => setDpToEdit(datapoint)}
-                useHexFormat={useHexFormat}
-                allowPolling={allowPolling}
-              />
-            ))}
+          {!showContent ? (
+            <Table.Row>
+              <Table.Cell colSpan={8}>
+                <VStack align="stretch" gap={2}>
+                  {[...Array(unit.dataPoints?.length)].map((_, idx) => (
+                    <Skeleton key={idx} height="30px" borderRadius="md" />
+                  ))}
+                </VStack>
+              </Table.Cell>
+            </Table.Row>
+          ) : (
+            unit.dataPoints
+              ?.sort((dpA, dpB) => dpA.address - dpB.address)
+              .map((datapoint) => (
+                <DatapointRow
+                  key={datapoint.id}
+                  device={device}
+                  unit={unit}
+                  datapoint={datapoint}
+                  onDelete={onUpdate}
+                  onEdit={() => setDpToEdit(datapoint)}
+                  useHexFormat={useHexFormat}
+                  allowPolling={allowPolling}
+                />
+              ))
+          )}
         </Table.Body>
       </Table.Root>
     </>

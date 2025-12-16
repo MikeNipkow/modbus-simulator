@@ -1,8 +1,15 @@
 import type { DataPoint } from "@/types/DataPoint";
+import { DataType } from "@/types/enums/DataType";
 import type { SimulationProps } from "@/types/SimulationProps";
-import { deserializeValue } from "@/util/jsonUtils";
-import { getMaxValueForType, getMinValueForType } from "@/util/modbusUtils";
+import { serializeValue } from "@/util/jsonUtils";
+import {
+  deserializeValueForType,
+  getMaxValueForType,
+  getMinValueForType,
+  isBigIntType,
+} from "@/util/modbusUtils";
 import { Field, Input } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 
 interface Props {
   datapoint: DataPoint;
@@ -10,31 +17,60 @@ interface Props {
 }
 
 const MinValueInput = ({ datapoint, onChange }: Props) => {
-  const handleChange = (inputValue: any) => {
+  // Local state for input value.
+  const [value, setValue] = useState<string | number>(
+    datapoint.simulation?.minValue as string | number,
+  );
+  const [invalid, setInvalid] = useState(false);
+
+  // Update local value when datapoint default value changes.
+  useEffect(() => {
+    setValue(datapoint.simulation?.minValue as string | number);
+    setInvalid(false);
+  }, [datapoint.simulation?.minValue]);
+
+  const handleChange = (inputVal: any) => {
     // Deserialize input value based on datapoint type.
-    let value = deserializeValue(inputValue);
+    let value = deserializeValueForType(inputVal, datapoint.type);
 
     // Check if value is valid for the current data type.
-    if (typeof value !== "number" && typeof value !== "bigint") return;
-
-    const isBigIntType = typeof value === "bigint";
-
-    // Check if new value is larger than minValue.
-    const minAllowedValue = getMinValueForType(datapoint.type);
-    const maxAllowedValue = getMaxValueForType(datapoint.type);
-    if (value >= datapoint.simulation!.maxValue) {
-      value = isBigIntType
-        ? (datapoint.simulation!.maxValue as bigint) - 1n
-        : (datapoint.simulation!.maxValue as number) - 1;
-
+    if (typeof value === "number" || typeof value === "bigint") {
       // Check if value is within allowed range.
-      if (value < minAllowedValue || value > maxAllowedValue) return;
-    } else if (value < minAllowedValue) value = minAllowedValue;
-    else if (value > maxAllowedValue) value = maxAllowedValue;
+      const minAllowedValue = getMinValueForType(datapoint.type);
+      const maxAllowedValue = getMaxValueForType(datapoint.type);
 
-    // Create new datapoint with updated min value.
+      // Get highest possible minValue.
+      const maxValue: number | bigint = deserializeValueForType(
+        datapoint.simulation?.maxValue as string,
+        datapoint.type,
+      ) as number | bigint;
+      const highestPossibleMinValue =
+        maxValue > maxAllowedValue
+          ? maxAllowedValue
+          : isBigIntType(datapoint.type)
+            ? BigInt(maxValue) - 1n
+            : (maxValue as number) - 1;
+
+      if (value < minAllowedValue) value = minAllowedValue;
+      else if (value > highestPossibleMinValue) value = highestPossibleMinValue;
+
+      setInvalid(false);
+    } else {
+      value =
+        datapoint.type === DataType.Int64 || datapoint.type === DataType.UInt64
+          ? 0n
+          : 0;
+      setInvalid(true);
+    }
+
+    // Create new datapoint with updated default value and value.
+    const serializedVal = serializeValue(value) as string | number;
+    setValue(serializedVal);
     const simulationProps: SimulationProps | undefined = datapoint.simulation
-      ? { ...datapoint.simulation, minValue: value }
+      ? {
+          ...datapoint.simulation,
+          minValue: serializedVal,
+        }
       : undefined;
     const newDatapoint: DataPoint = {
       ...datapoint,
@@ -49,9 +85,11 @@ const MinValueInput = ({ datapoint, onChange }: Props) => {
     <Field.Root>
       <Field.Label>Min Value</Field.Label>
       <Input
-        type="number"
-        value={datapoint.simulation?.minValue as number}
-        onChange={(e) => handleChange(Number(e.target.value))}
+        type={"number"}
+        value={value}
+        onChange={(e) => setValue(e.target.value)}
+        onBlur={(e) => handleChange(e.target.value)}
+        aria-invalid={invalid}
       ></Input>
     </Field.Root>
   );

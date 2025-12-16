@@ -1,4 +1,5 @@
 import { DataType } from "../types/enums/DataType.js";
+import { deserializeValue } from "./jsonUtils.js";
 
 /**
  * Gets the number of Modbus registers required to store a value of the specified data type (except ASCII).
@@ -58,6 +59,15 @@ export function getJSTypeFromDataType(type: DataType): string {
     default:
       throw new Error(`Unsupported DataType ${type} for JS type mapping`);
   }
+}
+
+/**
+ * Checks if the given DataType corresponds to a BigInt type.
+ * @param type Data type to check.
+ * @returns True if the type is Int64 or UInt64, false otherwise.
+ */
+export function isBigIntType(type: DataType): boolean {
+  return type === DataType.Int64 || type === DataType.UInt64;
 }
 
 /**
@@ -158,4 +168,43 @@ export function getMaxValueForType(type: DataType): number | bigint {
   }
 
   throw new Error(`Type ${type} does not have a defined minimum value`);
+}
+
+/**
+ * Deserializes a string value into the appropriate JavaScript type based on the provided DataType.
+ * @param value String value to deserialize.
+ * @param type Data type to deserialize into.
+ * @returns Deserialized value in the appropriate JavaScript type, or null if deserialization fails.
+ */
+export function deserializeValueForType(
+  value: string,
+  type: DataType,
+): boolean | number | bigint | string | null {
+  switch (type) {
+    case DataType.Bool:
+      if (value.toLowerCase() === "true") return true;
+      if (value.toLowerCase() === "false") return false;
+      return null;
+
+    case DataType.Byte:
+    case DataType.Int16:
+    case DataType.Int32:
+    case DataType.UInt16:
+    case DataType.UInt32:
+    case DataType.Float32:
+      const num = Number(value);
+      if (isNaN(num)) return null;
+      return num;
+
+    case DataType.Int64:
+    case DataType.UInt64:
+      const bigint = deserializeValue(String(value));
+      if (typeof bigint !== "bigint") return null;
+      return bigint;
+
+    case DataType.ASCII:
+      return value;
+    default:
+      throw new Error(`Unsupported DataType ${type} for deserialization`);
+  }
 }
