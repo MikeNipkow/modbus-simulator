@@ -5,6 +5,7 @@ import DeviceEditor from "./components/editor/DeviceEditor";
 import useDevices from "./hooks/device/useDevices";
 import { Toaster } from "./components/ui/Toaster";
 import Navbar from "./components/navbar/Navbar";
+import { defaultBase, runtimeBase } from "./services/apiClient";
 
 function App() {
   // State to trigger device list refresh.
@@ -22,6 +23,13 @@ function App() {
 
   // Effect to handle URL-based device selection.
   useEffect(() => {
+    console.log("Default base: " + defaultBase);
+    console.log("Runtime base: " + runtimeBase);
+    console.log(
+      "Using base: " +
+        (runtimeBase && runtimeBase.length ? runtimeBase : defaultBase),
+    );
+    console.log("Window location: " + window.location);
     // Check if URL has device or template filename.
     const path = window.location.pathname || "";
 

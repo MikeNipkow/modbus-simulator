@@ -26,10 +26,12 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
           <FaGears />
           Modbus Units
         </Tabs.Trigger>
-        <Tabs.Trigger value="logs">
-          <LuFileClock />
-          Logs
-        </Tabs.Trigger>
+        {!device.template && (
+          <Tabs.Trigger value="logs">
+            <LuFileClock />
+            Logs
+          </Tabs.Trigger>
+        )}
       </Tabs.List>
       <Tabs.Content value="config">
         <VStack>
@@ -49,11 +51,13 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
           <UnitOverviewCard device={device} onUpdate={onUpdate} />
         </VStack>
       </Tabs.Content>
-      <Tabs.Content value="logs">
-        <VStack>
-          <DeviceLogTable device={device} />
-        </VStack>
-      </Tabs.Content>
+      {!device.template && (
+        <Tabs.Content value="logs">
+          <VStack>
+            <DeviceLogTable device={device} />
+          </VStack>
+        </Tabs.Content>
+      )}
     </Tabs.Root>
   );
 };

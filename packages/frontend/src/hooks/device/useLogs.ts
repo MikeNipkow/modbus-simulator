@@ -18,7 +18,6 @@ const useLogs = (device: ModbusDevice, deps?: any[]) => {
         )
         .then((response) => {
           setLogs(response.data);
-          console.log(response.data);
         })
         .catch((error) => {
           setErrors((prevErrors) => [...prevErrors, error.message]);

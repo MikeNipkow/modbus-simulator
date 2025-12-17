@@ -87,26 +87,6 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
         });
   };
 
-  // Handle starting the device
-  const handleStart = async () => {
-    // Start device via hook
-    const result = await startDevice(device);
-
-    // Trigger onUpdate callback if successful
-    if (result.success) onUpdate?.();
-
-    // Show toaster notification based on success or failure
-    result.success
-      ? createSuccessToast({
-          title: "Modbus Server started",
-          description: `Modbus Server for device "${device.filename}" has been started.`,
-        })
-      : createErrorToast({
-          title: "Error starting Modbus Server",
-          description: result.errors,
-        });
-  };
-
   // Handle saving device as template.
   const handleSaveAsTemplate = async () => {
     // Create a new device object based on the current device but marked as a template
@@ -133,6 +113,26 @@ const DeviceOverviewCard = ({ device, onUpdate, onDelete }: Props) => {
         })
       : createErrorToast({
           title: "Failed to save device as template",
+          description: result.errors,
+        });
+  };
+
+  // Handle starting the device
+  const handleStart = async () => {
+    // Start device via hook
+    const result = await startDevice(device);
+
+    // Trigger onUpdate callback if successful
+    if (result.success) onUpdate?.();
+
+    // Show toaster notification based on success or failure
+    result.success
+      ? createSuccessToast({
+          title: "Modbus Server started",
+          description: `Modbus Server for device "${device.filename}" has been started.`,
+        })
+      : createErrorToast({
+          title: "Error starting Modbus Server",
           description: result.errors,
         });
   };

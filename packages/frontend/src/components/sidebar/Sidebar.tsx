@@ -82,6 +82,10 @@ const Sidebar = ({
             icon={FaPlus}
             iconSize={3}
             label="Add Device"
+            border={"none"}
+            borderRadius={"none"}
+            borderLeft={!isTemplateSelected() ? "3px solid" : undefined}
+            borderColor={"primary"}
             onClick={() => setAddDialogVisible("device")}
           />
           {devices.map((device) => (
@@ -93,6 +97,10 @@ const Sidebar = ({
                   ? "bold"
                   : undefined
               }
+              border={"none"}
+              borderRadius={"none"}
+              borderLeft={!isTemplateSelected() ? "3px solid" : undefined}
+              borderColor={"primary"}
               onClick={() => onDeviceSelect(device)}
               data-active={
                 isDeviceSelected() &&
@@ -126,12 +134,20 @@ const Sidebar = ({
             icon={FaPlus}
             iconSize={3}
             label="Add Template"
+            border={"none"}
+            borderRadius={"none"}
+            borderLeft={isTemplateSelected() ? "3px solid" : undefined}
+            borderColor={"primary"}
             onClick={() => setAddDialogVisible("template")}
           />
           {templates.map((template) => (
             <SidebarButton
               variant="secondary"
               onClick={() => onDeviceSelect(template)}
+              borderRadius={"none"}
+              border={"none"}
+              borderLeft={isTemplateSelected() ? "3px solid" : undefined}
+              borderColor={"primary"}
               fontWeight={
                 isTemplateSelected() &&
                 selectedDevice?.filename === template.filename

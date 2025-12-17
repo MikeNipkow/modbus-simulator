@@ -66,7 +66,6 @@ export function dataPointDTOFromObject(obj: any): ParseResult<DataPointDTO> {
   if (value !== undefined) {
     // Validate value type.
     if (typeof value !== getJSTypeFromDataType(dp.getType())) {
-      console.log(typeof value, getJSTypeFromDataType(dp.getType()));
       errors.push(
         `DataPointDTO value type ${typeof value} does not match DataType for data point '${dp.getId()}'`,
       );

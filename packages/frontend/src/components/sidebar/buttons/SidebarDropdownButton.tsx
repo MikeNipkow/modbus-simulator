@@ -62,7 +62,7 @@ const SidebarDropdownButton = ({ icon, label, children, ...props }: Props) => {
 
   return (
     <Collapsible.Root defaultOpen width={"100%"}>
-      <Collapsible.Trigger width={"100%"}>
+      <Collapsible.Trigger asChild width={"100%"}>
         <SidebarButton
           width="100%"
           {...props}

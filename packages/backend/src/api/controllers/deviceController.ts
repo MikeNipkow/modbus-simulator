@@ -272,11 +272,7 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
   }
 
   // Try to add new device.
-  const addResult = deviceManager.addDevice(
-    newDevice.getFilename(),
-    newDevice,
-    isDeviceEndpoint(req),
-  );
+  const addResult = deviceManager.addDevice(newDevice.getFilename(), newDevice);
   if (!addResult) {
     // Try to add the old device back.
     deviceManager.addDevice(
