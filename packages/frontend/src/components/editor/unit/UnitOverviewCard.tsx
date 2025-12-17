@@ -14,8 +14,8 @@ import UnitConfigurationCard from "./UnitConfigurationCard";
 import { createErrorToast, createSuccessToast } from "../../ui/Toaster";
 import { useCreateUnit } from "@/hooks/unit/useCreateUnit";
 import type { ModbusDevice } from "@/types/ModbusDevice";
-import { Tooltip } from "@/components/ui/Tooltip";
 import { useState } from "react";
+import { Tooltip } from "@/components/ui/Tooltip";
 
 interface Props {
   device: ModbusDevice;

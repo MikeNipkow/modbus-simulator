@@ -5,6 +5,7 @@ import DeviceEditor from "./components/editor/DeviceEditor";
 import useDevices from "./hooks/device/useDevices";
 import { Toaster } from "./components/ui/Toaster";
 import Navbar from "./components/navbar/Navbar";
+import Overview from "./components/Overview";
 
 function App() {
   // State to trigger device list refresh.
@@ -136,6 +137,7 @@ function App() {
 
         {/* Main Content */}
         <GridItem background={"bg.dark"}>
+          {getSelectedDevice() === null && <Overview />}
           {getSelectedDevice() !== null && (
             <DeviceEditor
               device={getSelectedDevice()!}
