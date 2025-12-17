@@ -68,7 +68,6 @@ Create a `docker-compose.yml` at the repository root (example below) to run fron
 Example `docker-compose.yml`:
 
 ```yaml
-version: "3.8"
 services:
   backend:
     container_name: modbus-simulator-backend
