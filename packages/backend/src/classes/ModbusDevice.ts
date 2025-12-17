@@ -183,7 +183,6 @@ export class ModbusDevice implements Modbus.IServiceVector {
       this.server = new Modbus.ServerTCP(this, {
         host: "0.0.0.0",
         port: this.port,
-        debug: true,
       });
 
       // Check if server was started successfully.

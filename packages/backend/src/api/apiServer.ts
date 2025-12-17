@@ -127,8 +127,9 @@ export function initializeApiServer() {
     updateDataPointRoute,
   );
 
-  const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-  app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
+  const port = process.env.API_PORT ? parseInt(process.env.API_PORT, 10) : 3000;
+  const host = "0.0.0.0";
+  app.listen(port, host, () => {
+    console.log(`Server running on http://${host}:${port}`);
   });
 }
