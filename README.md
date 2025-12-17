@@ -73,6 +73,9 @@ services:
     container_name: modbus-simulator-backend
     image: ghcr.io/mikenipkow/modbus-simulator-backend:latest
     network_mode: host
+#    ports:
+#      - 3000:3000
+#      - 502:502
     environment:
       - NODE_ENV=production
 
