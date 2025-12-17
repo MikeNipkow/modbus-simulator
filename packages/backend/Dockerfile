@@ -21,6 +21,7 @@ ENV NODE_ENV=production
 # copy built artifacts and package files
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
+COPY /templates ./dist/templates
 
 # install only production deps
 RUN if [ -f package-lock.json ]; then npm ci --production --silent; else npm install --production --silent; fi
