@@ -1,4 +1,4 @@
-import { DataPoint } from "../src/DataPoint.js";
+import { DataPoint } from "../src/classes/DataPoint.js";
 import { dataPointFromObject, dataPointToDataPointProps } from "../src/mapper/DataPointMapper.js";
 import { AccessMode } from "../src/types/enums/AccessMode.js";
 import { DataArea } from "../src/types/enums/DataArea.js";
