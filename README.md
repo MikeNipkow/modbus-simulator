@@ -81,8 +81,8 @@ services:
     image: ghcr.io/mikenipkow/modbus-simulator-frontend:latest
     ports:
       - "8080:80"
-    environment:
-      - API_URL=http://127.0.0.1:3000/api/v1
+#    environment:
+#      - API_URL=http://127.0.0.1:3000/api/v1
     depends_on:
       - backend
 ```
