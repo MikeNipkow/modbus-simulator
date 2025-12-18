@@ -275,16 +275,11 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
   const addResult = deviceManager.addDevice(
     newDevice.getFilename(),
     newDevice,
-    isDeviceEndpoint(req),
+    isDeviceEndpoint(req) && newDevice.isEnabled(),
   );
   if (!addResult) {
     // Try to add the old device back.
-    deviceManager.addDevice(
-      device.getFilename(),
-      device,
-      isDeviceEndpoint(req),
-    );
-    if (wasRunning) await device.startServer();
+    deviceManager.addDevice(device.getFilename(), device, wasRunning);
 
     // Save old device.
     deviceManager.saveDevice(device.getFilename());
@@ -295,10 +290,8 @@ export const updateDeviceRoute = async (req: Request, res: Response) => {
     return;
   }
 
-  // Save new device and start server if enabled.
+  // Save new device.
   deviceManager.saveDevice(newDevice.getFilename());
-  if (newDevice.isEnabled() && !isTemplateEndpoint(req))
-    await newDevice.startServer();
 
   res.status(200).json(deviceToDeviceDTO(newDevice, !isDeviceEndpoint(req)));
 };
