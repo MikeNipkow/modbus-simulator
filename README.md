@@ -60,6 +60,7 @@ docker run -d -p 8080:80 --name=modbus-simulator-frontend ghcr.io/mikenipkow/mod
 
 Notes:
 
+- To automatically start the containers after rebooting the device, you will need to set the restart-policy to e.g. `--restart unless-stopped`.
 - Using `--net=host` you **do not need to expose every port individually**, which allows you to run multiple servers with different ports without requiring additional configuration. Keep in mind that this may lead to address conflicts on your machine.
 - If you do not use port 3000 for your backend api, or if the backend is running on a different ip address, use the `-e API_URL=http://127.0.0.1:3000/api/v1` environment variable to point the frontend to your backend API. If not provided, the frontend will default to `http://<current-host>:3000/api/v1`.
 
