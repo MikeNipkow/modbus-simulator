@@ -5,6 +5,7 @@ This repository contains a **Modbus-TCP simulator**.
 The system is split into a backend software using Node.JS and a web-frontend using React. The backend offers a **REST-API** to allow communication to the web-frontend and other systems.
 
 ## Features
+
 - Server-side installation using **Docker**
 - **JSON template** files can be up- and downloaded
 - Communication **logging**
@@ -44,12 +45,15 @@ Prerequisites: Docker Engine installed.
 ```bash
 docker run -d --net=host --name=modbus-simulator-backend ghcr.io/mikenipkow/modbus-simulator-backend:latest
 ```
-*OR*
+
+_OR_
+
 ```bash
 docker run -d -p 3000:3000 -p 502:502 -p 503:503 --name=modbus-simulator-backend ghcr.io/mikenipkow/modbus-simulator-backend:latest
 ```
 
 2. Run frontend container
+
 ```bash
 docker run -d -p 8080:80 --name=modbus-simulator-frontend ghcr.io/mikenipkow/modbus-simulator-frontend:latest
 ```
@@ -57,9 +61,9 @@ docker run -d -p 8080:80 --name=modbus-simulator-frontend ghcr.io/mikenipkow/mod
 Notes:
 
 - Using `--net=host` you **do not need to expose every port individually**, which allows you to run multiple servers with different ports without requiring additional configuration. Keep in mind that this may lead to address conflicts on your machine.
-- Use the `-e API_URL=http://127.0.0.1:3000/api/v1` environment variable to point the frontend to your backend API, if you do not use port 3000 or if the backend container is running on a different address. If not provided, the frontend will default to `http://<current-host>:3000/api/v1`.
+- If you do not use port 3000 for your backend api, or if the backend is running on a different ip address, use the `-e API_URL=http://127.0.0.1:3000/api/v1` environment variable to point the frontend to your backend API. If not provided, the frontend will default to `http://<current-host>:3000/api/v1`.
 
-___
+---
 
 ### Docker Compose (recommended)
 
@@ -73,9 +77,9 @@ services:
     container_name: modbus-simulator-backend
     image: ghcr.io/mikenipkow/modbus-simulator-backend:latest
     network_mode: host
-#    ports:
-#      - 3000:3000
-#      - 502:502
+    #    ports:
+    #      - 3000:3000
+    #      - 502:502
     environment:
       - NODE_ENV=production
 
@@ -84,8 +88,8 @@ services:
     image: ghcr.io/mikenipkow/modbus-simulator-frontend:latest
     ports:
       - "8080:80"
-#    environment:
-#      - API_URL=http://127.0.0.1:3000/api/v1
+    #    environment:
+    #      - API_URL=http://127.0.0.1:3000/api/v1
     depends_on:
       - backend
 ```
