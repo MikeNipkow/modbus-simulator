@@ -65,7 +65,7 @@ Notes:
 
 ---
 
-### Docker Compose (recommended)
+### Docker Compose
 
 Create a `docker-compose.yml` at the repository root (example below) to run frontend and backend together.
 
