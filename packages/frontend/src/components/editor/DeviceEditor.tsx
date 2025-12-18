@@ -28,7 +28,6 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
     <Tabs.Root
       fitted
       variant={"line"}
-      defaultValue="config"
       value={activeTab}
       onValueChange={(e) => setActiveTab(e.value)}
     >

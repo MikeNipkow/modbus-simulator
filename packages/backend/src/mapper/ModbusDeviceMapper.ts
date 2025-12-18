@@ -3,6 +3,7 @@ import { Endian } from "../types/enums/Endian.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
 import { ModbusDeviceProps } from "../types/ModbusDeviceProps.js";
 import { isValidFilename } from "../util/fileUtils.js";
+import { isInteger } from "../util/utilMath.js";
 import { unitFromObject, unitToUnitProps } from "./ModbusUnitMapper.js";
 
 /**
@@ -63,8 +64,12 @@ export function deviceFromObject(
 
   // Check port.
   const port = obj.port;
+
+  // Port is required.
   if (port === undefined || typeof port !== "number")
     errors.push("ModbusDevice must have a valid port number");
+  else if (!isInteger(port))
+    errors.push("ModbusDevice port must be an integer");
   else if (port < 1 || port > 65535)
     errors.push("ModbusDevice port must be between 1 and 65535");
 

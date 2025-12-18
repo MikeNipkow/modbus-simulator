@@ -23,10 +23,47 @@ const ChangeUnitIdDialog = ({
   onChange,
 }: Props) => {
   // State to manage the new unit ID input.
+  const [unitIdInput, setUnitIdInput] = useState(unit.unitId.toString());
+
+  // State to manage the new unit ID as number.
   const [newUnitId, setNewUnitId] = useState<number>(unit.unitId);
 
   // Hook for updating unit.
   const { updateUnit, isLoading } = useUpdateUnit();
+
+  /**
+   * Handle port input change and validation.
+   * @param value New port value as string.
+   */
+  const handleUnitIdInput = (value: string) => {
+    // Check if value can be parsed to number.
+    const parsedValue = Number(value);
+    if (value.length === 0 || isNaN(parsedValue)) {
+      setUnitIdInput(newUnitId.toString());
+      return;
+    }
+
+    // Check for valid unit id number.
+    if (parsedValue < 1) {
+      setUnitIdInput("1");
+      setNewUnitId(1);
+      return;
+    }
+    if (parsedValue > 254) {
+      setUnitIdInput("254");
+      setNewUnitId(254);
+      return;
+    }
+
+    // Check if value is integer.
+    if (!Number.isInteger(parsedValue)) {
+      setUnitIdInput(Math.trunc(parsedValue).toString());
+      setNewUnitId(Math.trunc(parsedValue));
+      return;
+    }
+
+    setNewUnitId(parsedValue);
+  };
 
   /**
    * Handle changing the unit ID.
@@ -71,12 +108,9 @@ const ChangeUnitIdDialog = ({
         <Field.Label>Unit-ID</Field.Label>
         <Input
           type="number"
-          value={newUnitId}
-          onChange={(e) =>
-            1 <= Number(e.target.value) && Number(e.target.value) <= 254
-              ? setNewUnitId(Number(e.target.value))
-              : null
-          }
+          value={unitIdInput}
+          onChange={(e) => setUnitIdInput(e.target.value)}
+          onBlur={(e) => handleUnitIdInput(e.target.value)}
         />
       </Field.Root>
     </BaseDialog>

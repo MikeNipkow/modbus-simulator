@@ -24,6 +24,9 @@ interface Props {
 }
 
 const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
+  // State to manage port input as string.
+  const [port, setPort] = useState<string>(device.port.toString());
+
   // State to manage editable device fields.
   const [editDevice, setEditDevice] = useState<ModbusDevice>({ ...device });
 
@@ -48,6 +51,40 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
     if (editDevice[field] === value) return;
     setEditDevice((prev) => ({ ...prev, [field]: value }));
     setDataChanged(true);
+  };
+
+  /**
+   * Handle port input change and validation.
+   * @param value New port value as string.
+   */
+  const handlePortChange = (value: string) => {
+    // Check if value can be parsed to number.
+    const parsedValue = Number(value);
+    if (value.length === 0 || isNaN(parsedValue)) {
+      setPort(editDevice.port.toString());
+      return;
+    }
+
+    // Check for valid port number.
+    if (parsedValue < 0) {
+      setField("port", 0);
+      setPort("0");
+      return;
+    }
+    if (parsedValue > 65535) {
+      setField("port", 65535);
+      setPort("65535");
+      return;
+    }
+
+    // Check if value is integer.
+    if (!Number.isInteger(parsedValue)) {
+      setField("port", Math.trunc(parsedValue));
+      setPort(Math.trunc(parsedValue).toString());
+      return;
+    }
+
+    setField("port", parsedValue);
   };
 
   /**
@@ -122,8 +159,9 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
                 <Field.Label>Port</Field.Label>
                 <Input
                   type="number"
-                  value={editDevice.port}
-                  onChange={(e) => setField("port", Number(e.target.value))}
+                  value={port}
+                  onChange={(e) => setPort(e.target.value)}
+                  onBlur={(e) => handlePortChange(e.target.value)}
                 />
               </Field.Root>
 
@@ -191,6 +229,7 @@ const DeviceConfigurationCard = ({ device, onUpdate }: Props) => {
             variant="outline"
             onClick={() => {
               setEditDevice({ ...device });
+              setPort(device.port.toString());
               setDataChanged(false);
             }}
             disabled={!dataChanged}

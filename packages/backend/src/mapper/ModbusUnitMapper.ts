@@ -1,6 +1,7 @@
 import { ModbusUnit } from "../classes/ModbusUnit.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
 import { ModbusUnitProps } from "../types/ModbusUnitProps.js";
+import { isInteger } from "../util/utilMath.js";
 import {
   dataPointFromObject,
   dataPointToDataPointProps,
@@ -43,6 +44,12 @@ export function unitFromObject(obj: any): ParseResult<ModbusUnit> {
   const unitId: number = obj.unitId;
   if (unitId === undefined || unitId < 1 || unitId > 254) {
     errors.push("ModbusUnit unitId must be between 1 and 254");
+    return { success: false, errors: errors };
+  }
+
+  // Check if unitId is integer.
+  if (!isInteger(unitId)) {
+    errors.push("ModbusUnit unitId must be an integer");
     return { success: false, errors: errors };
   }
 

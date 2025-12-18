@@ -7,6 +7,7 @@ import {
   getMaxValueForType,
   getMinValueForType,
   isBigIntType,
+  isIntType,
 } from "@/util/modbusUtils";
 import { Field, Input } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -35,6 +36,9 @@ const MinValueInput = ({ datapoint, onChange }: Props) => {
 
     // Check if value is valid for the current data type.
     if (typeof value === "number" || typeof value === "bigint") {
+      // Check if value is integer for integer types.
+      if (isIntType(datapoint.type)) value = Math.trunc(value as number);
+
       // Check if value is within allowed range.
       const minAllowedValue = getMinValueForType(datapoint.type);
       const maxAllowedValue = getMaxValueForType(datapoint.type);
@@ -49,7 +53,7 @@ const MinValueInput = ({ datapoint, onChange }: Props) => {
           ? maxAllowedValue
           : isBigIntType(datapoint.type)
             ? BigInt(maxValue) - 1n
-            : (maxValue as number) - 1;
+            : (maxValue as number) - (isIntType(datapoint.type) ? 1 : 0.1);
 
       if (value < minAllowedValue) value = minAllowedValue;
       else if (value > highestPossibleMinValue) value = highestPossibleMinValue;

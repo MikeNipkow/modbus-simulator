@@ -5,6 +5,7 @@ import {
   deserializeValueForType,
   getMaxValueForType,
   getMinValueForType,
+  isIntType,
 } from "@/util/modbusUtils";
 import { Field, Input, NativeSelect } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
@@ -34,6 +35,9 @@ const DefaultValueInput = ({ datapoint, onChange }: Props) => {
 
     // Check if value is valid for the current data type.
     if (typeof value === "number" || typeof value === "bigint") {
+      // Check if value is integer for integer types.
+      if (isIntType(datapoint.type)) value = Math.trunc(value as number);
+
       // Check if value is within allowed range.
       const minAllowedValue = getMinValueForType(datapoint.type);
       const maxAllowedValue = getMaxValueForType(datapoint.type);

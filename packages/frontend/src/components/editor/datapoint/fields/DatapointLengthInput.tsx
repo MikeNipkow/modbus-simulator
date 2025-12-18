@@ -1,5 +1,6 @@
 import type { DataPoint } from "@/types/DataPoint";
 import { Field, Input, Text } from "@chakra-ui/react";
+import { useState } from "react";
 
 interface Props {
   datapoint: DataPoint;
@@ -7,16 +8,47 @@ interface Props {
 }
 
 const DatapointLengthInput = ({ datapoint, onChange }: Props) => {
-  // Handle change of length input.
-  const handleChange = (value: number) => {
-    // Validate length.
-    if (value < 1) value = 1;
-    if (value > 16) value = 16;
+  // State to manage length input as string.
+  const [lengthInput, setLengthInput] = useState<string>(
+    datapoint.length?.toString() || "1",
+  );
 
-    // Update datapoint length.
+  // Handle change of length input.
+  const handleChange = (value: string) => {
+    // Check if value can be parsed to number.
+    const parsedValue = Number(value);
+    if (value.length === 0 || isNaN(parsedValue)) {
+      setLengthInput(datapoint.length?.toString() || "1");
+      return;
+    }
+
+    // Validate length.
+    if (parsedValue < 1) {
+      setLengthField(1);
+      setLengthInput("1");
+      return;
+    }
+    if (parsedValue > 16) {
+      setLengthField(16);
+      setLengthInput("16");
+      return;
+    }
+
+    // Check if value is integer.
+    if (!Number.isInteger(parsedValue)) {
+      setLengthField(Math.trunc(parsedValue));
+      setLengthInput(Math.trunc(parsedValue).toString());
+      return;
+    }
+
+    // Notify parent component.
+    setLengthField(parsedValue);
+  };
+
+  const setLengthField = (length: number) => {
     const newDatapoint: DataPoint = {
       ...datapoint,
-      length: value,
+      length: length,
     };
 
     // Adjust defaultValue and value according to new length.
@@ -26,12 +58,14 @@ const DatapointLengthInput = ({ datapoint, onChange }: Props) => {
     ) {
       newDatapoint.defaultValue = "";
       newDatapoint.value = "";
-    } else if (newDatapoint.defaultValue.length > value * 2) {
-      newDatapoint.defaultValue = newDatapoint.defaultValue.slice(0, value * 2);
-      newDatapoint.value = newDatapoint.value.slice(0, value * 2);
+    } else if (newDatapoint.defaultValue.length > length * 2) {
+      newDatapoint.defaultValue = newDatapoint.defaultValue.slice(
+        0,
+        length * 2,
+      );
+      newDatapoint.value = newDatapoint.value.slice(0, length * 2);
     }
 
-    // Notify parent component.
     onChange(newDatapoint);
   };
 
@@ -42,8 +76,9 @@ const DatapointLengthInput = ({ datapoint, onChange }: Props) => {
       </Field.Label>
       <Input
         type="number"
-        value={datapoint.length || 1}
-        onChange={(e) => handleChange(Number(e.target.value))}
+        value={lengthInput}
+        onChange={(e) => setLengthInput(e.target.value)}
+        onBlur={(e) => handleChange(e.target.value)}
       ></Input>
     </Field.Root>
   );

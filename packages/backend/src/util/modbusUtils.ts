@@ -71,6 +71,21 @@ export function isBigIntType(type: DataType): boolean {
 }
 
 /**
+ * Checks if the given DataType corresponds to an integer type.
+ * @param type Data type to check.
+ * @returns True if the type is an integer type, false otherwise.
+ */
+export function isIntegerType(type: DataType): boolean {
+  return (
+    type === DataType.Byte ||
+    type === DataType.Int16 ||
+    type === DataType.Int32 ||
+    type === DataType.UInt16 ||
+    type === DataType.UInt32
+  );
+}
+
+/**
  * Gets the default value for a given DataType.
  * @param type Data type.
  * @returns Default value corresponding to the data type.

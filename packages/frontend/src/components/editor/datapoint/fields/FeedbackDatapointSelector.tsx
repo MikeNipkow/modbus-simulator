@@ -18,9 +18,31 @@ const FeedbackDatapointSelector = ({
   datapoints,
   onSelect,
 }: Props) => {
+  // Function to generate label for a datapoint.
+  const getLabel = (dp: DataPoint) => {
+    const areas = "[" + dp.areas?.join(", ") + "]";
+    return (
+      areas +
+      " Address " +
+      dp.address +
+      " - " +
+      (dp.name?.length !== 0 ? dp.name : "Unnamed")
+    );
+  };
+
+  // Get the currently selected feedback datapoint.
+  const getCurrentFeedbackDatapoint = () => {
+    if (!datapoint.feedbackDataPoint) return undefined;
+    return datapoints?.find((dp) => dp.id === datapoint.feedbackDataPoint);
+  };
+
   // Collection of datapoints for selection.
   const datapointCollection = createListCollection({
-    items: datapoints?.map((dp) => ({ value: dp.id, label: dp.name })) || [],
+    items:
+      datapoints
+        ?.filter((dp) => dp.id !== datapoint.id)
+        .filter((dp) => dp.type === datapoint.type)
+        .map((dp) => ({ value: dp.id, label: getLabel(dp) })) || [],
   });
 
   // Filter out the current datapoint from the list.
@@ -47,13 +69,17 @@ const FeedbackDatapointSelector = ({
       <Combobox.Root
         collection={collection}
         onInputValueChange={(e) => filter(e.inputValue)}
-        onSelect={(e) => handleSelect(e.itemValue)}
+        onValueChange={(e) => handleSelect(e.value[0])}
       >
         <Combobox.Label>Feedback Datapoint</Combobox.Label>
         <Combobox.Control>
           <Combobox.Input
             placeholder="Type to search"
-            value={datapoint.feedbackDataPoint}
+            defaultValue={
+              getCurrentFeedbackDatapoint() !== undefined
+                ? getLabel(getCurrentFeedbackDatapoint()!)
+                : ""
+            }
           />
           <Combobox.IndicatorGroup>
             <Combobox.ClearTrigger />

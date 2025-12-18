@@ -6,10 +6,13 @@ import {
   getJSTypeFromDataType,
   getMaxValueForType,
   getMinValueForType,
+  isIntegerType,
 } from "../util/modbusUtils.js";
 import { ParseResult } from "../types/enums/ParseResult.js";
 import { serializeValue, deserializeValue } from "../util/jsonUtils.js";
 import { DataPoint } from "../classes/DataPoint.js";
+import { isInteger } from "../util/utilMath.js";
+import { get } from "http";
 
 /**
  * Maps a DataPoint to its DataPointProps representation.
@@ -109,6 +112,7 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
   if (
     obj.address === undefined ||
     typeof obj.address !== "number" ||
+    !isInteger(obj.address) ||
     obj.address < 0 ||
     obj.address > 65535
   )
@@ -133,6 +137,28 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
         `DataPoint defaultValue type does not match DataType ${obj.type}`,
       );
       return { success: false, errors: errors };
+    }
+
+    if (isIntegerType(obj.type) && !isInteger(defaultValue)) {
+      errors.push(
+        `DataPoint defaultValue must be an integer for DataType ${obj.type}`,
+      );
+      return { success: false, errors: errors };
+    }
+
+    if (obj.type !== DataType.Bool && obj.type !== DataType.ASCII) {
+      if (defaultValue < getMinValueForType(obj.type)) {
+        errors.push(
+          `DataPoint defaultValue is out of range for DataType ${obj.type}`,
+        );
+        return { success: false, errors: errors };
+      }
+      if (defaultValue > getMaxValueForType(obj.type)) {
+        errors.push(
+          `DataPoint defaultValue is out of range for DataType ${obj.type}`,
+        );
+        return { success: false, errors: errors };
+      }
     }
   }
 
@@ -161,7 +187,11 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
   // Add length if type is ASCII.
   if (obj.type === DataType.ASCII) {
     // Validate length.
-    if (typeof obj.length !== "number" || obj.length < 1) {
+    if (
+      typeof obj.length !== "number" ||
+      !isInteger(obj.length) ||
+      obj.length < 1
+    ) {
       errors.push(
         "DataPoint of type ASCII must have a valid length greater than 0",
       );
@@ -215,7 +245,40 @@ export function dataPointFromObject(obj: any): ParseResult<DataPoint> {
       );
       return { success: false, errors: errors };
     }
+    if (isIntegerType(type) && !isInteger(minValue)) {
+      errors.push(
+        `DataPoint simulation minValue must be an integer for type ${type} in data point '${id}'`,
+      );
+      return { success: false, errors: errors };
+    }
+    if (
+      type !== DataType.Bool &&
+      type !== DataType.ASCII &&
+      minValue < getMinValueForType(type)
+    ) {
+      errors.push(
+        `DataPoint simulation minValue is out of range for type ${type} in data point '${id}'`,
+      );
+      return { success: false, errors: errors };
+    }
+
     if (maxValue > getMaxValueForType(type)) {
+      errors.push(
+        `DataPoint simulation maxValue is out of range for type ${type} in data point '${id}'`,
+      );
+      return { success: false, errors: errors };
+    }
+    if (isIntegerType(type) && !isInteger(maxValue)) {
+      errors.push(
+        `DataPoint simulation maxValue must be an integer for type ${type} in data point '${id}'`,
+      );
+      return { success: false, errors: errors };
+    }
+    if (
+      type !== DataType.Bool &&
+      type !== DataType.ASCII &&
+      maxValue > getMaxValueForType(type)
+    ) {
       errors.push(
         `DataPoint simulation maxValue is out of range for type ${type} in data point '${id}'`,
       );
