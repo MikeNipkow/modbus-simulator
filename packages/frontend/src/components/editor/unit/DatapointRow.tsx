@@ -45,7 +45,7 @@ const DatapointRow = ({
   // Refresh datapoint value every second.
   useEffect(() => {
     if (!allowPolling) return;
-    if (!datapoint.simulation?.enabled) return;
+    //if (!datapoint.simulation?.enabled) return;
     const id = setInterval(() => setRefreshTrigger({}), 1000);
     return () => clearInterval(id);
   }, [datapoint.simulation?.enabled, allowPolling]);

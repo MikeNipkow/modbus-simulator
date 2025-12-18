@@ -19,10 +19,11 @@ import { Tooltip } from "@/components/ui/Tooltip";
 
 interface Props {
   device: ModbusDevice;
+  isActive?: boolean;
   onUpdate?: () => void;
 }
 
-const UnitOverviewCard = ({ device, onUpdate }: Props) => {
+const UnitOverviewCard = ({ device, isActive, onUpdate }: Props) => {
   // State for polling option.
   const [allowPolling, setAllowPolling] = useState(false);
 
@@ -137,7 +138,7 @@ const UnitOverviewCard = ({ device, onUpdate }: Props) => {
               key={unit.unitId}
               device={device}
               unit={unit}
-              allowPolling={allowPolling}
+              allowPolling={allowPolling && isActive}
               onUpdate={onUpdate}
             />
           ))}

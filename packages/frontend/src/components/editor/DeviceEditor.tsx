@@ -7,6 +7,7 @@ import { LuFileClock } from "react-icons/lu";
 import { FaInfo } from "react-icons/fa";
 import { FaGears } from "react-icons/fa6";
 import DeviceLogTable from "./device/DeviceLogTable";
+import { useState } from "react";
 
 interface Props {
   device: ModbusDevice;
@@ -15,8 +16,16 @@ interface Props {
 }
 
 const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
+  // State to manage the active tab.
+  const [activeTab, setActiveTab] = useState<string>("config");
+
   return (
-    <Tabs.Root fitted variant={"line"} defaultValue="config">
+    <Tabs.Root
+      fitted
+      variant={"line"}
+      defaultValue="config"
+      onValueChange={(e) => setActiveTab(e.value)}
+    >
       <Tabs.List>
         <Tabs.Trigger value="config">
           <FaInfo />
@@ -48,13 +57,17 @@ const DeviceEditor = ({ device, onUpdate, onDelete }: Props) => {
       <Tabs.Content value="units">
         <VStack>
           {/* Unit Overview */}
-          <UnitOverviewCard device={device} onUpdate={onUpdate} />
+          <UnitOverviewCard
+            device={device}
+            onUpdate={onUpdate}
+            isActive={activeTab === "units"}
+          />
         </VStack>
       </Tabs.Content>
       {!device.template && (
         <Tabs.Content value="logs">
           <VStack>
-            <DeviceLogTable device={device} />
+            <DeviceLogTable device={device} isActive={activeTab === "logs"} />
           </VStack>
         </Tabs.Content>
       )}
