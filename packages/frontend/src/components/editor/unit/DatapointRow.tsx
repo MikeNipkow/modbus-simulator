@@ -95,7 +95,7 @@ const DatapointRow = ({
               : "")}
         </Badge>
       </Table.Cell>
-      <Table.Cell>{datapoint.areas}</Table.Cell>
+      <Table.Cell>{datapoint.areas.toSorted().join(", ")}</Table.Cell>
       <Table.Cell>
         {useHexFormat
           ? "16#" + datapoint.address.toString(16)
