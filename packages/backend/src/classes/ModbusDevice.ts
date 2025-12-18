@@ -28,7 +28,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
   private running: boolean = false;
 
   // Logger.
-  private logger: Logger = new Logger(100);
+  private logger: Logger = new Logger(200);
 
   /**
    * Creates a new ModbusDevice instance.
