@@ -641,7 +641,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
         {
           modbusErrorCode: ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
         },
-        null,
+        [],
       ];
     }
 
@@ -660,7 +660,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
           {
             modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS,
           },
-          null,
+          [],
         ];
       }
 
@@ -677,7 +677,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
           {
             modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS,
           },
-          null,
+          [],
         ];
       }
 
@@ -737,7 +737,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
         {
           modbusErrorCode: ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
         },
-        null,
+        [],
       ];
     }
 
@@ -754,7 +754,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
           length > 1 ? length : undefined,
           value,
         );
-        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS }, null];
+        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_ADDRESS }, []];
       }
 
       // Check if datapoint is read-only.
@@ -767,7 +767,7 @@ export class ModbusDevice implements Modbus.IServiceVector {
           length > 1 ? length : undefined,
           value,
         );
-        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_VALUE }, null];
+        return [{ modbusErrorCode: ModbusError.ILLEGAL_DATA_VALUE }, []];
       }
     }
 
