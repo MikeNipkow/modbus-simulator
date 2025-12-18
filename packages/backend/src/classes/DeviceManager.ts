@@ -54,6 +54,7 @@ export class DeviceManager {
    * Adds a new device.
    * @param filename Filename of the device.
    * @param device The ModbusDevice instance to add.
+   * @param startServer Whether to start the Modbus server for the device after adding. Default is false.
    * @returns True if the device was added successfully, false if a device with the same filename already exists.
    */
   public addDevice(
