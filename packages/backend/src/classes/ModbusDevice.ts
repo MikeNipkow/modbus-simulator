@@ -139,7 +139,12 @@ export class ModbusDevice implements Modbus.IServiceVector {
     this.enabled = true;
 
     // Start server.
-    return this.startServer();
+    return this.startServer().then((result) => {
+      // Start simulations.
+      if (result.success) this.startAllEnabledSimulations();
+
+      return result;
+    });
   }
 
   /**
@@ -150,7 +155,12 @@ export class ModbusDevice implements Modbus.IServiceVector {
     this.enabled = false;
 
     // Stop server.
-    return this.stopServer();
+    return this.stopServer().then((result) => {
+      // Stop simulations.
+      if (result.success) this.stopAllSimulations();
+
+      return result;
+    });
   }
 
   /**

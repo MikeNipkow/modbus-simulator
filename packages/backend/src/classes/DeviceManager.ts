@@ -69,7 +69,7 @@ export class DeviceManager {
     this.devices.set(filename, device);
 
     // Enable simulation if configured.
-    if (startServer) device.startAllEnabledSimulations();
+    if (startServer && device.isEnabled()) device.startAllEnabledSimulations();
 
     // Start the Modbus server if requested.
     if (startServer && device.isEnabled()) device.startServer();
