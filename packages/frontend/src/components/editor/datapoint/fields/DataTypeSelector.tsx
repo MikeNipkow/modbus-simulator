@@ -49,6 +49,7 @@ const DataTypeSelector = ({ datapoint, onSelect }: Props) => {
         collection={dataTypes}
         value={[datapoint.type]}
         onSelect={(newType) => handleSelect(newType.value as DataType)}
+        positioning={{ strategy: "fixed", hideWhenDetached: true }}
       >
         <Select.HiddenSelect />
         <Select.Control>
