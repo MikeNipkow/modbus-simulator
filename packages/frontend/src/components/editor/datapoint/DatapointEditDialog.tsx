@@ -171,7 +171,7 @@ const DatapointEditDialog = ({
         onCheckedChange={() => setShowAdvancedSettings(!showAdvancedSettings)}
       >
         <Checkbox.HiddenInput />
-        <Checkbox.Control />
+        <Checkbox.Control background={"primary"} border={"none"} />
         <Checkbox.Label>Show advanced settings</Checkbox.Label>
       </Checkbox.Root>
 

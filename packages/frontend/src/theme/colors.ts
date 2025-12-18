@@ -1,7 +1,7 @@
 export const colors = {
   primary: {
-    value: "#81A938",
-    hover: { value: "#6d8f30" },
+    value: "#6EC800",
+    hover: { value: "#63B400" },
     contrast: { value: "white" },
   },
   fg: {
