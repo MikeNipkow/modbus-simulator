@@ -88,6 +88,7 @@ export function getDefaultValueForType(
     case DataType.UInt16:
     case DataType.UInt32:
     case DataType.Float32:
+    case DataType.Float64:
       return 0;
 
     case DataType.Int64:
@@ -192,6 +193,7 @@ export function deserializeValueForType(
     case DataType.UInt16:
     case DataType.UInt32:
     case DataType.Float32:
+    case DataType.Float64:
       const num = Number(value);
       if (isNaN(num)) return null;
       return num;

@@ -88,11 +88,11 @@ export function getDefaultValueForType(
     case DataType.UInt16:
     case DataType.UInt32:
     case DataType.Float32:
+    case DataType.Float64:
       return 0;
 
     case DataType.Int64:
     case DataType.UInt64:
-    case DataType.Float64:
       return BigInt(0);
 
     case DataType.ASCII:

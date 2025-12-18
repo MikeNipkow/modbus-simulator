@@ -1,4 +1,5 @@
 import type { DataPoint } from "@/types/DataPoint";
+import { DataArea } from "@/types/enums/DataArea";
 import { DataType } from "@/types/enums/DataType";
 import { serializeValue } from "@/util/jsonUtils";
 import { getDefaultValueForType } from "@/util/modbusUtils";
@@ -28,6 +29,10 @@ const DataTypeSelector = ({ datapoint, onSelect }: Props) => {
       defaultValue: defaultValue,
       value: defaultValue,
       length: newType === DataType.ASCII ? 1 : undefined,
+      areas:
+        datapoint.type !== newType && datapoint.type === DataType.Bool
+          ? [DataArea.HoldingRegister]
+          : datapoint.areas,
       simulation: {
         enabled: false,
         minValue: 0,
