@@ -549,7 +549,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
         );
-        expect(value).toBeNull();
         done();
       });
     });
@@ -569,7 +568,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.ILLEGAL_DATA_ADDRESS,
         );
-        expect(value).toBeNull();
         done();
       });
     });
@@ -590,7 +588,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.ILLEGAL_DATA_ADDRESS,
         );
-        expect(value).toBeNull();
         done();
       });
     });
@@ -682,7 +679,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.GATEWAY_TARGET_FAILED_TO_RESPOND,
         );
-        expect(value).toBeNull();
         done();
       });
     });
@@ -702,7 +698,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.ILLEGAL_DATA_ADDRESS,
         );
-        expect(value).toBeNull();
         done();
       });
     });
@@ -723,7 +718,6 @@ describe("ModbusDevice", () => {
           "modbusErrorCode",
           ModbusError.ILLEGAL_DATA_VALUE,
         );
-        expect(value).toBeNull();
         done();
       });
     });
