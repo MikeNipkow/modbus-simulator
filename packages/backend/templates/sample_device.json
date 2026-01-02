@@ -11,9 +11,7 @@
       "dataPoints": [
         {
           "id": "sample_coil_1",
-          "areas": [
-            "Coil"
-          ],
+          "areas": ["Coil"],
           "type": "Bool",
           "address": 0,
           "accessMode": "RO",
@@ -28,9 +26,7 @@
         },
         {
           "id": "sample_discreteInput_1",
-          "areas": [
-            "DiscreteInput"
-          ],
+          "areas": ["DiscreteInput"],
           "type": "Bool",
           "address": 0,
           "accessMode": "RO",
@@ -45,9 +41,7 @@
         },
         {
           "id": "sample_holdingRegister_1",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Byte",
           "address": 0,
           "accessMode": "RW",
@@ -62,9 +56,7 @@
         },
         {
           "id": "sample_inputRegister_1",
-          "areas": [
-            "InputRegister"
-          ],
+          "areas": ["InputRegister"],
           "type": "Float32",
           "address": 0,
           "accessMode": "RO",
@@ -79,9 +71,7 @@
         },
         {
           "id": "sample_coil_2",
-          "areas": [
-            "Coil"
-          ],
+          "areas": ["Coil"],
           "type": "Bool",
           "address": 1,
           "accessMode": "RW",
@@ -97,9 +87,7 @@
         },
         {
           "id": "sample_holdingRegister_2",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "UInt16",
           "address": 10,
           "accessMode": "RW",
@@ -114,9 +102,7 @@
         },
         {
           "id": "sample_holdingRegister_3",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "UInt32",
           "address": 11,
           "accessMode": "RW",
@@ -131,9 +117,7 @@
         },
         {
           "id": "sample_holdingRegister_4",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "UInt64",
           "address": 13,
           "accessMode": "RW",
@@ -148,9 +132,7 @@
         },
         {
           "id": "sample_holdingRegister_5",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Int16",
           "address": 17,
           "accessMode": "RW",
@@ -165,9 +147,7 @@
         },
         {
           "id": "sample_holdingRegister_6",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Int32",
           "address": 18,
           "accessMode": "RW",
@@ -182,9 +162,7 @@
         },
         {
           "id": "sample_holdingRegister_7",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Int64",
           "address": 20,
           "accessMode": "RW",
@@ -199,9 +177,7 @@
         },
         {
           "id": "sample_holdingRegister_8",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Float32",
           "address": 24,
           "accessMode": "RW",
@@ -216,9 +192,7 @@
         },
         {
           "id": "sample_holdingRegister_9",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Float64",
           "address": 26,
           "accessMode": "RW",
@@ -233,9 +207,7 @@
         },
         {
           "id": "sample_holdingRegister_10",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "ASCII",
           "address": 30,
           "accessMode": "RW",
@@ -251,9 +223,7 @@
         },
         {
           "id": "sample_holdingRegister_11",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Float32",
           "address": 100,
           "accessMode": "RW",
@@ -268,9 +238,7 @@
         },
         {
           "id": "sample_holdingRegister_12",
-          "areas": [
-            "HoldingRegister"
-          ],
+          "areas": ["HoldingRegister"],
           "type": "Float32",
           "address": 102,
           "accessMode": "RW",
@@ -286,10 +254,7 @@
         },
         {
           "id": "sample_inputRegister_2",
-          "areas": [
-            "InputRegister",
-            "HoldingRegister"
-          ],
+          "areas": ["InputRegister", "HoldingRegister"],
           "type": "Float32",
           "address": 200,
           "accessMode": "RO",

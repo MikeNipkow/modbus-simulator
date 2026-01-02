@@ -705,6 +705,15 @@ export class ModbusDevice implements Modbus.IServiceVector {
     return [null, data];
   }
 
+  /**
+   * Modbus request handler for writing data points.
+   * @param area The data area to write to.
+   * @param unitID The ID of the unit to write to.
+   * @param addr The address of the data point.
+   * @param value The value(s) to write.
+   * @param length Optional length of data points to write.
+   * @returns A tuple containing an optional Modbus error and the written value(s).
+   */
   private handleWriteRequest(
     area: DataArea,
     unitID: number,
